@@ -1,6 +1,7 @@
 const { print } = require('gluegun/print')
 const { bins } = require('../config/environment')
 const childProcess = require('child_process')
+const projectTypes = require('../config/project-types')
 const promptValidator = require('../validators/general')
 
 const description = 'Create a named migration file'
@@ -9,11 +10,9 @@ module.exports = {
   name: 'migrate:make',
   description: description,
   run: async (context) => {
-    const { filesystem, parameters, system, prompt } = context
+    const { parameters, system, prompt } = context
 
-    if (!filesystem.exists('.wizard')) {
-      print.error(`This project is not managed by Wizard`)
-
+    if (!context.canRunCommand(projectTypes.backendExpress)) {
       return
     }
 

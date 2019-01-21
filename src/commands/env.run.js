@@ -1,6 +1,7 @@
 const { print } = require('gluegun/print')
 const { bins } = require('../config/environment')
 const childProcess = require('child_process')
+const projectTypes = require('../config/project-types')
 
 const description = 'Runs the app in the docker container'
 
@@ -8,11 +9,9 @@ module.exports = {
   name: 'env:run',
   description: description,
   run: async (context) => {
-    const { filesystem, parameters, system } = context
+    const { parameters, system } = context
 
-    if (!filesystem.exists('.wizard')) {
-      print.error(`This project is not managed by Wizard`)
-
+    if (!context.canRunCommand(projectTypes.backendExpress)) {
       return
     }
 

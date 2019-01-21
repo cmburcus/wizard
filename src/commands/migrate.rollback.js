@@ -1,6 +1,7 @@
 const { print } = require('gluegun/print')
 const { bins } = require('../config/environment')
 const childProcess = require('child_process')
+const projectTypes = require('../config/project-types')
 
 const description = 'Rollback the last set of migrations performed'
 
@@ -8,11 +9,9 @@ module.exports = {
   name: 'migrate:rollback',
   description: description,
   run: async (context) => {
-    const { filesystem, parameters, system } = context
+    const { parameters, system } = context
 
-    if (!filesystem.exists('.wizard')) {
-      print.error(`This project is not managed by Wizard`)
-
+    if (!context.canRunCommand(projectTypes.backendExpress)) {
       return
     }
 

@@ -1,6 +1,7 @@
 const { print } = require('gluegun/print')
 const { builds, dockerfiles } = require('../config/environment')
 const childProcess = require('child_process')
+const projectTypes = require('../config/project-types')
 
 const description = 'Stops the docker containers if they are running (dev by default)'
 
@@ -8,11 +9,9 @@ module.exports = {
   name: 'env:stop',
   description: description,
   run: async (context) => {
-    const { filesystem, parameters, system } = context
+    const { parameters, system } = context
 
-    if (!filesystem.exists('.wizard')) {
-      print.error(`This project is not managed by Wizard`)
-
+    if (!context.canRunCommand(projectTypes.backendExpress)) {
       return
     }
 

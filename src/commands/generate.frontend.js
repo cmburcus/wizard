@@ -13,13 +13,8 @@ module.exports = {
   run: async (context) => {
     const { print, prompt } = context
 
-    // Checking if we're already in a project directory
-    if (filesystem.exists('.wizard')) {
-      print.error(`This folder is a project managed by Wizard.`)
-
-      if (!await prompt.confirm('Continue anyway')) {
-        return
-      }
+    if (!context.canRunCommand()) {
+      return
     }
 
     print.info(`Generating ${projectTypes.frontendReactMap}...`.yellow)

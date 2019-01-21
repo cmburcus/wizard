@@ -1,7 +1,8 @@
-const { print } = require('gluegun/print')
+const { print, filesystem } = require('gluegun')
 const { version } = require('../../package')
 
 const commandTypes = require('../config/command-types')
+const projectTypes = require('../config/project-types')
 
 /**
  * Displays help message
@@ -70,22 +71,28 @@ module.exports = (context) => {
     printCommandsByType(context.plugin.commands, commandTypes.global)
 
     // Generator commands
-    print.info('generate'.yellow)
-    printCommandsByType(context.plugin.commands, commandTypes.generate)
+    if (!context.isProject()) {
+      print.info('generate'.yellow)
+      printCommandsByType(context.plugin.commands, commandTypes.generate)
+    }
 
     // Environment commands
-    print.info('environment'.yellow)
-    printCommandsByType(context.plugin.commands, commandTypes.environment)
+    if (context.isBackendExpressProject()) {
+      print.info('environment'.yellow)
+      printCommandsByType(context.plugin.commands, commandTypes.environment)
+    }
 
     // Migration commands
-    print.info('migrate'.yellow)
-    printCommandsByType(context.plugin.commands, commandTypes.migrate)
+    if (context.isBackendExpressProject()) {
+      print.info('migrate'.yellow)
+      printCommandsByType(context.plugin.commands, commandTypes.migrate)
+    }
 
     // Seed commands
-    print.info('seed'.yellow)
-    printCommandsByType(context.plugin.commands, commandTypes.seed)
-
-    // print.printHelp(context)
+    if (context.isBackendExpressProject()) {
+      print.info('seed'.yellow)
+      printCommandsByType(context.plugin.commands, commandTypes.seed)
+    }
   }
 }
 
