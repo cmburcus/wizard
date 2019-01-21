@@ -1,0 +1,23 @@
+'use strict';
+
+/**
+ * Configuration file to be used for routes
+ */
+
+const routeApiPrefix = 'api';
+const routeVersions = {
+  v1: 'v1',
+};
+const routes = [
+  
+];
+
+module.exports = {
+  setRoutes: (app) => {
+    routes.forEach((route) => {
+      app.use(`/${routeApiPrefix}/${route.version}/${route.route}`, require(route.path));
+    });
+
+    return app;
+  },
+};

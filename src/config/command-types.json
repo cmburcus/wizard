@@ -1,0 +1,15 @@
+{
+  "global": ["help"],
+  "generate": ["generate:backend", "generate:frontend"],
+  "environment": [
+    "env:build",
+    "env:run",
+    "env:stop",
+    "env:test",
+    "env:ssh",
+    "env:logs",
+    "env:format"
+  ],
+  "migrate": ["migrate:latest", "migrate:rollback", "migrate:version", "migrate:make"],
+  "seed": ["seed:run", "seed:make"]
+}

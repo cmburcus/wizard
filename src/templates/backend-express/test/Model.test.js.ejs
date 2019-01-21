@@ -1,0 +1,50 @@
+'use strict';
+
+const chai = require('chai');
+
+const expect = chai.expect;
+const AbstractModel = require('../resources/Model');
+
+describe('TESTING: Objection Model', () => {
+  it('it should create a new instance of Model', () => {
+    const model = new AbstractModel();
+
+    expect(model).to.be.an('object');
+  });
+
+  it('it should have static function pickJsonSchemaProperties', () => {
+    const result = AbstractModel.pickJsonSchemaProperties;
+
+    expect(result).to.be.a('boolean');
+  });
+
+  it('it should set the created_at and updated_at dates on $beforeInsert', () => {
+    const model = new AbstractModel();
+
+    model.$beforeInsert();
+
+    expect(model).to.have.property('created_at').be.a('string');
+    expect(model).to.have.property('updated_at').be.a('string');
+  });
+
+  it('it should update updated_at before a model update if created_at does not exist', () => {
+    const model = new AbstractModel();
+
+    model.$beforeUpdate();
+
+    expect(model).to.not.have.property('created_at');
+    expect(model).to.have.property('updated_at').be.a('string');
+  });
+
+  it('it should delete created_at and update updated_at before a model update if created_at exists', () => {
+    const model = new AbstractModel();
+
+    model.created_at = 'created at';
+    model.updated_at = 'updated at';
+
+    model.$beforeUpdate();
+
+    expect(model).to.not.have.property('created_at');
+    expect(model).to.have.property('updated_at').be.a('string').and.not.equal('updated at');
+  });
+});

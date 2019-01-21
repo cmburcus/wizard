@@ -1,0 +1,36 @@
+'use strict';
+
+const errorUtil = require('error-util');
+const express = require('express');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const Knex = require('knex');
+const databaseConfig = require('./config/database');
+const routesConfig = require('./config/routes');
+const Model = require('objection').Model;
+
+require('dotenv').config();
+
+const app = express();
+
+// Initialize knex.
+/* istanbul ignore next */
+const knex = Knex(databaseConfig[app.get('env') || 'development']);
+
+// Bind all Models to a knex instance. If you only have one database in
+// your server this is all you have to do. For multi database systems, see
+// the Model.bindKnex method.
+Model.knex(knex);
+
+app.use(logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+
+routesConfig.setRoutes(app);
+
+// Error and 404 handlers
+app.use(errorUtil.notFoundHandler);
+app.use(errorUtil.errorHandler);
+
+module.exports = app;

@@ -1,0 +1,31 @@
+'use strict';
+
+const ObjectionModel = require('objection').Model;
+
+/**
+ * Base model to be used by any objection models
+ */
+class Model extends ObjectionModel {
+  // If this is true only properties in jsonSchema are picked when inserting or updating a row in the database.
+  static get pickJsonSchemaProperties() {
+    return true;
+  }
+
+  // Sets created_at and updated_at to current time
+  $beforeInsert() {
+    this.created_at = new Date().toISOString();
+    this.updated_at = new Date().toISOString();
+  }
+
+  // Removes created_at so that it doesn't get updated
+  // Sets updated_at to current time
+  $beforeUpdate() {
+    if (this.created_at) {
+      delete this.created_at;
+    }
+
+    this.updated_at = new Date().toISOString();
+  }
+}
+
+module.exports = Model;

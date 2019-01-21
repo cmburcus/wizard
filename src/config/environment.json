@@ -1,0 +1,17 @@
+{
+  "builds": {
+    "dev": "dev",
+    "test": "test",
+    "prod": "prod"
+  },
+  "dockerfiles": {
+    "main": "docker-compose.yml",
+    "dev": "docker-compose.dev.yml",
+    "test": "docker-compose.test.yml"
+  },
+  "bins": {
+    "node": "node",
+    "knex": "node_modules/.bin/knex",
+    "knexfile": "database/knexfile.js"
+  }
+}

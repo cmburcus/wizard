@@ -1,0 +1,44 @@
+{
+  "name": "<%= props.projectNameAlias %>",
+  "author": "<%= props.authorName %>",
+  "version": "0.0.1",
+  "private": true,
+  "engines": {
+    "node": "<%= props.nodeVersion %>"
+  },
+  "scripts": {
+    "node:dev": "DEBUG=app:* && nodemon ./bin/www",
+    "node:prod": "DEBUG=app:* && node ./bin/www",
+    "node:test": "DEBUG=app:* && nyc mocha -c -t 10000 --recursive --exit",
+    "format": "eslint --quiet --report-unused-disable-directives --fix '**/*.js' || true"
+  },
+  "dependencies": {
+    "cookie-parser": "1.4.3",
+    "debug": "2.6.9",
+    "dotenv": "5.0.1",
+    "express": "4.16.0",
+    "http-errors": "1.6.2",
+    "http-status": "1.1.2",
+    "joi": "13.4.0",
+    "knex": "0.14.6",
+    "morgan": "1.9.0",
+    "objection": "1.1.10",
+    "objection-filters-util": "git+ssh://git@github.com:cmburcus/util_ObjectionFilters.git#v1.0",
+    "pg": "7.4.3",
+    "pg-hstore": "2.3.2",
+    "validator-util": "git+ssh://git@github.com:cmburcus/util_Validator.git#v0.1.1",
+    "error-util": "git+ssh://git@github.com:cmburcus/util_Errors.git#v0.1"
+  },
+  "devDependencies": {
+    "chai": "4.1.2",
+    "chai-http": "4.0.0",
+    "eslint": "4.19.1",
+    "eslint-config-prettier": "2.9.0",
+    "eslint-plugin-node": "6.0.1",
+    "eslint-plugin-prettier": "2.6.0",
+    "mocha": "5.2.0",
+    "nodemon": "1.17.3",
+    "nyc": "12.0.2",
+    "prettier": "1.13.0"
+  }
+}
