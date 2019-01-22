@@ -8,91 +8,91 @@ const projectTypes = require('../project-types')
 module.exports = (answers) => {
   const environment = [
     {
-      template: 'backend-express/package.json.ejs',
+      template: 'backend-express/bare/package.json.ejs',
       target: `${answers.folderName}/package.json`,
       props: answers
     }, {
-      template: 'backend-express/.node-version.ejs',
+      template: 'backend-express/bare/.node-version.ejs',
       target: `${answers.folderName}/.node-version`,
       props: answers
     }, {
-      template: 'backend-express/.gitignore.ejs',
+      template: 'backend-express/bare/.gitignore.ejs',
       target: `${answers.folderName}/.gitignore`
     }, {
-      template: 'backend-express/.eslintrc.ejs',
+      template: 'backend-express/bare/.eslintrc.ejs',
       target: `${answers.folderName}/.eslintrc`
     }, {
-      template: 'backend-express/.env.example.ejs',
+      template: 'backend-express/bare/.env.example.ejs',
       target: `${answers.folderName}/.env.example`
     }
   ]
 
   const docker = [
     {
-      template: 'backend-express/node.dev.Dockerfile.ejs',
+      template: 'backend-express/bare/node.dev.Dockerfile.ejs',
       target: `${answers.folderName}/node.dev.Dockerfile`,
       props: answers
     }, {
-      template: 'backend-express/node.test.Dockerfile.ejs',
+      template: 'backend-express/bare/node.test.Dockerfile.ejs',
       target: `${answers.folderName}/node.test.Dockerfile`,
       props: answers
     }, {
-      template: 'backend-express/docker-compose.yml.ejs',
+      template: 'backend-express/bare/docker-compose.yml.ejs',
       target: `${answers.folderName}/docker-compose.yml`
     }, {
-      template: 'backend-express/docker-compose.dev.yml.ejs',
+      template: 'backend-express/bare/docker-compose.dev.yml.ejs',
       target: `${answers.folderName}/docker-compose.dev.yml`,
       props: answers
     }, {
-      template: 'backend-express/docker-compose.test.yml.ejs',
+      template: 'backend-express/bare/docker-compose.test.yml.ejs',
       target: `${answers.folderName}/docker-compose.test.yml`,
       props: answers
     }, {
-      template: 'backend-express/.dockerignore.ejs',
+      template: 'backend-express/bare/.dockerignore.ejs',
       target: `${answers.folderName}/.dockerignore`
     }
   ]
 
   const database = [
     {
-      template: 'backend-express/config/database.js.ejs',
+      template: 'backend-express/bare/config/database.js.ejs',
       target: `${answers.folderName}/config/database.js`,
       props: answers
     }, {
-      template: 'backend-express/database/knexfile.js.ejs',
+      template: 'backend-express/bare/database/knexfile.js.ejs',
       target: `${answers.folderName}/database/knexfile.js`
     }, {
-      template: 'backend-express/database/migration.stub.ejs',
+      template: 'backend-express/bare/database/migration.stub.ejs',
       target: `${answers.folderName}/database/migration.stub`
     }
   ]
 
   const app = [
     {
-      template: 'backend-express/app.js.ejs',
+      template: 'backend-express/bare/app.js.ejs',
       target: `${answers.folderName}/app.js`
     }, {
-      template: 'backend-express/bin/www.ejs',
+      template: 'backend-express/bare/bin/www.ejs',
       target: `${answers.folderName}/bin/www`,
       props: answers
     }, {
-      template: 'backend-express/config/routes.js.ejs',
+      template: 'backend-express/bare/config/routes.js.ejs',
       target: `${answers.folderName}/config/routes.js`
     }, {
-      template: 'backend-express/resources/Model.js.ejs',
+      template: 'backend-express/bare/resources/Model.js.ejs',
       target: `${answers.folderName}/resources/Model.js`
     }
   ]
 
   const testing = [
     {
-      template: 'backend-express/nodemon.json.ejs',
+      template: 'backend-express/bare/nodemon.json.ejs',
       target: `${answers.folderName}/nodemon.json`
     }, {
-      template: 'backend-express/.nycrc.ejs',
+      template: 'backend-express/bare/.nycrc.ejs',
       target: `${answers.folderName}/.nycrc`
     }, {
-      template: 'backend-express/test/Model.test.js.ejs',
+      template: 'backend-express/bare/test/Model.test.js.ejs',
       target: `${answers.folderName}/test/Model.test.js`
     }
   ]
