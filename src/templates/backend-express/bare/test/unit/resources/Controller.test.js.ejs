@@ -1,0 +1,226 @@
+'use strict';
+
+const chai = require('chai');
+
+const expect = chai.expect;
+const AbstractController = require('../../../resources/Controller');
+
+// Mocking service so that we don't touch the database
+const service = {
+  query: () => [{ col: 'value' }, { col: 'value' }],
+  show: (id) => (id ? { col: 'value' } : null),
+  create: (record) => record,
+  update: (id, record) => record,
+  delete: (id) => (id ? 1 : null),
+};
+const controller = AbstractController(service);
+
+// Global variables used to monitor the results
+let status = null;
+let result = null;
+let error = null;
+
+// Mocked response and next functions
+const response = {
+  status: (returnedStatus) => {
+    status = returnedStatus;
+
+    return {
+      json: (returnedRecords) => {
+        result = returnedRecords;
+      },
+    };
+  },
+};
+const next = (returnedError) => {
+  error = returnedError;
+  status = returnedError.status || 500;
+};
+
+describe('TESTING: Controller class', () => {
+  beforeEach(() => {
+    status = null;
+    result = null;
+    error = null;
+  });
+
+  describe('Controller.query', () => {
+    it('it should be able to perform a query operation', async () => {
+      const request = {};
+
+      try {
+        await controller.query(request, response, next);
+      } catch (codeError) {
+        error = codeError;
+      }
+
+      expect(status).to.equal(200);
+      expect(result)
+        .to.be.an('array')
+        .and.have.lengthOf(2);
+      expect(result)
+        .to.have.nested.property('[0]')
+        .be.an('object');
+      expect(result)
+        .to.have.nested.property('[1]')
+        .be.an('object');
+    });
+
+    it('it should handle errors', async () => {
+      try {
+        await controller.query(null, null, next);
+      } catch (codeError) {
+        error = codeError;
+      }
+
+      expect(status).to.equal(500);
+      expect(result).to.be.null;
+      expect(error).to.be.an('error');
+    });
+  });
+
+  describe('Controller.show', () => {
+    it('it should be able to retrieve one record by id', async () => {
+      const request = { params: { id: 1 } };
+
+      try {
+        await controller.show(request, response, next);
+      } catch (codeError) {
+        error = codeError;
+      }
+
+      expect(status).to.equal(200);
+      expect(result).to.be.an('object');
+    });
+
+    it('it should handle a not found record', async () => {
+      const request = { params: {} };
+
+      try {
+        await controller.show(request, response, next);
+      } catch (codeError) {
+        error = codeError;
+      }
+
+      expect(status).to.equal(404);
+      expect(result).to.be.null;
+    });
+
+    it('it should handle errors', async () => {
+      try {
+        await controller.show(null, null, next);
+      } catch (codeError) {
+        error = codeError;
+      }
+
+      expect(status).to.equal(500);
+      expect(result).to.be.null;
+      expect(error).to.be.an('error');
+    });
+  });
+
+  describe('Controller.create', () => {
+    it('it should be able to perform a create operation', async () => {
+      const request = { body: { col: 'value' } };
+
+      try {
+        await controller.create(request, response, next);
+      } catch (codeError) {
+        error = codeError;
+      }
+
+      expect(status).to.equal(201);
+      expect(result)
+        .to.be.an('object')
+        .and.have.property('col')
+        .equal('value');
+    });
+
+    it('it should handle errors', async () => {
+      try {
+        await controller.create(null, null, next);
+      } catch (codeError) {
+        error = codeError;
+      }
+
+      expect(status).to.equal(500);
+      expect(result).to.be.null;
+      expect(error).to.be.an('error');
+    });
+  });
+
+  describe('Controller.update', () => {
+    it('it should be able to perform an update operation', async () => {
+      const request = {
+        params: { id: 1 },
+        body: { col: 'value' },
+      };
+
+      try {
+        await controller.update(request, response, next);
+      } catch (codeError) {
+        error = codeError;
+      }
+
+      expect(status).to.equal(200);
+      expect(result)
+        .to.be.an('object')
+        .and.have.property('col')
+        .equal('value');
+    });
+
+    it('it should handle errors', async () => {
+      try {
+        await controller.update(null, null, next);
+      } catch (codeError) {
+        error = codeError;
+      }
+
+      expect(status).to.equal(500);
+      expect(result).to.be.null;
+      expect(error).to.be.an('error');
+    });
+  });
+
+  describe('Controller.delete', () => {
+    it('it should be able to perform a delete operation', async () => {
+      const request = { params: { id: 1 } };
+
+      try {
+        await controller.delete(request, response, next);
+      } catch (codeError) {
+        error = codeError;
+      }
+
+      expect(status).to.equal(200);
+      expect(result)
+        .to.be.a('number')
+        .and.equal(1);
+    });
+
+    it('it should handle a not found record', async () => {
+      const request = { params: {} };
+
+      try {
+        await controller.delete(request, response, next);
+      } catch (codeError) {
+        error = codeError;
+      }
+
+      expect(status).to.equal(404);
+      expect(result).to.be.null;
+    });
+
+    it('it should handle errors', async () => {
+      try {
+        await controller.delete(null, null, next);
+      } catch (codeError) {
+        error = codeError;
+      }
+
+      expect(status).to.equal(500);
+      expect(result).to.be.null;
+      expect(error).to.be.an('error');
+    });
+  });
+});

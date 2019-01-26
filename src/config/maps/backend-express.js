@@ -24,7 +24,7 @@ module.exports = (answers) => {
     }, {
       template: 'backend-express/bare/.env.example.ejs',
       target: `${answers.folderName}/.env.example`
-    }
+    },
   ]
 
   const docker = [
@@ -50,7 +50,7 @@ module.exports = (answers) => {
     }, {
       template: 'backend-express/bare/.dockerignore.ejs',
       target: `${answers.folderName}/.dockerignore`
-    }
+    },
   ]
 
   const database = [
@@ -64,7 +64,7 @@ module.exports = (answers) => {
     }, {
       template: 'backend-express/bare/database/migration.stub.ejs',
       target: `${answers.folderName}/database/migration.stub`
-    }
+    },
   ]
 
   const app = [
@@ -81,7 +81,13 @@ module.exports = (answers) => {
     }, {
       template: 'backend-express/bare/resources/Model.js.ejs',
       target: `${answers.folderName}/resources/Model.js`
-    }
+    }, {
+      template: 'backend-express/bare/resources/Service.js.ejs',
+      target: `${answers.folderName}/resources/Service.js`
+    }, {
+      template: 'backend-express/bare/resources/Controller.js.ejs',
+      target: `${answers.folderName}/resources/Controller.js`
+    },
   ]
 
   const testing = [
@@ -92,9 +98,15 @@ module.exports = (answers) => {
       template: 'backend-express/bare/.nycrc.ejs',
       target: `${answers.folderName}/.nycrc`
     }, {
-      template: 'backend-express/bare/test/Model.test.js.ejs',
-      target: `${answers.folderName}/test/Model.test.js`
-    }
+      template: 'backend-express/bare/test/unit/resources/Model.test.js.ejs',
+      target: `${answers.folderName}/test/unit/resources/Model.test.js`
+    }, {
+      template: 'backend-express/bare/test/unit/resources/Service.test.js.ejs',
+      target: `${answers.folderName}/test/unit/resources/Service.test.js`
+    }, {
+      template: 'backend-express/bare/test/unit/resources/Controller.test.js.ejs',
+      target: `${answers.folderName}/test/unit/resources/Controller.test.js`
+    },
   ]
 
   return [
@@ -108,6 +120,6 @@ module.exports = (answers) => {
       template: '.wizard.ejs',
       target: `${answers.folderName}/.wizard`,
       props: { projectType: projectTypes.backendExpress }
-    }
+    },
   ]
 }

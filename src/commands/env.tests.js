@@ -41,7 +41,7 @@ module.exports = {
 
       print.info(`Executed in ${timer() * 0.001} s`)
     } catch (error) {
-      print.error(error.stack)
+      // If the tests fail there will be an error thrown but we don't want to display it
     }
   }
 }

@@ -9,7 +9,7 @@
   "scripts": {
     "node:dev": "DEBUG=app:* && nodemon ./bin/www",
     "node:prod": "DEBUG=app:* && node ./bin/www",
-    "node:test": "DEBUG=app:* && nyc mocha -c -t 10000 --recursive --exit",
+    "node:test": "DEBUG=app:* && nyc mocha --file app.js -c -t 10000 --recursive --exit",
     "format": "eslint --quiet --report-unused-disable-directives --fix '**/*.js' || true"
   },
   "dependencies": {
@@ -26,7 +26,7 @@
     "objection-filters-util": "git+ssh://git@github.com:cmburcus/util_ObjectionFilters.git#v1.0",
     "pg": "7.4.3",
     "pg-hstore": "2.3.2",
-    "validator-util": "git+ssh://git@github.com:cmburcus/util_Validator.git#v0.1.1",
+    "validator-util": "git+ssh://git@github.com:cmburcus/util_Validator.git#v0.1.3",
     "error-util": "git+ssh://git@github.com:cmburcus/util_Errors.git#v0.1"
   },
   "devDependencies": {

@@ -7,13 +7,23 @@ const frontendReactMap = require('../config/maps/frontend-react')
 // Project types
 const projectTypes = require('../config/project-types')
 
+const { print } = require('gluegun/print')
+const description = 'Generate an express application'
+
 module.exports = {
   name: 'generate:frontend',
-  description: 'Generate an express application',
+  description: description,
   run: async (context) => {
-    const { print, prompt } = context
+    const { parameters, prompt } = context
 
     if (!context.canRunCommand()) {
+      return
+    }
+
+    // Display help if requested
+    if (parameters.options.h || parameters.options.help) {
+      printHelp(context)
+
       return
     }
 
@@ -29,4 +39,25 @@ module.exports = {
 
     context.generateProject(answers.folderName, frontendReactMap(answers))
   }
+}
+
+/**
+ * Prints the help message of this command
+ */
+function printHelp (context) {
+  context.helpHeader()
+
+  // Usage
+  context.helpUsageTitle()
+  print.info('  generate:frontend [options]')
+  print.info('')
+
+  // Options
+  context.helpOptionsTitle()
+  print.info('  -h, --help'.green + '\t\tDisplay help message')
+  print.info('')
+
+  // Help title
+  context.helpTitle()
+  print.info(`  ${description}`)
 }

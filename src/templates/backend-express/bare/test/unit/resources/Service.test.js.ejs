@@ -1,0 +1,363 @@
+'use strict';
+
+const chai = require('chai');
+
+const expect = chai.expect;
+const AbstractService = require('../../../resources/Service');
+const AbstractModel = require('../../../resources/Model');
+
+const service = AbstractService(AbstractModel);
+
+describe('TESTING: Service class', () => {
+  describe('Service.query', () => {
+    it('it should be able to perform a query operation without a query', () => {
+      expect(service.query()).to.be.an('object');
+      expect(service.query().constructor.name).to.equal('QueryBuilder');
+    });
+
+    it('it should ignore query if it is not an object', () => {
+      expect(service.query('...')).to.be.an('object');
+      expect(service.query('...').constructor.name).to.equal('QueryBuilder');
+    });
+
+    it('it should be able to perform a query operation with a query', () => {
+      let result = null;
+
+      try {
+        result = service.query({
+          select: 'col1,col2',
+          filter: JSON.stringify([{ column: 'col1', value: 'value' }]),
+          order: 'col1',
+          page: 1,
+          pageSize: 10,
+        });
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('object');
+      expect(result.constructor.name).to.equal('QueryBuilder');
+    });
+  });
+
+  describe('Service.show', () => {
+    it('it should be able to retrieve one record by id', () => {
+      let result = null;
+
+      try {
+        result = service.show(1);
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('object');
+      expect(result.constructor.name).to.equal('QueryBuilder');
+      expect(result)
+        .to.have.property('_operations')
+        .be.an('array')
+        .and.have.lengthOf(1);
+      expect(result)
+        .to.have.nested.property('_operations[0].name')
+        .equal('findById');
+      expect(result)
+        .to.have.nested.property('_operations[0].id')
+        .equal(1);
+    });
+
+    it('it should throw an error if id is not defined', () => {
+      let result = null;
+
+      try {
+        result = service.show();
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('error');
+      expect(result)
+        .to.have.property('type')
+        .equal('InvalidArgumentError');
+      expect(result)
+        .to.have.property('status')
+        .equal(400);
+      expect(result)
+        .to.have.property('error')
+        .equal('show');
+    });
+  });
+
+  describe('Service.create', () => {
+    it('it should be able to perform a create operation', () => {
+      const record = { col: 'value' };
+      let result = null;
+
+      try {
+        result = service.create(record);
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('object');
+      expect(result.constructor.name).to.equal('QueryBuilder');
+      expect(result)
+        .to.have.property('_operations')
+        .be.an('array')
+        .and.have.lengthOf(1);
+      expect(result)
+        .to.have.nested.property('_operations[0].name')
+        .equal('insert');
+      expect(result)
+        .to.have.nested.property('_operations[0].models')
+        .be.an('array')
+        .and.have.lengthOf(1);
+      expect(result)
+        .to.have.nested.property('_operations[0].models[0]')
+        .be.an('object')
+        .and.deep.equal(record);
+    });
+
+    it('it should throw an error if record is not defined', () => {
+      let result = null;
+
+      try {
+        result = service.create();
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('error');
+      expect(result)
+        .to.have.property('type')
+        .equal('InvalidArgumentError');
+      expect(result)
+        .to.have.property('status')
+        .equal(400);
+      expect(result)
+        .to.have.property('error')
+        .equal('create');
+    });
+  });
+
+  describe('Service.update', () => {
+    it('it should be able to perform an update operation', () => {
+      const record = { id: 1, col: 'value' };
+      let result = null;
+
+      try {
+        result = service.update(record.id, record);
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('object');
+      expect(result.constructor.name).to.equal('QueryBuilder');
+      expect(result)
+        .to.have.property('_operations')
+        .be.an('array')
+        .and.have.lengthOf(1);
+      expect(result)
+        .to.have.nested.property('_operations[0].name')
+        .equal('updateAndFetch');
+      expect(result)
+        .to.have.nested.property('_operations[0].delegate.name')
+        .equal('update');
+      expect(result)
+        .to.have.nested.property('_operations[0].delegate.model')
+        .be.an('object')
+        .and.deep.equal(record);
+    });
+
+    it('it should throw an error if record is not defined', () => {
+      let result = null;
+
+      try {
+        result = service.update();
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('error');
+      expect(result)
+        .to.have.property('type')
+        .equal('InvalidArgumentError');
+      expect(result)
+        .to.have.property('status')
+        .equal(400);
+      expect(result)
+        .to.have.property('error')
+        .equal('update');
+    });
+  });
+
+  describe('Service.delete', () => {
+    it('it should be able to perform a delete operation', () => {
+      let result = null;
+
+      try {
+        result = service.delete(1);
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('object');
+      expect(result.constructor.name).to.equal('QueryBuilder');
+      expect(result)
+        .to.have.property('_operations')
+        .be.an('array')
+        .and.have.lengthOf(1);
+      expect(result)
+        .to.have.nested.property('_operations[0].name')
+        .equal('deleteById');
+      expect(result)
+        .to.have.nested.property('_operations[0].id')
+        .equal(1);
+    });
+
+    it('it should throw an error if id is not defined', () => {
+      let result = null;
+
+      try {
+        result = service.delete();
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('error');
+      expect(result)
+        .to.have.property('type')
+        .equal('InvalidArgumentError');
+      expect(result)
+        .to.have.property('status')
+        .equal(400);
+      expect(result)
+        .to.have.property('error')
+        .equal('delete');
+    });
+  });
+
+  describe('Service.countBy', () => {
+    it('it should be able to perform a count operation if the condition is not defined', () => {
+      let result = null;
+
+      try {
+        result = service.countBy([{ key: 'col', value: 'value' }]);
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('object');
+      expect(result.constructor.name).to.equal('QueryBuilder');
+      expect(result)
+        .to.have.property('_operations')
+        .be.an('array')
+        .and.have.lengthOf(2);
+      expect(result)
+        .to.have.nested.property('_operations[0].name')
+        .equal('where');
+      expect(result)
+        .to.have.nested.property('_operations[0].args.0')
+        .equal('col');
+      expect(result)
+        .to.have.nested.property('_operations[0].args.1')
+        .equal('value');
+      expect(result)
+        .to.have.nested.property('_operations[1].name')
+        .equal('count');
+    });
+
+    it('it should be able to perform a count operation if the condition is defined', () => {
+      let result = null;
+
+      try {
+        result = service.countBy([{ key: 'col', condition: '!=', value: 'value' }]);
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('object');
+      expect(result.constructor.name).to.equal('QueryBuilder');
+      expect(result)
+        .to.have.property('_operations')
+        .be.an('array')
+        .and.have.lengthOf(2);
+      expect(result)
+        .to.have.nested.property('_operations[0].name')
+        .equal('where');
+      expect(result)
+        .to.have.nested.property('_operations[0].args.0')
+        .equal('col');
+      expect(result)
+        .to.have.nested.property('_operations[0].args.1')
+        .equal('!=');
+      expect(result)
+        .to.have.nested.property('_operations[0].args.2')
+        .equal('value');
+      expect(result)
+        .to.have.nested.property('_operations[1].name')
+        .equal('count');
+    });
+
+    it('it should fail if the argument is not defined', () => {
+      let result = null;
+
+      try {
+        result = service.countBy();
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('error');
+      expect(result)
+        .to.have.property('type')
+        .equal('InvalidArgumentError');
+      expect(result)
+        .to.have.property('status')
+        .equal(400);
+      expect(result)
+        .to.have.property('error')
+        .equal('no argument found');
+    });
+
+    it('it should fail if the argument is not an array', () => {
+      let result = null;
+
+      try {
+        result = service.countBy('not an array');
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('error');
+      expect(result)
+        .to.have.property('type')
+        .equal('InvalidArgumentError');
+      expect(result)
+        .to.have.property('status')
+        .equal(400);
+      expect(result)
+        .to.have.property('error')
+        .equal('argument must be an array');
+    });
+
+    it('it should fail if the argument not formatted properly', () => {
+      let result = null;
+
+      try {
+        result = service.countBy(['not an object']);
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('error');
+      expect(result)
+        .to.have.property('type')
+        .equal('InvalidArgumentError');
+      expect(result)
+        .to.have.property('status')
+        .equal(400);
+      expect(result)
+        .to.have.property('error')
+        .equal('invalid object format');
+    });
+  });
+});
