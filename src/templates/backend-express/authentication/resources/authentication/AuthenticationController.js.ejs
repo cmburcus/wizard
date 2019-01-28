@@ -59,22 +59,4 @@ module.exports = {
       next(error);
     }
   },
-
-  /**
-   * Removes an authentication record from the database
-   *
-   * @param {object} request
-   * @param {object} response
-   *
-   * @returns {number} Number of deleted records
-   */
-  delete: async (request, response, next) => {
-    try {
-      const numberOfRecords = await AuthenticationService.delete(request.params.authorityId);
-
-      response.status(numberOfRecords > 0 ? status.OK : status.NOT_FOUND).json(numberOfRecords);
-    } catch (error) {
-      next(error);
-    }
-  },
 };

@@ -37,9 +37,6 @@ module.exports = () => {
       template: 'backend-express/authentication/test/integration/authentication/api/authenticate.test.js.ejs',
       target: 'test/integration/authentication/api/authenticate.test.js',
     }, {
-      template: 'backend-express/authentication/test/integration/authentication/api/delete.test.js.ejs',
-      target: 'test/integration/authentication/api/delete.test.js',
-    }, {
       template: 'backend-express/authentication/test/integration/authentication/api/register.test.js.ejs',
       target: 'test/integration/authentication/api/register.test.js',
     }, {
@@ -49,8 +46,8 @@ module.exports = () => {
       template: 'backend-express/authentication/test/integration/authentication/service/authenticate.test.js.ejs',
       target: 'test/integration/authentication/service/authenticate.test.js',
     }, {
-      template: 'backend-express/authentication/test/integration/authentication/service/delete.test.js.ejs',
-      target: 'test/integration/authentication/service/delete.test.js',
+      template: 'backend-express/authentication/test/integration/authentication/service/deleteByAuthorityId.test.js.ejs',
+      target: 'test/integration/authentication/service/deleteByAuthorityId.test.js',
     }, {
       template: 'backend-express/authentication/test/integration/authentication/service/register.test.js.ejs',
       target: 'test/integration/authentication/service/register.test.js',

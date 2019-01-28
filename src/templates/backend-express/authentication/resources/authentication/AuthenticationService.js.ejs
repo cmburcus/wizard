@@ -85,13 +85,13 @@ module.exports = {
   },
 
   /**
-   * Deletes an authentication record from the database
+   * Deletes an authentication record from the database by the authorityId
    *
    * @param {number} authorityId
    *
    * @returns {Promise} Promise
    */
-  delete: (authorityId) => {
+  deleteByAuthorityId: (authorityId) => {
     if (!authorityId) {
       throw errorUtil.getInvalidArgumentError('delete');
     }

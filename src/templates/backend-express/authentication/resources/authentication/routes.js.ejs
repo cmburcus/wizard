@@ -27,7 +27,6 @@ router
     validator.validateSchema(joiAuthenticateSchema),
     AuthenticationController.authenticate
   )
-  .get('/verify', AuthenticationController.verify)
-  .delete('/:authorityId', AuthenticationController.delete);
+  .get('/verify', AuthenticationController.verify);
 
 module.exports = router;
