@@ -1,0 +1,1265 @@
+'use strict';
+
+const chai = require('chai');
+const chaiHttp = require('chai-http');
+const expect = chai.expect;
+const server = require('../../../../app');
+
+chai.use(chaiHttp);
+
+const AuthenticationModel = require('../../../../resources/authentication/Authentication');
+const AuthenticationController = require('../../../../resources/authentication/AuthenticationController');
+
+const bcrypt = require('bcrypt');
+
+const FAKE_AUTHORITY_ID = 1;
+const FAKE_EMAIL = 'johnsmith@example.com';
+const FAKE_PASSWORD = 'testPassword';
+
+describe('TESTING: AuthenticationController.register server failure', () => {
+  it('it should call the next callback with the error', async () => {
+    let errorReturn = null;
+    await AuthenticationController.register(null, null, function(error) {
+      errorReturn = error;
+    });
+
+    expect(errorReturn).to.be.an('error');
+  });
+});
+
+describe('TESTING: /register for authentication', () => {
+  beforeEach(async () => {
+    await AuthenticationModel.query().delete();
+  });
+
+  after(async () => {
+    await AuthenticationModel.query().delete();
+  });
+
+  it('it should create an authentication record if the data is valid', (done) => {
+    const record = {
+      authority_id: FAKE_AUTHORITY_ID,
+      email: FAKE_EMAIL,
+      password: FAKE_PASSWORD,
+    };
+
+    chai
+      .request(server)
+      .post('/api/v1/authentication/register')
+      .set('content-type', 'application/json')
+      .send(record)
+      .end((error, response) => {
+        expect(response).to.have.status(201);
+
+        expect(response).to.have.property('body').be.empty;
+
+        done();
+      });
+  });
+
+  it('it should fail if no data is provided', (done) => {
+    chai
+      .request(server)
+      .post('/api/v1/authentication/register')
+      .set('content-type', 'application/json')
+      .end((error, response) => {
+        expect(response).to.have.status(400);
+
+        expect(response)
+          .to.have.property('body')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.type')
+          .equal('ValidationError');
+        expect(response)
+          .to.have.nested.property('body.status')
+          .equal(400);
+        expect(response)
+          .to.have.nested.property('body.message')
+          .equal('Validation failed');
+        expect(response)
+          .to.have.nested.property('body.error')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.original')
+          .be.an('object')
+          .and.deep.equal({});
+        expect(response)
+          .to.have.nested.property('body.error.errors')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.errors.email')
+          .be.an('array')
+          .and.have.lengthOf(1);
+        expect(response)
+          .to.have.nested.property('body.error.errors.email[0]')
+          .be.an('object')
+          .and.deep.equal({
+            type: 'any.required',
+            message: 'email is required',
+          });
+        expect(response)
+          .to.have.nested.property('body.error.errors.password')
+          .be.an('array')
+          .and.have.lengthOf(1);
+        expect(response)
+          .to.have.nested.property('body.error.errors.password[0]')
+          .be.an('object')
+          .and.deep.equal({
+            type: 'any.required',
+            message: 'password is required',
+          });
+
+        done();
+      });
+  });
+
+  it('it should encrypt the password before storing it in the database', (done) => {
+    const record = {
+      authority_id: FAKE_AUTHORITY_ID,
+      email: FAKE_EMAIL,
+      password: FAKE_PASSWORD,
+    };
+
+    chai
+      .request(server)
+      .post('/api/v1/authentication/register')
+      .set('content-type', 'application/json')
+      .send(record)
+      .end((error, response) => {
+        expect(response).to.have.status(201);
+        expect(response).to.have.nested.property('body').be.empty;
+
+        AuthenticationModel.query()
+          .then((authResponse) => {
+            expect(authResponse)
+              .to.be.an('array')
+              .and.have.lengthOf(1);
+            expect(authResponse)
+              .to.have.nested.property('[0].password')
+              .be.a('string');
+
+            return authResponse[0].password;
+          })
+          .then((password) => {
+            bcrypt.compare(FAKE_PASSWORD, password, (bcryptError, bcryptResponse) => {
+              expect(bcryptResponse).to.be.true;
+            });
+          });
+
+        done();
+      });
+  });
+
+  ///////////////////////////////////////////////////////
+  //
+  // AUTHORITY_ID : SPECIFIC
+  //
+  ///////////////////////////////////////////////////////
+
+  it('it should create an authentication record if authority_id is not provided', (done) => {
+    const record = {
+      email: FAKE_EMAIL,
+      password: FAKE_PASSWORD,
+    };
+
+    chai
+      .request(server)
+      .post('/api/v1/authentication/register')
+      .set('content-type', 'application/json')
+      .send(record)
+      .end((error, response) => {
+        expect(response).to.have.status(201);
+
+        expect(response).to.have.property('body').be.empty;
+
+        done();
+      });
+  });
+
+  it('it should create an authentication record if authority_id is null', (done) => {
+    const record = {
+      authority_id: null,
+      email: FAKE_EMAIL,
+      password: FAKE_PASSWORD,
+    };
+
+    chai
+      .request(server)
+      .post('/api/v1/authentication/register')
+      .set('content-type', 'application/json')
+      .send(record)
+      .end((error, response) => {
+        expect(response).to.have.status(201);
+
+        expect(response).to.have.property('body').be.empty;
+
+        done();
+      });
+  });
+
+  it('it should fail if authority_id is empty', (done) => {
+    const record = {
+      authority_id: '',
+      email: FAKE_EMAIL,
+      password: FAKE_PASSWORD,
+    };
+
+    chai
+      .request(server)
+      .post('/api/v1/authentication/register')
+      .set('content-type', 'application/json')
+      .send(record)
+      .end((error, response) => {
+        expect(response).to.have.status(400);
+
+        expect(response)
+          .to.have.property('body')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.type')
+          .equal('ValidationError');
+        expect(response)
+          .to.have.nested.property('body.status')
+          .equal(400);
+        expect(response)
+          .to.have.nested.property('body.message')
+          .equal('Validation failed');
+        expect(response)
+          .to.have.nested.property('body.error')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.original')
+          .be.an('object')
+          .and.deep.equal(record);
+        expect(response)
+          .to.have.nested.property('body.error.errors')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.errors.authority_id')
+          .be.an('array')
+          .and.have.lengthOf(1);
+        expect(response)
+          .to.have.nested.property('body.error.errors.authority_id[0]')
+          .be.an('object')
+          .and.deep.equal({
+            type: 'number.base',
+            message: 'authority_id must be a number',
+          });
+
+        done();
+      });
+  });
+
+  it('it should fail if authority_id is not a number', (done) => {
+    const record = {
+      authority_id: '1a',
+      email: FAKE_EMAIL,
+      password: FAKE_PASSWORD,
+    };
+
+    chai
+      .request(server)
+      .post('/api/v1/authentication/register')
+      .set('content-type', 'application/json')
+      .send(record)
+      .end((error, response) => {
+        expect(response).to.have.status(400);
+
+        expect(response)
+          .to.have.property('body')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.type')
+          .equal('ValidationError');
+        expect(response)
+          .to.have.nested.property('body.status')
+          .equal(400);
+        expect(response)
+          .to.have.nested.property('body.message')
+          .equal('Validation failed');
+        expect(response)
+          .to.have.nested.property('body.error')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.original')
+          .be.an('object')
+          .and.deep.equal(record);
+        expect(response)
+          .to.have.nested.property('body.error.errors')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.errors.authority_id')
+          .be.an('array')
+          .and.have.lengthOf(1);
+        expect(response)
+          .to.have.nested.property('body.error.errors.authority_id[0]')
+          .be.an('object')
+          .and.deep.equal({
+            type: 'number.base',
+            message: 'authority_id must be a number',
+          });
+
+        done();
+      });
+  });
+
+  it('it should fail if authority_id is not a negative number', (done) => {
+    const record = {
+      authority_id: -1,
+      email: FAKE_EMAIL,
+      password: FAKE_PASSWORD,
+    };
+
+    chai
+      .request(server)
+      .post('/api/v1/authentication/register')
+      .set('content-type', 'application/json')
+      .send(record)
+      .end((error, response) => {
+        expect(response).to.have.status(400);
+
+        expect(response)
+          .to.have.property('body')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.type')
+          .equal('ValidationError');
+        expect(response)
+          .to.have.nested.property('body.status')
+          .equal(400);
+        expect(response)
+          .to.have.nested.property('body.message')
+          .equal('Validation failed');
+        expect(response)
+          .to.have.nested.property('body.error')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.original')
+          .be.an('object')
+          .and.deep.equal(record);
+        expect(response)
+          .to.have.nested.property('body.error.errors')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.errors.authority_id')
+          .be.an('array')
+          .and.have.lengthOf(1);
+        expect(response)
+          .to.have.nested.property('body.error.errors.authority_id[0]')
+          .be.an('object')
+          .and.deep.equal({
+            type: 'number.positive',
+            message: 'authority_id must be a positive number',
+          });
+
+        done();
+      });
+  });
+
+  it('it should fail if authority_id is not unique', (done) => {
+    const record = {
+      authority_id: FAKE_AUTHORITY_ID,
+      email: FAKE_EMAIL,
+      password: FAKE_PASSWORD,
+    };
+
+    AuthenticationModel.query()
+      .insert(record)
+      .then(() => {
+        record.email = `2${record.email}`;
+
+        chai
+          .request(server)
+          .post('/api/v1/authentication/register')
+          .set('content-type', 'application/json')
+          .send(record)
+          .end((error, response) => {
+            expect(response).to.have.status(400);
+
+            expect(response)
+              .to.have.property('body')
+              .be.an('object');
+            expect(response)
+              .to.have.nested.property('body.type')
+              .equal('ValidationError');
+            expect(response)
+              .to.have.nested.property('body.status')
+              .equal(400);
+            expect(response)
+              .to.have.nested.property('body.message')
+              .equal('Validation failed');
+            expect(response)
+              .to.have.nested.property('body.error')
+              .be.an('object');
+            expect(response)
+              .to.have.nested.property('body.error.original')
+              .be.an('object')
+              .and.deep.equal(record);
+            expect(response)
+              .to.have.nested.property('body.error.errors')
+              .be.an('object');
+            expect(response)
+              .to.have.nested.property('body.error.errors.authority_id')
+              .be.an('array')
+              .and.have.lengthOf(1);
+            expect(response)
+              .to.have.nested.property('body.error.errors.authority_id[0]')
+              .be.an('object')
+              .and.deep.equal({
+                type: 'field.unique',
+                message: 'authority_id must be unique',
+              });
+
+            done();
+          });
+      });
+  });
+
+  ///////////////////////////////////////////////////////
+  //
+  // EMAIL : SPECIFIC
+  //
+  ///////////////////////////////////////////////////////
+
+  it('it should fail if email is not provided', (done) => {
+    const record = {
+      authority_id: FAKE_AUTHORITY_ID,
+      password: FAKE_PASSWORD,
+    };
+
+    chai
+      .request(server)
+      .post('/api/v1/authentication/register')
+      .set('content-type', 'application/json')
+      .send(record)
+      .end((error, response) => {
+        expect(response).to.have.status(400);
+
+        expect(response)
+          .to.have.property('body')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.type')
+          .equal('ValidationError');
+        expect(response)
+          .to.have.nested.property('body.status')
+          .equal(400);
+        expect(response)
+          .to.have.nested.property('body.message')
+          .equal('Validation failed');
+        expect(response)
+          .to.have.nested.property('body.error')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.original')
+          .be.an('object')
+          .and.deep.equal(record);
+        expect(response)
+          .to.have.nested.property('body.error.errors')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.errors.email')
+          .be.an('array')
+          .and.have.lengthOf(1);
+        expect(response)
+          .to.have.nested.property('body.error.errors.email[0]')
+          .be.an('object')
+          .and.deep.equal({
+            type: 'any.required',
+            message: 'email is required',
+          });
+
+        done();
+      });
+  });
+
+  it('it should fail if email is null', (done) => {
+    const record = {
+      authority_id: FAKE_AUTHORITY_ID,
+      email: null,
+      password: FAKE_PASSWORD,
+    };
+
+    chai
+      .request(server)
+      .post('/api/v1/authentication/register')
+      .set('content-type', 'application/json')
+      .send(record)
+      .end((error, response) => {
+        expect(response).to.have.status(400);
+
+        expect(response)
+          .to.have.property('body')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.type')
+          .equal('ValidationError');
+        expect(response)
+          .to.have.nested.property('body.status')
+          .equal(400);
+        expect(response)
+          .to.have.nested.property('body.message')
+          .equal('Validation failed');
+        expect(response)
+          .to.have.nested.property('body.error')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.original')
+          .be.an('object')
+          .and.deep.equal(record);
+        expect(response)
+          .to.have.nested.property('body.error.errors')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.errors.email')
+          .be.an('array')
+          .and.have.lengthOf(1);
+        expect(response)
+          .to.have.nested.property('body.error.errors.email[0]')
+          .be.an('object')
+          .and.deep.equal({
+            type: 'string.base',
+            message: 'email must be a string',
+          });
+
+        done();
+      });
+  });
+
+  it('it should fail if email is empty', (done) => {
+    const record = {
+      authority_id: FAKE_AUTHORITY_ID,
+      email: '',
+      password: FAKE_PASSWORD,
+    };
+
+    chai
+      .request(server)
+      .post('/api/v1/authentication/register')
+      .set('content-type', 'application/json')
+      .send(record)
+      .end((error, response) => {
+        expect(response).to.have.status(400);
+
+        expect(response)
+          .to.have.property('body')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.type')
+          .equal('ValidationError');
+        expect(response)
+          .to.have.nested.property('body.status')
+          .equal(400);
+        expect(response)
+          .to.have.nested.property('body.message')
+          .equal('Validation failed');
+        expect(response)
+          .to.have.nested.property('body.error')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.original')
+          .be.an('object')
+          .and.deep.equal(record);
+        expect(response)
+          .to.have.nested.property('body.error.errors')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.errors.email')
+          .be.an('array')
+          .and.have.lengthOf(3);
+        expect(response)
+          .to.have.nested.property('body.error.errors.email[0]')
+          .be.an('object')
+          .and.deep.equal({
+            type: 'any.empty',
+            message: 'email is not allowed to be empty',
+          });
+        expect(response)
+          .to.have.nested.property('body.error.errors.email[1]')
+          .be.an('object')
+          .and.deep.equal({
+            type: 'string.min',
+            message: 'email length must be at least 5 characters long',
+          });
+        expect(response)
+          .to.have.nested.property('body.error.errors.email[2]')
+          .be.an('object')
+          .and.deep.equal({
+            type: 'string.email',
+            message: 'email must be a valid email',
+          });
+
+        done();
+      });
+  });
+
+  it('it should fail if email is not a string', (done) => {
+    const record = {
+      authority_id: FAKE_AUTHORITY_ID,
+      email: 12345,
+      password: FAKE_PASSWORD,
+    };
+
+    chai
+      .request(server)
+      .post('/api/v1/authentication/register')
+      .set('content-type', 'application/json')
+      .send(record)
+      .end((error, response) => {
+        expect(response).to.have.status(400);
+
+        expect(response)
+          .to.have.property('body')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.type')
+          .equal('ValidationError');
+        expect(response)
+          .to.have.nested.property('body.status')
+          .equal(400);
+        expect(response)
+          .to.have.nested.property('body.message')
+          .equal('Validation failed');
+        expect(response)
+          .to.have.nested.property('body.error')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.original')
+          .be.an('object')
+          .and.deep.equal(record);
+        expect(response)
+          .to.have.nested.property('body.error.errors')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.errors.email')
+          .be.an('array')
+          .and.have.lengthOf(1);
+        expect(response)
+          .to.have.nested.property('body.error.errors.email[0]')
+          .be.an('object')
+          .and.deep.equal({
+            type: 'string.base',
+            message: 'email must be a string',
+          });
+
+        done();
+      });
+  });
+
+  it('it should fail if email is less than 5 characters', (done) => {
+    const record = {
+      authority_id: FAKE_AUTHORITY_ID,
+      email: 'a@b.',
+      password: FAKE_PASSWORD,
+    };
+
+    chai
+      .request(server)
+      .post('/api/v1/authentication/register')
+      .set('content-type', 'application/json')
+      .send(record)
+      .end((error, response) => {
+        expect(response).to.have.status(400);
+
+        expect(response)
+          .to.have.property('body')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.type')
+          .equal('ValidationError');
+        expect(response)
+          .to.have.nested.property('body.status')
+          .equal(400);
+        expect(response)
+          .to.have.nested.property('body.message')
+          .equal('Validation failed');
+        expect(response)
+          .to.have.nested.property('body.error')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.original')
+          .be.an('object')
+          .and.deep.equal(record);
+        expect(response)
+          .to.have.nested.property('body.error.errors')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.errors.email')
+          .be.an('array')
+          .and.have.lengthOf(2);
+        expect(response)
+          .to.have.nested.property('body.error.errors.email[0]')
+          .be.an('object')
+          .and.deep.equal({
+            type: 'string.min',
+            message: 'email length must be at least 5 characters long',
+          });
+        expect(response)
+          .to.have.nested.property('body.error.errors.email[1]')
+          .be.an('object')
+          .and.deep.equal({
+            type: 'string.email',
+            message: 'email must be a valid email',
+          });
+
+        done();
+      });
+  });
+
+  it('it should fail if email is longer than 250 characters', (done) => {
+    const record = {
+      authority_id: FAKE_AUTHORITY_ID,
+      email:
+        'abcdefghijklmnopqrstuvwzabcdefghijklmnopqrstuvwzababcdefghijklmnopqrstuvwzabcdefghijklmnopqrstuvwzababcdefghijklmnopqrstuvwzabcdefghijklmnopqrstuvwzababcdefghijklmnopqrstuvwzabcdefghijklmnopqrstuvwzababcdefghijklmnopqrstuvwzabcdefghijklmnopqrstu@w.com',
+      password: FAKE_PASSWORD,
+    };
+
+    chai
+      .request(server)
+      .post('/api/v1/authentication/register')
+      .set('content-type', 'application/json')
+      .send(record)
+      .end((error, response) => {
+        expect(response).to.have.status(400);
+
+        expect(response)
+          .to.have.property('body')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.type')
+          .equal('ValidationError');
+        expect(response)
+          .to.have.nested.property('body.status')
+          .equal(400);
+        expect(response)
+          .to.have.nested.property('body.message')
+          .equal('Validation failed');
+        expect(response)
+          .to.have.nested.property('body.error')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.original')
+          .be.an('object')
+          .and.deep.equal(record);
+        expect(response)
+          .to.have.nested.property('body.error.errors')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.errors.email')
+          .be.an('array')
+          .and.have.lengthOf(2);
+        expect(response)
+          .to.have.nested.property('body.error.errors.email[0]')
+          .be.an('object')
+          .and.deep.equal({
+            type: 'string.max',
+            message: 'email length must be less than or equal to 250 characters long',
+          });
+        expect(response)
+          .to.have.nested.property('body.error.errors.email[1]')
+          .be.an('object')
+          .and.deep.equal({
+            type: 'string.email',
+            message: 'email must be a valid email',
+          });
+
+        done();
+      });
+  });
+
+  it('it should fail if email does not have the @ sign', (done) => {
+    const record = {
+      authority_id: FAKE_AUTHORITY_ID,
+      email: 'johnsmith.com',
+      password: FAKE_PASSWORD,
+    };
+
+    chai
+      .request(server)
+      .post('/api/v1/authentication/register')
+      .set('content-type', 'application/json')
+      .send(record)
+      .end((error, response) => {
+        expect(response).to.have.status(400);
+
+        expect(response)
+          .to.have.property('body')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.type')
+          .equal('ValidationError');
+        expect(response)
+          .to.have.nested.property('body.status')
+          .equal(400);
+        expect(response)
+          .to.have.nested.property('body.message')
+          .equal('Validation failed');
+        expect(response)
+          .to.have.nested.property('body.error')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.original')
+          .be.an('object')
+          .and.deep.equal(record);
+        expect(response)
+          .to.have.nested.property('body.error.errors')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.errors.email')
+          .be.an('array')
+          .and.have.lengthOf(1);
+        expect(response)
+          .to.have.nested.property('body.error.errors.email[0]')
+          .be.an('object')
+          .and.deep.equal({
+            type: 'string.email',
+            message: 'email must be a valid email',
+          });
+
+        done();
+      });
+  });
+
+  it('it should fail if email does not have the .domain', (done) => {
+    const record = {
+      authority_id: FAKE_AUTHORITY_ID,
+      email: 'johnsmith@example.',
+      password: FAKE_PASSWORD,
+    };
+
+    chai
+      .request(server)
+      .post('/api/v1/authentication/register')
+      .set('content-type', 'application/json')
+      .send(record)
+      .end((error, response) => {
+        expect(response).to.have.status(400);
+
+        expect(response)
+          .to.have.property('body')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.type')
+          .equal('ValidationError');
+        expect(response)
+          .to.have.nested.property('body.status')
+          .equal(400);
+        expect(response)
+          .to.have.nested.property('body.message')
+          .equal('Validation failed');
+        expect(response)
+          .to.have.nested.property('body.error')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.original')
+          .be.an('object')
+          .and.deep.equal(record);
+        expect(response)
+          .to.have.nested.property('body.error.errors')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.errors.email')
+          .be.an('array')
+          .and.have.lengthOf(1);
+        expect(response)
+          .to.have.nested.property('body.error.errors.email[0]')
+          .be.an('object')
+          .and.deep.equal({
+            type: 'string.email',
+            message: 'email must be a valid email',
+          });
+
+        done();
+      });
+  });
+
+  it('it should fail if email is not an email format', (done) => {
+    const record = {
+      authority_id: FAKE_AUTHORITY_ID,
+      email: 'johnsmith',
+      password: FAKE_PASSWORD,
+    };
+
+    chai
+      .request(server)
+      .post('/api/v1/authentication/register')
+      .set('content-type', 'application/json')
+      .send(record)
+      .end((error, response) => {
+        expect(response).to.have.status(400);
+
+        expect(response)
+          .to.have.property('body')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.type')
+          .equal('ValidationError');
+        expect(response)
+          .to.have.nested.property('body.status')
+          .equal(400);
+        expect(response)
+          .to.have.nested.property('body.message')
+          .equal('Validation failed');
+        expect(response)
+          .to.have.nested.property('body.error')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.original')
+          .be.an('object')
+          .and.deep.equal(record);
+        expect(response)
+          .to.have.nested.property('body.error.errors')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.errors.email')
+          .be.an('array')
+          .and.have.lengthOf(1);
+        expect(response)
+          .to.have.nested.property('body.error.errors.email[0]')
+          .be.an('object')
+          .and.deep.equal({
+            type: 'string.email',
+            message: 'email must be a valid email',
+          });
+
+        done();
+      });
+  });
+
+  it('it should fail if email is not unique', (done) => {
+    const record = {
+      authority_id: FAKE_AUTHORITY_ID,
+      email: FAKE_EMAIL,
+      password: FAKE_PASSWORD,
+    };
+
+    AuthenticationModel.query()
+      .insert(record)
+      .then(() => {
+        record.authority_id = FAKE_AUTHORITY_ID + 1;
+
+        chai
+          .request(server)
+          .post('/api/v1/authentication/register')
+          .set('content-type', 'application/json')
+          .send(record)
+          .end((error, response) => {
+            expect(response).to.have.status(400);
+
+            expect(response)
+              .to.have.property('body')
+              .be.an('object');
+            expect(response)
+              .to.have.nested.property('body.type')
+              .equal('ValidationError');
+            expect(response)
+              .to.have.nested.property('body.status')
+              .equal(400);
+            expect(response)
+              .to.have.nested.property('body.message')
+              .equal('Validation failed');
+            expect(response)
+              .to.have.nested.property('body.error')
+              .be.an('object');
+            expect(response)
+              .to.have.nested.property('body.error.original')
+              .be.an('object')
+              .and.deep.equal(record);
+            expect(response)
+              .to.have.nested.property('body.error.errors')
+              .be.an('object');
+            expect(response)
+              .to.have.nested.property('body.error.errors.email')
+              .be.an('array')
+              .and.have.lengthOf(1);
+            expect(response)
+              .to.have.nested.property('body.error.errors.email[0]')
+              .be.an('object')
+              .and.deep.equal({
+                type: 'field.unique',
+                message: 'email must be unique',
+              });
+
+            done();
+          });
+      });
+  });
+
+  ///////////////////////////////////////////////////////
+  //
+  // PASSWORD : SPECIFIC
+  //
+  ///////////////////////////////////////////////////////
+
+  it('it should fail if password is not provided', (done) => {
+    const record = {
+      authority_id: FAKE_AUTHORITY_ID,
+      email: FAKE_EMAIL,
+    };
+
+    chai
+      .request(server)
+      .post('/api/v1/authentication/register')
+      .set('content-type', 'application/json')
+      .send(record)
+      .end((error, response) => {
+        expect(response).to.have.status(400);
+
+        expect(response)
+          .to.have.property('body')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.type')
+          .equal('ValidationError');
+        expect(response)
+          .to.have.nested.property('body.status')
+          .equal(400);
+        expect(response)
+          .to.have.nested.property('body.message')
+          .equal('Validation failed');
+        expect(response)
+          .to.have.nested.property('body.error')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.original')
+          .be.an('object')
+          .and.deep.equal(record);
+        expect(response)
+          .to.have.nested.property('body.error.errors')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.errors.password')
+          .be.an('array')
+          .and.have.lengthOf(1);
+        expect(response)
+          .to.have.nested.property('body.error.errors.password[0]')
+          .be.an('object')
+          .and.deep.equal({
+            type: 'any.required',
+            message: 'password is required',
+          });
+
+        done();
+      });
+  });
+
+  it('it should fail if password is null', (done) => {
+    const record = {
+      authority_id: FAKE_AUTHORITY_ID,
+      email: FAKE_EMAIL,
+      password: null,
+    };
+
+    chai
+      .request(server)
+      .post('/api/v1/authentication/register')
+      .set('content-type', 'application/json')
+      .send(record)
+      .end((error, response) => {
+        expect(response).to.have.status(400);
+
+        expect(response)
+          .to.have.property('body')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.type')
+          .equal('ValidationError');
+        expect(response)
+          .to.have.nested.property('body.status')
+          .equal(400);
+        expect(response)
+          .to.have.nested.property('body.message')
+          .equal('Validation failed');
+        expect(response)
+          .to.have.nested.property('body.error')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.original')
+          .be.an('object')
+          .and.deep.equal(record);
+        expect(response)
+          .to.have.nested.property('body.error.errors')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.errors.password')
+          .be.an('array')
+          .and.have.lengthOf(1);
+        expect(response)
+          .to.have.nested.property('body.error.errors.password[0]')
+          .be.an('object')
+          .and.deep.equal({
+            type: 'string.base',
+            message: 'password must be a string',
+          });
+
+        done();
+      });
+  });
+
+  it('it should fail if password is empty', (done) => {
+    const record = {
+      authority_id: FAKE_AUTHORITY_ID,
+      email: FAKE_EMAIL,
+      password: '',
+    };
+
+    chai
+      .request(server)
+      .post('/api/v1/authentication/register')
+      .set('content-type', 'application/json')
+      .send(record)
+      .end((error, response) => {
+        expect(response).to.have.status(400);
+
+        expect(response)
+          .to.have.property('body')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.type')
+          .equal('ValidationError');
+        expect(response)
+          .to.have.nested.property('body.status')
+          .equal(400);
+        expect(response)
+          .to.have.nested.property('body.message')
+          .equal('Validation failed');
+        expect(response)
+          .to.have.nested.property('body.error')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.original')
+          .be.an('object')
+          .and.deep.equal(record);
+        expect(response)
+          .to.have.nested.property('body.error.errors')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.errors.password')
+          .be.an('array')
+          .and.have.lengthOf(2);
+        expect(response)
+          .to.have.nested.property('body.error.errors.password[0]')
+          .be.an('object')
+          .and.deep.equal({
+            type: 'any.empty',
+            message: 'password is not allowed to be empty',
+          });
+        expect(response)
+          .to.have.nested.property('body.error.errors.password[1]')
+          .be.an('object')
+          .and.deep.equal({
+            type: 'string.min',
+            message: 'password length must be at least 8 characters long',
+          });
+
+        done();
+      });
+  });
+
+  it('it should fail if password is not a string', (done) => {
+    const record = {
+      authority_id: FAKE_AUTHORITY_ID,
+      email: FAKE_EMAIL,
+      password: 1234567890,
+    };
+
+    chai
+      .request(server)
+      .post('/api/v1/authentication/register')
+      .set('content-type', 'application/json')
+      .send(record)
+      .end((error, response) => {
+        expect(response).to.have.status(400);
+
+        expect(response)
+          .to.have.property('body')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.type')
+          .equal('ValidationError');
+        expect(response)
+          .to.have.nested.property('body.status')
+          .equal(400);
+        expect(response)
+          .to.have.nested.property('body.message')
+          .equal('Validation failed');
+        expect(response)
+          .to.have.nested.property('body.error')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.original')
+          .be.an('object')
+          .and.deep.equal(record);
+        expect(response)
+          .to.have.nested.property('body.error.errors')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.errors.password')
+          .be.an('array')
+          .and.have.lengthOf(1);
+        expect(response)
+          .to.have.nested.property('body.error.errors.password[0]')
+          .be.an('object')
+          .and.deep.equal({
+            type: 'string.base',
+            message: 'password must be a string',
+          });
+
+        done();
+      });
+  });
+
+  it('it should fail if password is less than 8 characters', (done) => {
+    const record = {
+      authority_id: FAKE_AUTHORITY_ID,
+      email: FAKE_EMAIL,
+      password: '1234567',
+    };
+
+    chai
+      .request(server)
+      .post('/api/v1/authentication/register')
+      .set('content-type', 'application/json')
+      .send(record)
+      .end((error, response) => {
+        expect(response).to.have.status(400);
+
+        expect(response)
+          .to.have.property('body')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.type')
+          .equal('ValidationError');
+        expect(response)
+          .to.have.nested.property('body.status')
+          .equal(400);
+        expect(response)
+          .to.have.nested.property('body.message')
+          .equal('Validation failed');
+        expect(response)
+          .to.have.nested.property('body.error')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.original')
+          .be.an('object')
+          .and.deep.equal(record);
+        expect(response)
+          .to.have.nested.property('body.error.errors')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.errors.password')
+          .be.an('array')
+          .and.have.lengthOf(1);
+        expect(response)
+          .to.have.nested.property('body.error.errors.password[0]')
+          .be.an('object')
+          .and.deep.equal({
+            type: 'string.min',
+            message: 'password length must be at least 8 characters long',
+          });
+
+        done();
+      });
+  });
+});

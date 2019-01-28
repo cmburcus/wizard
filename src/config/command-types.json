@@ -1,6 +1,7 @@
 {
   "global": ["help"],
-  "generate": ["generate:backend", "generate:frontend"],
+  "generateExpress": ["generate:auth"],
+  "generateBare": ["generate:backend", "generate:frontend"],
   "environment": [
     "env:build",
     "env:run",

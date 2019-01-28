@@ -1,0 +1,334 @@
+'use strict';
+
+const chai = require('chai');
+const chaiHttp = require('chai-http');
+const expect = chai.expect;
+const server = require('../../../../app');
+
+chai.use(chaiHttp);
+
+const AuthenticationModel = require('../../../../resources/authentication/Authentication');
+const AuthenticationController = require('../../../../resources/authentication/AuthenticationController');
+
+const jsonwebtoken = require('jsonwebtoken');
+
+const FAKE_AUTHORITY_ID = 1;
+const FAKE_EMAIL = 'johnsmith@example.com';
+const FAKE_PASSWORD = 'testPassword';
+
+const FAKE_CREDENTIALS = {
+  email: FAKE_EMAIL,
+  password: FAKE_PASSWORD,
+};
+
+describe('TESTING: AuthenticationController.authenticate server failure', () => {
+  it('it should call the next callback with the error', async () => {
+    let errorReturn = null;
+    await AuthenticationController.authenticate(null, null, function(error) {
+      errorReturn = error;
+    });
+
+    expect(errorReturn).to.be.an('error');
+  });
+});
+
+describe('TESTING: /authenticate for authentication', () => {
+  before(async () => {
+    await AuthenticationModel.query().delete();
+    await AuthenticationModel.query().insert({
+      authority_id: FAKE_AUTHORITY_ID,
+      email: FAKE_EMAIL,
+      password: FAKE_PASSWORD,
+    });
+  });
+
+  after(async () => {
+    await AuthenticationModel.query().delete();
+  });
+
+  it('it should authenticate if the credentials are valid', (done) => {
+    chai
+      .request(server)
+      .post('/api/v1/authentication/authenticate')
+      .set('content-type', 'application/json')
+      .send(FAKE_CREDENTIALS)
+      .end((error, response) => {
+        expect(response).to.have.status(200);
+        expect(response)
+          .to.have.property('body')
+          .be.a('string');
+
+        done();
+      });
+  });
+
+  it('it should return a valid JWT token', (done) => {
+    const credentials = {
+      email: FAKE_EMAIL,
+      password: FAKE_PASSWORD,
+    };
+
+    chai
+      .request(server)
+      .post('/api/v1/authentication/authenticate')
+      .set('content-type', 'application/json')
+      .send(credentials)
+      .end((error, response) => {
+        expect(response)
+          .to.have.property('body')
+          .be.a('string');
+
+        let verifiedToken = null;
+
+        try {
+          verifiedToken = jsonwebtoken.verify(response.body, process.env.JWT_SECRET);
+        } catch (error) {
+          verifiedToken = error;
+        }
+
+        expect(verifiedToken).to.be.an('object');
+        expect(verifiedToken)
+          .to.have.property('data')
+          .be.an('object');
+        expect(verifiedToken)
+          .to.have.nested.property('data.authorityId')
+          .be.a('number')
+          .and.equal(FAKE_AUTHORITY_ID);
+        expect(verifiedToken)
+          .to.have.property('iat')
+          .be.a('number');
+        expect(verifiedToken)
+          .to.have.property('exp')
+          .be.a('number');
+
+        done();
+      });
+  });
+
+  it('it should fail if no data is provided', (done) => {
+    chai
+      .request(server)
+      .post('/api/v1/authentication/authenticate')
+      .set('content-type', 'application/json')
+      .end((error, response) => {
+        expect(response).to.have.status(400);
+
+        expect(response)
+          .to.have.property('body')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.type')
+          .equal('ValidationError');
+        expect(response)
+          .to.have.nested.property('body.status')
+          .equal(400);
+        expect(response)
+          .to.have.nested.property('body.message')
+          .equal('Validation failed');
+        expect(response)
+          .to.have.nested.property('body.error')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.original')
+          .be.an('object')
+          .and.deep.equal({});
+        expect(response)
+          .to.have.nested.property('body.error.errors')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.errors.email')
+          .be.an('array')
+          .and.have.lengthOf(1);
+        expect(response)
+          .to.have.nested.property('body.error.errors.email[0]')
+          .be.an('object')
+          .and.deep.equal({
+            type: 'any.required',
+            message: 'email is required',
+          });
+        expect(response)
+          .to.have.nested.property('body.error.errors.password')
+          .be.an('array')
+          .and.have.lengthOf(1);
+        expect(response)
+          .to.have.nested.property('body.error.errors.password[0]')
+          .be.an('object')
+          .and.deep.equal({
+            type: 'any.required',
+            message: 'password is required',
+          });
+
+        done();
+      });
+  });
+
+  ///////////////////////////////////////////////////////
+  //
+  // EMAIL : SPECIFIC
+  //
+  ///////////////////////////////////////////////////////
+
+  it('it should fail if email is not provided', (done) => {
+    const credentials = {
+      password: FAKE_PASSWORD,
+    };
+
+    chai
+      .request(server)
+      .post('/api/v1/authentication/authenticate')
+      .set('content-type', 'application/json')
+      .send(credentials)
+      .end((error, response) => {
+        expect(response).to.have.status(400);
+
+        expect(response)
+          .to.have.property('body')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.type')
+          .equal('ValidationError');
+        expect(response)
+          .to.have.nested.property('body.status')
+          .equal(400);
+        expect(response)
+          .to.have.nested.property('body.message')
+          .equal('Validation failed');
+        expect(response)
+          .to.have.nested.property('body.error')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.original')
+          .be.an('object')
+          .and.deep.equal(credentials);
+        expect(response)
+          .to.have.nested.property('body.error.errors')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.errors.email')
+          .be.an('array')
+          .and.have.lengthOf(1);
+        expect(response)
+          .to.have.nested.property('body.error.errors.email[0]')
+          .be.an('object')
+          .and.deep.equal({
+            type: 'any.required',
+            message: 'email is required',
+          });
+
+        done();
+      });
+  });
+
+  it('it should fail if email is not found', (done) => {
+    const credentials = {
+      email: 'fakejohnsmith@example.com',
+      password: FAKE_PASSWORD,
+    };
+
+    chai
+      .request(server)
+      .post('/api/v1/authentication/authenticate')
+      .set('content-type', 'application/json')
+      .send(credentials)
+      .end((error, response) => {
+        expect(response).to.have.status(401);
+
+        expect(response)
+          .to.have.property('body')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.type')
+          .equal('AuthenticationError');
+        expect(response)
+          .to.have.nested.property('body.status')
+          .equal(401);
+
+        done();
+      });
+  });
+
+  ///////////////////////////////////////////////////////
+  //
+  // PASSWORD : SPECIFIC
+  //
+  ///////////////////////////////////////////////////////
+
+  it('it should fail if password is not provided', (done) => {
+    const credentials = {
+      email: FAKE_EMAIL,
+    };
+
+    chai
+      .request(server)
+      .post('/api/v1/authentication/authenticate')
+      .set('content-type', 'application/json')
+      .send(credentials)
+      .end((error, response) => {
+        expect(response).to.have.status(400);
+
+        expect(response)
+          .to.have.property('body')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.type')
+          .equal('ValidationError');
+        expect(response)
+          .to.have.nested.property('body.status')
+          .equal(400);
+        expect(response)
+          .to.have.nested.property('body.message')
+          .equal('Validation failed');
+        expect(response)
+          .to.have.nested.property('body.error')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.original')
+          .be.an('object')
+          .and.deep.equal(credentials);
+        expect(response)
+          .to.have.nested.property('body.error.errors')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.error.errors.password')
+          .be.an('array')
+          .and.have.lengthOf(1);
+        expect(response)
+          .to.have.nested.property('body.error.errors.password[0]')
+          .be.an('object')
+          .and.deep.equal({
+            type: 'any.required',
+            message: 'password is required',
+          });
+
+        done();
+      });
+  });
+
+  it('it should fail if password is incorrect', (done) => {
+    const credentials = {
+      email: FAKE_EMAIL,
+      password: 'wrongPassword',
+    };
+
+    chai
+      .request(server)
+      .post('/api/v1/authentication/authenticate')
+      .set('content-type', 'application/json')
+      .send(credentials)
+      .end((error, response) => {
+        expect(response).to.have.status(401);
+
+        expect(response)
+          .to.have.property('body')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.type')
+          .equal('AuthenticationError');
+        expect(response)
+          .to.have.nested.property('body.status')
+          .equal(401);
+
+        done();
+      });
+  });
+});

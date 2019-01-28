@@ -1,0 +1,33 @@
+'use strict';
+
+const express = require('express');
+const router = express.Router();
+
+const validator = require('validator-util');
+const joiRegistrationSchema = require('./Authentication').joiRegistrationSchema;
+const joiAuthenticateSchema = require('./Authentication').joiAuthenticateSchema;
+
+const AuthenticationController = require('./AuthenticationController');
+const AuthenticationService = require('./AuthenticationService');
+
+/**
+ * Authentication router
+ */
+
+router
+  .post(
+    '/register',
+    validator.validateSchema(joiRegistrationSchema),
+    validator.uniqueField('authority_id', AuthenticationService.countBy),
+    validator.uniqueField('email', AuthenticationService.countBy),
+    AuthenticationController.register
+  )
+  .post(
+    '/authenticate',
+    validator.validateSchema(joiAuthenticateSchema),
+    AuthenticationController.authenticate
+  )
+  .get('/verify', AuthenticationController.verify)
+  .delete('/:authorityId', AuthenticationController.delete);
+
+module.exports = router;

@@ -1,0 +1,96 @@
+'use strict';
+
+const chai = require('chai');
+
+const expect = chai.expect;
+
+const AuthenticationModel = require('../../../../resources/authentication/Authentication');
+const AuthenticationService = require('../../../../resources/authentication/AuthenticationService');
+
+// Record data to be used within test functions
+let recordId = null;
+
+const fakeRecords = [
+  {
+    authority_id: 1,
+    email: 'johnsmith1@example.com',
+    password: 'password',
+  },
+  {
+    authority_id: 2,
+    email: 'johnsmith2@example.com',
+    password: 'password',
+  },
+  {
+    authority_id: 3,
+    email: 'johnsmith3@example.com',
+    password: 'password',
+  },
+  {
+    authority_id: 4,
+    email: 'johnsmith4@example.com',
+    password: 'password',
+  },
+  {
+    authority_id: 5,
+    email: 'johnsmith5@example.com',
+    password: 'password',
+  },
+];
+
+describe('TESTING: AuthenticationService.delete', () => {
+  beforeEach(async () => {
+    await AuthenticationModel.query().delete();
+
+    const records = await AuthenticationModel.query().insert(fakeRecords);
+
+    recordId = records[0].authority_id;
+  });
+
+  it('it should delete record if it exists', async () => {
+    let result = null;
+
+    try {
+      result = await AuthenticationService.delete(recordId);
+    } catch (error) {
+      result = error;
+    }
+
+    expect(result).to.be.a('number');
+    expect(result).to.equal(1);
+  });
+
+  it('it should return 0 if the record does not exist', async () => {
+    let result = null;
+
+    try {
+      result = await AuthenticationService.delete(9999999);
+    } catch (error) {
+      result = error;
+    }
+
+    expect(result).to.be.a('number');
+    expect(result).to.equal(0);
+  });
+
+  it('it should fail if id is not defined', async () => {
+    let result = null;
+
+    try {
+      result = await AuthenticationService.delete();
+    } catch (error) {
+      result = error;
+    }
+
+    expect(result).to.be.an('error');
+    expect(result)
+      .to.have.property('type')
+      .equal('InvalidArgumentError');
+    expect(result)
+      .to.have.property('status')
+      .equal(400);
+    expect(result)
+      .to.have.property('error')
+      .equal('delete');
+  });
+});

@@ -73,7 +73,10 @@ module.exports = (context) => {
     // Generator commands
     if (!context.isProject()) {
       print.info('generate'.yellow)
-      printCommandsByType(context.plugin.commands, commandTypes.generate)
+      printCommandsByType(context.plugin.commands, commandTypes.generateBare)
+    } else if (context.isBackendExpressProject()) {
+      print.info('generate'.yellow)
+      printCommandsByType(context.plugin.commands, commandTypes.generateExpress)
     }
 
     // Environment commands

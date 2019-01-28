@@ -1,0 +1,75 @@
+'use strict';
+
+const chai = require('chai');
+const chaiHttp = require('chai-http');
+const expect = chai.expect;
+const server = require('../../../../app');
+
+chai.use(chaiHttp);
+
+const AuthenticationModel = require('../../../../resources/authentication/Authentication');
+const AuthenticationController = require('../../../../resources/authentication/AuthenticationController');
+
+const FAKE_AUTHORITY_ID = 1;
+const FAKE_EMAIL = 'johnsmith@example.com';
+const FAKE_PASSWORD = 'testPassword';
+
+describe('TESTING: AuthenticationController.delete server failure', () => {
+  it('it should call the next callback with the error', async () => {
+    let errorReturn = null;
+    await AuthenticationController.delete(null, null, function(error) {
+      errorReturn = error;
+    });
+
+    expect(errorReturn).to.be.an('error');
+  });
+});
+
+describe('TESTING: /delete for authentication', () => {
+  beforeEach(async () => {
+    await AuthenticationModel.query().delete();
+    await AuthenticationModel.query().insert({
+      authority_id: FAKE_AUTHORITY_ID,
+      email: FAKE_EMAIL,
+      password: FAKE_PASSWORD,
+    });
+  });
+
+  after(async () => {
+    await AuthenticationModel.query().delete();
+  });
+
+  it('it should delete an authentication record if it exists', (done) => {
+    chai
+      .request(server)
+      .delete(`/api/v1/authentication/${FAKE_AUTHORITY_ID}`)
+      .set('content-type', 'application/json')
+      .end((error, response) => {
+        expect(response).to.have.status(200);
+
+        expect(response)
+          .to.have.property('body')
+          .be.a('number')
+          .and.equal(1);
+
+        done();
+      });
+  });
+
+  it('it should return NOT FOUND if the authentication record does not exists', (done) => {
+    chai
+      .request(server)
+      .delete('/api/v1/authentication/0')
+      .set('content-type', 'application/json')
+      .end((error, response) => {
+        expect(response).to.have.status(404);
+
+        expect(response)
+          .to.have.property('body')
+          .be.a('number')
+          .and.equal(0);
+
+        done();
+      });
+  });
+});

@@ -1,0 +1,90 @@
+'use strict';
+
+const Model = require('../Model');
+const Joi = require('joi');
+const bcrypt = require('bcrypt');
+
+/**
+ * This represents an authentication model
+ */
+class Authentication extends Model {
+  // Name of database table for this model
+  static get tableName() {
+    return 'authentications';
+  }
+
+  // If this is true only properties in jsonSchema are picked when inserting or updating a row in the database.
+  static get pickJsonSchemaProperties() {
+    return true;
+  }
+
+  // Encrypt password
+  $beforeInsert() {
+    super.$beforeInsert();
+
+    this.password = bcrypt.hashSync(this.password, 10);
+  }
+
+  // Gets the joi schema for registration route validation
+  static get joiRegistrationSchema() {
+    return Joi.object().keys({
+      authority_id: Joi.number()
+        .integer()
+        .positive()
+        .allow(null)
+        .optional(),
+      email: Joi.string()
+        .min(5)
+        .max(250)
+        .email()
+        .required(),
+      password: Joi.string()
+        .min(8)
+        .max(60)
+        .required(),
+    });
+  }
+
+  // Gets the joi schema for authenticate route validation
+  static get joiAuthenticateSchema() {
+    return Joi.object().keys({
+      email: Joi.string().required(),
+      password: Joi.string().required(),
+    });
+  }
+
+  // Optional schema against which the JSON is validated
+  static get jsonSchema() {
+    return {
+      // Type for this model
+      type: 'object',
+
+      // Required fields
+      required: ['email', 'password'],
+
+      // Property validation when creating the object
+      properties: {
+        authority_id: {
+          type: ['number', null],
+        },
+        email: {
+          type: 'string',
+          minLength: 5,
+          maxLength: 250,
+        },
+        password: {
+          type: 'string',
+          minLenth: 8,
+        },
+        created_at: {
+          type: 'string',
+        },
+        updated_at: {
+          type: 'string',
+        },
+      },
+    };
+  }
+}
+
+module.exports = Authentication;

@@ -24,6 +24,9 @@ module.exports = (answers) => {
     }, {
       template: 'backend-express/bare/.env.example.ejs',
       target: `${answers.folderName}/.env.example`
+    }, {
+      template: 'backend-express/bare/.env.ejs',
+      target: `${answers.folderName}/.env`
     },
   ]
 

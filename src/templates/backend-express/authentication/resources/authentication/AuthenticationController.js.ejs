@@ -1,0 +1,80 @@
+'use strict';
+
+const Controller = require('../Controller');
+const AuthenticationService = require('./AuthenticationService');
+
+const status = require('http-status');
+
+const jwtUtil = require('../../utils/jwt');
+
+module.exports = {
+  ...Controller(AuthenticationService),
+
+  /**
+   * Registers a new authority
+   *
+   * @param {object} request
+   * @param {object} response
+   */
+  register: async (request, response, next) => {
+    try {
+      await AuthenticationService.register(request.body);
+
+      response.status(status.CREATED).json();
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  /**
+   * Authenticates an authority and returns a JWT token if successful
+   *
+   * @param {object} request
+   * @param {object} response
+   */
+  authenticate: async (request, response, next) => {
+    try {
+      const token = await AuthenticationService.authenticate(request.body);
+
+      response.status(status.OK).json(token);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  /**
+   * Given a token, returns the associated authority
+   *
+   * @param {object} request
+   * @param {object} response
+   */
+  verify: async (request, response, next) => {
+    try {
+      const jwtToken = jwtUtil.getTokenFromHeader(request);
+
+      const authority = await AuthenticationService.verify(jwtToken);
+
+      response.status(status.OK).json(authority);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  /**
+   * Removes an authentication record from the database
+   *
+   * @param {object} request
+   * @param {object} response
+   *
+   * @returns {number} Number of deleted records
+   */
+  delete: async (request, response, next) => {
+    try {
+      const numberOfRecords = await AuthenticationService.delete(request.params.authorityId);
+
+      response.status(numberOfRecords > 0 ? status.OK : status.NOT_FOUND).json(numberOfRecords);
+    } catch (error) {
+      next(error);
+    }
+  },
+};
