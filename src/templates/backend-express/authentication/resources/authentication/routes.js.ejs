@@ -4,20 +4,24 @@ const express = require('express');
 const router = express.Router();
 
 const validator = require('validator-util');
-const joiRegistrationSchema = require('./Authentication').joiRegistrationSchema;
-const joiAuthenticateSchema = require('./Authentication').joiAuthenticateSchema;
 
 const AuthenticationController = require('./AuthenticationController');
 const AuthenticationService = require('./AuthenticationService');
+const {
+  joiSchema,
+  joiUpdateSchema,
+  joiAuthenticateSchema,
+} = require('./Authentication');
 
 /**
  * Authentication router
  */
 
 router
+  // Authentication specific routes
   .post(
     '/register',
-    validator.validateSchema(joiRegistrationSchema),
+    validator.validateSchema(joiSchema),
     validator.uniqueField('authority_id', AuthenticationService.countBy),
     validator.uniqueField('email', AuthenticationService.countBy),
     AuthenticationController.register
@@ -27,6 +31,27 @@ router
     validator.validateSchema(joiAuthenticateSchema),
     AuthenticationController.authenticate
   )
-  .get('/verify', AuthenticationController.verify);
+  .get('/verify', AuthenticationController.verify)
+
+  // Basic routes
+  .get('/', AuthenticationController.query)
+  .get('/:id', AuthenticationController.show)
+  .post(
+    '/',
+    validator.validateSchema(joiSchema),
+    validator.uniqueField('authority_id', AuthenticationService.countBy),
+    validator.uniqueField('email', AuthenticationService.countBy),
+    AuthenticationController.create
+  )
+  .put(
+    '/:id',
+    validator.validateSchema(joiUpdateSchema),
+    validator.uniqueField('authority_id', AuthenticationService.countBy, 'id'),
+    validator.uniqueField('email', AuthenticationService.countBy, 'id'),
+    AuthenticationController.update
+  )
+  .delete('/:id', AuthenticationController.delete)
+  
+  ;
 
 module.exports = router;

@@ -18,6 +18,26 @@ class Authentication extends Model {
     return true;
   }
 
+  static get joiAuthorityIdValidation() {
+    return Joi.number()
+      .integer()
+      .positive()
+      .allow(null);
+  }
+
+  static get joiEmailValidation() {
+    return Joi.string()
+      .min(5)
+      .max(250)
+      .email();
+  }
+
+  static get joiPasswordValidation() {
+    return Joi.string()
+      .min(8)
+      .max(60);
+  }
+
   // Encrypt password
   $beforeInsert() {
     super.$beforeInsert();
@@ -25,23 +45,37 @@ class Authentication extends Model {
     this.password = bcrypt.hashSync(this.password, 10);
   }
 
-  // Gets the joi schema for registration route validation
-  static get joiRegistrationSchema() {
+  $beforeUpdate() {
+    super.$beforeUpdate();
+
+    if (typeof this.password !== 'undefined') {
+      this.password = bcrypt.hashSync(this.password, 10);
+    }
+  }
+
+  $formatJson(json) {
+    delete json.password;
+
+    json = super.$formatJson(json);
+
+    return json;
+  }
+
+  // Gets the joi schema for registration and create route validation
+  static get joiSchema() {
     return Joi.object().keys({
-      authority_id: Joi.number()
-        .integer()
-        .positive()
-        .allow(null)
-        .optional(),
-      email: Joi.string()
-        .min(5)
-        .max(250)
-        .email()
-        .required(),
-      password: Joi.string()
-        .min(8)
-        .max(60)
-        .required(),
+      authority_id: this.joiAuthorityIdValidation.optional(),
+      email: this.joiEmailValidation.required(),
+      password: this.joiPasswordValidation.required(),
+    });
+  }
+
+  // Gets the joi schema for update route validation
+  static get joiUpdateSchema() {
+    return Joi.object().keys({
+      authority_id: this.joiAuthorityIdValidation.optional(),
+      email: this.joiEmailValidation.optional(),
+      password: this.joiPasswordValidation.optional(),
     });
   }
 

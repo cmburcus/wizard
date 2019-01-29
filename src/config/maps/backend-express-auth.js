@@ -34,6 +34,9 @@ module.exports = () => {
       template: 'backend-express/authentication/test/unit/utils/jwt.test.js.ejs',
       target: 'test/unit/utils/jwt.test.js',
     }, {
+      template: 'backend-express/authentication/test/unit/resources/authentication/Authentication.test.js.ejs',
+      target: 'test/unit/resources/authentication/Authentication.test.js',
+    }, {
       template: 'backend-express/authentication/test/integration/authentication/api/authenticate.test.js.ejs',
       target: 'test/integration/authentication/api/authenticate.test.js',
     }, {
