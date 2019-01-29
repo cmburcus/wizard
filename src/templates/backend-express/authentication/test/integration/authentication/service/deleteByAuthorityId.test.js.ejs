@@ -38,7 +38,7 @@ const fakeRecords = [
   },
 ];
 
-describe('TESTING: AuthenticationService.delete', () => {
+describe('TESTING: AuthenticationService.deleteByAuthorityId', () => {
   beforeEach(async () => {
     await AuthenticationModel.query().delete();
 
@@ -51,7 +51,7 @@ describe('TESTING: AuthenticationService.delete', () => {
     let result = null;
 
     try {
-      result = await AuthenticationService.delete(recordId);
+      result = await AuthenticationService.deleteByAuthorityId(recordId);
     } catch (error) {
       result = error;
     }
@@ -64,7 +64,7 @@ describe('TESTING: AuthenticationService.delete', () => {
     let result = null;
 
     try {
-      result = await AuthenticationService.delete(9999999);
+      result = await AuthenticationService.deleteByAuthorityId(9999999);
     } catch (error) {
       result = error;
     }
@@ -77,7 +77,7 @@ describe('TESTING: AuthenticationService.delete', () => {
     let result = null;
 
     try {
-      result = await AuthenticationService.delete();
+      result = await AuthenticationService.deleteByAuthorityId();
     } catch (error) {
       result = error;
     }
