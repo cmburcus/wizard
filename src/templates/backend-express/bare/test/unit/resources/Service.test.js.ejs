@@ -55,13 +55,16 @@ describe('TESTING: Service', () => {
       expect(result)
         .to.have.property('_operations')
         .be.an('array')
-        .and.have.lengthOf(1);
+        .and.have.lengthOf(2);
       expect(result)
         .to.have.nested.property('_operations[0].name')
         .equal('findById');
       expect(result)
         .to.have.nested.property('_operations[0].id')
         .equal(1);
+      expect(result)
+        .to.have.nested.property('_operations[1].name')
+        .equal('first');
     });
 
     it('it should throw an error if id is not defined', () => {
@@ -255,13 +258,19 @@ describe('TESTING: Service', () => {
       expect(result)
         .to.have.property('_operations')
         .be.an('array')
-        .and.have.lengthOf(1);
+        .and.have.lengthOf(3);
       expect(result)
         .to.have.nested.property('_operations[0].name')
-        .equal('deleteById');
+        .equal('findById');
       expect(result)
         .to.have.nested.property('_operations[0].id')
         .equal(1);
+      expect(result)
+        .to.have.nested.property('_operations[1].name')
+        .equal('first');
+      expect(result)
+        .to.have.nested.property('_operations[2].name')
+        .equal('delete');
     });
 
     it('it should throw an error if id is not defined', () => {

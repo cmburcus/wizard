@@ -32,11 +32,11 @@ module.exports = {
       const addedDependencies = await context.addDependencies([{
         type: 'dependencies',
         name: 'bcrypt',
-        version: '3.0.0',
+        version: '3.0.4',
       }, {
         type: 'dependencies',
         name: 'jsonwebtoken',
-        version: '8.3.0',
+        version: '8.4.0',
       }])
       addedDependencies.forEach(dependency => {
         print.info('package.json: '.yellow + `New ${dependency.type} ${dependency.name}@${dependency.version}`)
