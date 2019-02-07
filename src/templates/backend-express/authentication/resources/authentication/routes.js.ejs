@@ -7,11 +7,7 @@ const validator = require('validator-util');
 
 const AuthenticationController = require('./AuthenticationController');
 const AuthenticationService = require('./AuthenticationService');
-const {
-  joiSchema,
-  joiUpdateSchema,
-  joiAuthenticateSchema,
-} = require('./Authentication');
+const { joiSchema, joiPatchSchema, joiAuthenticateSchema } = require('./Authentication');
 
 /**
  * Authentication router
@@ -45,13 +41,18 @@ router
   )
   .put(
     '/:id',
-    validator.validateSchema(joiUpdateSchema),
+    validator.validateSchema(joiSchema),
     validator.uniqueField('authority_id', AuthenticationService.countBy, 'id'),
     validator.uniqueField('email', AuthenticationService.countBy, 'id'),
     AuthenticationController.update
   )
-  .delete('/:id', AuthenticationController.delete)
-  
-  ;
+  .patch(
+    '/:id',
+    validator.validateSchema(joiPatchSchema),
+    validator.uniqueField('authority_id', AuthenticationService.countBy, 'id'),
+    validator.uniqueField('email', AuthenticationService.countBy, 'id'),
+    AuthenticationController.patch
+  )
+  .delete('/:id', AuthenticationController.delete);
 
 module.exports = router;

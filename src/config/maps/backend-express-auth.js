@@ -37,26 +37,14 @@ module.exports = () => {
       template: 'backend-express/authentication/test/unit/resources/authentication/Authentication.test.js.ejs',
       target: 'test/unit/resources/authentication/Authentication.test.js',
     }, {
-      template: 'backend-express/authentication/test/integration/authentication/api/authenticate.test.js.ejs',
-      target: 'test/integration/authentication/api/authenticate.test.js',
+      template: 'backend-express/authentication/test/integration/authentication/api.test.js.ejs',
+      target: 'test/integration/authentication/api.test.js',
     }, {
-      template: 'backend-express/authentication/test/integration/authentication/api/register.test.js.ejs',
-      target: 'test/integration/authentication/api/register.test.js',
+      template: 'backend-express/authentication/test/integration/authentication/AuthenticationService.test.js.ejs',
+      target: 'test/integration/authentication/AuthenticationService.test.js',
     }, {
-      template: 'backend-express/authentication/test/integration/authentication/api/verify.test.js.ejs',
-      target: 'test/integration/authentication/api/verify.test.js',
-    }, {
-      template: 'backend-express/authentication/test/integration/authentication/service/authenticate.test.js.ejs',
-      target: 'test/integration/authentication/service/authenticate.test.js',
-    }, {
-      template: 'backend-express/authentication/test/integration/authentication/service/deleteByAuthorityId.test.js.ejs',
-      target: 'test/integration/authentication/service/deleteByAuthorityId.test.js',
-    }, {
-      template: 'backend-express/authentication/test/integration/authentication/service/register.test.js.ejs',
-      target: 'test/integration/authentication/service/register.test.js',
-    }, {
-      template: 'backend-express/authentication/test/integration/authentication/service/verify.test.js.ejs',
-      target: 'test/integration/authentication/service/verify.test.js',
+      template: 'backend-express/authentication/test/integration/authentication/validation.js.ejs',
+      target: 'test/integration/authentication/validation.js',
     },
   ]
 

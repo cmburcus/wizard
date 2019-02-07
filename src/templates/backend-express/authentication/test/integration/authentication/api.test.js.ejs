@@ -1,0 +1,833 @@
+'use strict';
+
+const chai = require('chai');
+const chaiHttp = require('chai-http');
+const expect = chai.expect;
+const server = require('../../../app');
+
+const bcrypt = require('bcrypt');
+const jsonwebtoken = require('jsonwebtoken');
+
+chai.use(chaiHttp);
+
+const validation = require('./validation');
+
+const AuthenticationModel = require('../../../resources/authentication/Authentication');
+const AuthenticationController = require('../../../resources/authentication/AuthenticationController');
+const AuthenticationService = require('../../../resources/authentication/AuthenticationService');
+
+// Fake data to be used for the tests
+const FAKE_RECORDS = [
+  {
+    authority_id: 1,
+    email: 'test@example.com',
+    password: 'asdfasdf',
+  },
+  {
+    authority_id: null,
+    email: 'test2@example.com',
+    password: 'asdfasdf',
+  },
+];
+
+const FAKE_CREDENTIALS = {
+  email: FAKE_RECORDS[0].email,
+  password: FAKE_RECORDS[0].password,
+};
+
+let storedRecord = null;
+let jwtToken = null;
+
+describe('TESTING HTTP: /api/v1/authentication', () => {
+  beforeEach(async () => {
+    await AuthenticationModel.query().delete();
+    storedRecord = null;
+    jwtToken = null;
+  });
+
+  after(async () => {
+    await AuthenticationModel.query().delete();
+  });
+
+  ////////////////////////////////////////////////
+  //
+  //  GET /
+  //
+  ////////////////////////////////////////////////
+  describe('GET: /', () => {
+    beforeEach(async () => {
+      await AuthenticationModel.query().insert(FAKE_RECORDS);
+    });
+
+    it('it should handle server failure by returning an error', async () => {
+      let errorReturn = null;
+      await AuthenticationController.query(null, null, function(error) {
+        errorReturn = error;
+      });
+
+      expect(errorReturn).to.be.an('error');
+    });
+
+    it('it should get an empty array if there are no records', async () => {
+      await AuthenticationModel.query().delete();
+
+      const response = await chai
+        .request(server)
+        .get('/api/v1/authentication')
+        .set('content-type', 'application/json');
+
+      expect(response).to.have.status(200);
+      expect(response)
+        .to.have.property('body')
+        .be.an('array')
+        .and.have.lengthOf(0);
+    });
+
+    it('it should get all records in the database', async () => {
+      const response = await chai
+        .request(server)
+        .get('/api/v1/authentication')
+        .set('content-type', 'application/json');
+
+      expect(response).to.have.status(200);
+      expect(response)
+        .to.have.property('body')
+        .be.an('array')
+        .and.have.lengthOf(2);
+    });
+  });
+
+  ////////////////////////////////////////////////
+  //
+  //  GET /:id
+  //
+  ////////////////////////////////////////////////
+  describe('GET: /:id', () => {
+    beforeEach(async () => {
+      const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
+      storedRecord = records[0];
+    });
+
+    it('it should handle server failure by returning an error', async () => {
+      let errorReturn = null;
+      await AuthenticationController.show(null, null, function(error) {
+        errorReturn = error;
+      });
+
+      expect(errorReturn).to.be.an('error');
+    });
+
+    it('it should return NOT FOUND if a record is does not exist', async () => {
+      const response = await chai
+        .request(server)
+        .get('/api/v1/authentication/0')
+        .set('content-type', 'application/json');
+
+      expect(response).to.have.status(404);
+      expect(response).to.have.property('body').be.empty;
+    });
+
+    it('it should get user if found in the database', async () => {
+      const response = await chai
+        .request(server)
+        .get(`/api/v1/authentication/${storedRecord.id}`)
+        .set('content-type', 'application/json');
+
+      expect(response).to.have.status(200);
+
+      expect(response)
+        .to.have.nested.property('body.id')
+        .be.a('number')
+        .and.equal(storedRecord.id);
+      expect(response)
+        .to.have.nested.property('body.authority_id')
+        .be.a('number')
+        .and.equal(storedRecord.authority_id);
+      expect(response)
+        .to.have.nested.property('body.email')
+        .be.a('string')
+        .and.equal(storedRecord.email);
+      expect(response).to.not.have.nested.property('password');
+      expect(response)
+        .to.have.nested.property('body.created_at')
+        .be.a('string')
+        .and.equal(storedRecord.created_at);
+      expect(response)
+        .to.have.nested.property('body.updated_at')
+        .be.a('string')
+        .and.equal(storedRecord.updated_at);
+    });
+  });
+
+  ////////////////////////////////////////////////
+  //
+  //  POST /
+  //
+  ////////////////////////////////////////////////
+  describe('POST: /', () => {
+    it('it should handle server failure by returning an error', async () => {
+      let errorReturn = null;
+      await AuthenticationController.create(null, null, function(error) {
+        errorReturn = error;
+      });
+
+      expect(errorReturn).to.be.an('error');
+    });
+
+    it('it should create a record if the data is valid', async () => {
+      const record = {
+        authority_id: 1,
+        email: 'johnsmith@example.com',
+        password: 'asdfasdf',
+      };
+
+      const response = await chai
+        .request(server)
+        .post('/api/v1/authentication')
+        .set('content-type', 'application/json')
+        .send(record);
+
+      expect(response).to.have.status(201);
+      expect(response)
+        .to.have.property('body')
+        .be.an('object');
+      expect(response)
+        .to.have.nested.property('body.authority_id')
+        .equal(record.authority_id);
+      expect(response)
+        .to.have.nested.property('body.email')
+        .equal(record.email);
+      expect(response).to.not.have.nested.property('body.password');
+      expect(response)
+        .to.have.nested.property('body.id')
+        .be.a('number');
+      expect(response)
+        .to.have.nested.property('body.created_at')
+        .be.a('string');
+      expect(response)
+        .to.have.nested.property('body.updated_at')
+        .be.a('string');
+    });
+
+    it('it should fail if no data is provided', async () => {
+      const response = await chai
+        .request(server)
+        .post('/api/v1/authentication')
+        .set('content-type', 'application/json');
+
+      expect(response).to.have.status(400);
+      expect(response)
+        .to.have.nested.property('body.type')
+        .equal('ValidationError');
+      expect(response)
+        .to.have.nested.property('body.status')
+        .equal(400);
+      expect(response)
+        .to.have.nested.property('body.message')
+        .equal('Validation failed');
+      expect(response)
+        .to.have.nested.property('body.error')
+        .be.an('object');
+      expect(response)
+        .to.have.nested.property('body.error.original')
+        .be.an('object')
+        .and.deep.equal({});
+      expect(response)
+        .to.have.nested.property('body.error.errors')
+        .be.an('object');
+      expect(response)
+        .to.have.nested.property('body.error.errors.email')
+        .be.an('array')
+        .and.be.lengthOf(1);
+      expect(response)
+        .to.have.nested.property('body.error.errors.email[0]')
+        .be.an('object')
+        .and.deep.equal({
+          type: 'any.required',
+          message: 'email is required',
+        });
+      expect(response)
+        .to.have.nested.property('body.error.errors.password')
+        .be.an('array')
+        .and.be.lengthOf(1);
+      expect(response)
+        .to.have.nested.property('body.error.errors.password[0]')
+        .be.an('object')
+        .and.deep.equal({
+          type: 'any.required',
+          message: 'password is required',
+        });
+    });
+  });
+
+  ////////////////////////////////////////////////
+  //
+  //  PUT /:id
+  //
+  ////////////////////////////////////////////////
+  describe('PUT: /:id', () => {
+    beforeEach(async () => {
+      const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
+      storedRecord = records[0];
+    });
+
+    it('it should handle server failure by returning an error', async () => {
+      let errorReturn = null;
+      await AuthenticationController.update(null, null, function(error) {
+        errorReturn = error;
+      });
+
+      expect(errorReturn).to.be.an('error');
+    });
+
+    it('it should update the record if the data is valid', async () => {
+      const record = {
+        authority_id: 5000,
+        email: 'newjohnsmith@example.com',
+        password: 'newPassword',
+      };
+
+      const response = await chai
+        .request(server)
+        .put(`/api/v1/authentication/${storedRecord.id}`)
+        .set('content-type', 'application/json')
+        .send(record);
+
+      expect(response).to.have.status(200);
+      expect(response)
+        .to.have.property('body')
+        .be.an('object');
+      expect(response)
+        .to.have.nested.property('body.authority_id')
+        .equal(record.authority_id);
+      expect(response)
+        .to.have.nested.property('body.email')
+        .equal(record.email);
+      expect(response).to.not.have.nested.property('password');
+      expect(response)
+        .to.have.nested.property('body.id')
+        .be.a('number');
+      expect(response)
+        .to.have.nested.property('body.created_at')
+        .be.a('string');
+      expect(response)
+        .to.have.nested.property('body.updated_at')
+        .be.a('string');
+    });
+
+    it('it should fail if no data is provided', async () => {
+      const response = await chai
+        .request(server)
+        .put(`/api/v1/authentication/${storedRecord.id}`)
+        .set('content-type', 'application/json');
+
+      expect(response).to.have.status(400);
+      expect(response)
+        .to.have.nested.property('body.type')
+        .equal('ValidationError');
+      expect(response)
+        .to.have.nested.property('body.status')
+        .equal(400);
+      expect(response)
+        .to.have.nested.property('body.message')
+        .equal('Validation failed');
+      expect(response)
+        .to.have.nested.property('body.error')
+        .be.an('object');
+      expect(response)
+        .to.have.nested.property('body.error.original')
+        .be.an('object')
+        .and.deep.equal({});
+      expect(response)
+        .to.have.nested.property('body.error.errors')
+        .be.an('object');
+      expect(response)
+        .to.have.nested.property('body.error.errors.email')
+        .be.an('array')
+        .and.be.lengthOf(1);
+      expect(response)
+        .to.have.nested.property('body.error.errors.email[0]')
+        .be.an('object')
+        .and.deep.equal({
+          type: 'any.required',
+          message: 'email is required',
+        });
+      expect(response)
+        .to.have.nested.property('body.error.errors.password')
+        .be.an('array')
+        .and.be.lengthOf(1);
+      expect(response)
+        .to.have.nested.property('body.error.errors.password[0]')
+        .be.an('object')
+        .and.deep.equal({
+          type: 'any.required',
+          message: 'password is required',
+        });
+    });
+  });
+
+  ////////////////////////////////////////////////
+  //
+  //  PATCH /:id
+  //
+  ////////////////////////////////////////////////
+  describe('PATCH: /:id', () => {
+    beforeEach(async () => {
+      const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
+      storedRecord = records[0];
+    });
+
+    it('it should handle server failure by returning an error', async () => {
+      let errorReturn = null;
+      await AuthenticationController.patch(null, null, function(error) {
+        errorReturn = error;
+      });
+
+      expect(errorReturn).to.be.an('error');
+    });
+
+    it('it should update the record if the data is valid', async () => {
+      const record = {
+        authority_id: 5000,
+      };
+
+      const response = await chai
+        .request(server)
+        .patch(`/api/v1/authentication/${storedRecord.id}`)
+        .set('content-type', 'application/json')
+        .send(record);
+
+      expect(response).to.have.status(200);
+      expect(response)
+        .to.have.property('body')
+        .be.an('object');
+      expect(response)
+        .to.have.nested.property('body.authority_id')
+        .equal(record.authority_id);
+      expect(response)
+        .to.have.nested.property('body.email')
+        .equal(storedRecord.email);
+      expect(response).to.not.have.nested.property('password');
+      expect(response)
+        .to.have.nested.property('body.id')
+        .be.a('number');
+      expect(response)
+        .to.have.nested.property('body.created_at')
+        .be.a('string');
+      expect(response)
+        .to.have.nested.property('body.updated_at')
+        .be.a('string');
+    });
+
+    it('it should succeed even if no data is provided', async () => {
+      const response = await chai
+        .request(server)
+        .patch(`/api/v1/authentication/${storedRecord.id}`)
+        .set('content-type', 'application/json');
+
+      expect(response).to.have.status(200);
+      expect(response)
+        .to.have.property('body')
+        .be.an('object');
+      expect(response)
+        .to.have.nested.property('body.authority_id')
+        .equal(storedRecord.authority_id);
+      expect(response)
+        .to.have.nested.property('body.email')
+        .equal(storedRecord.email);
+      expect(response).to.not.have.nested.property('password');
+      expect(response)
+        .to.have.nested.property('body.id')
+        .be.a('number');
+      expect(response)
+        .to.have.nested.property('body.created_at')
+        .be.a('string');
+      expect(response)
+        .to.have.nested.property('body.updated_at')
+        .be.a('string');
+    });
+  });
+
+  ////////////////////////////////////////////////
+  //
+  //  DELETE /:id
+  //
+  ////////////////////////////////////////////////
+  describe('DELETE: /:id', () => {
+    beforeEach(async () => {
+      const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
+      storedRecord = records[0];
+    });
+
+    it('it should handle server failure by returning an error', async () => {
+      let errorReturn = null;
+      await AuthenticationController.delete(null, null, function(error) {
+        errorReturn = error;
+      });
+
+      expect(errorReturn).to.be.an('error');
+    });
+
+    it('it should delete record if it exists', async () => {
+      const response = await chai
+        .request(server)
+        .delete(`/api/v1/authentication/${storedRecord.id}`)
+        .set('content-type', 'application/json');
+
+      expect(response).to.have.status(200);
+      expect(response)
+        .to.have.property('body')
+        .be.a('number')
+        .and.equal(1);
+    });
+
+    it('it should return NOT FOUND if the record does not exists', async () => {
+      const response = await chai
+        .request(server)
+        .delete('/api/v1/authentication/0')
+        .set('content-type', 'application/json');
+
+      expect(response).to.have.status(404);
+      expect(response)
+        .to.have.property('body')
+        .be.a('number')
+        .and.equal(0);
+    });
+  });
+
+  ////////////////////////////////////////////////
+  //
+  //  POST /register
+  //
+  ////////////////////////////////////////////////
+  describe('POST: /register', () => {
+    it('it should handle server failure by returning an error', async () => {
+      let errorReturn = null;
+      await AuthenticationController.register(null, null, function(error) {
+        errorReturn = error;
+      });
+
+      expect(errorReturn).to.be.an('error');
+    });
+
+    it('it should create an authentication record if the data is valid', async () => {
+      const response = await chai
+        .request(server)
+        .post('/api/v1/authentication/register')
+        .set('content-type', 'application/json')
+        .send(FAKE_RECORDS[0]);
+
+      expect(response).to.have.status(201);
+      expect(response).to.have.property('body').be.empty;
+    });
+
+    it('it should create an authentication record if authority_id is not provided', async () => {
+      const response = await chai
+        .request(server)
+        .post('/api/v1/authentication/register')
+        .set('content-type', 'application/json')
+        .send({
+          email: FAKE_RECORDS[0].email,
+          password: FAKE_RECORDS[0].password,
+        });
+
+      expect(response).to.have.status(201);
+      expect(response).to.have.property('body').be.empty;
+    });
+
+    it('it should create an authentication record if authority_id is null', async () => {
+      const response = await chai
+        .request(server)
+        .post('/api/v1/authentication/register')
+        .set('content-type', 'application/json')
+        .send({
+          authority_id: null,
+          email: FAKE_RECORDS[0].email,
+          password: FAKE_RECORDS[0].password,
+        });
+
+      expect(response).to.have.status(201);
+      expect(response).to.have.property('body').be.empty;
+    });
+
+    it('it should encrypt the password before storing it in the database', async () => {
+      const response = await chai
+        .request(server)
+        .post('/api/v1/authentication/register')
+        .set('content-type', 'application/json')
+        .send(FAKE_RECORDS[0]);
+
+      expect(response).to.have.status(201);
+      expect(response).to.have.nested.property('body').be.empty;
+
+      const record = await AuthenticationModel.query();
+
+      expect(record)
+        .to.be.an('array')
+        .and.have.lengthOf(1);
+      expect(record)
+        .to.have.nested.property('[0].password')
+        .be.a('string');
+
+      const passwordMatch = await bcrypt.compare(FAKE_RECORDS[0].password, record[0].password);
+
+      expect(passwordMatch).to.be.true;
+    });
+
+    // Validation tests
+    validation.register.forEach((test) => {
+      it(test.message, async () => {
+        if (typeof test.prerequesite !== 'undefined') {
+          await test.prerequesite();
+        }
+
+        const response = await chai
+          .request(server)
+          .post('/api/v1/authentication/register')
+          .set('content-type', 'application/json')
+          .send(test.record);
+
+        expect(response).to.have.status(400);
+        expect(response)
+          .to.have.property('body')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.type')
+          .equal('ValidationError');
+        expect(response)
+          .to.have.nested.property('body.status')
+          .equal(400);
+        expect(response)
+          .to.have.nested.property('body.message')
+          .equal('Validation failed');
+        expect(response)
+          .to.have.nested.property('body.error')
+          .be.an('object');
+      });
+    });
+  });
+
+  ////////////////////////////////////////////////
+  //
+  //  POST /authenticate
+  //
+  ////////////////////////////////////////////////
+  describe('POST: /authenticate', () => {
+    beforeEach(async () => {
+      await AuthenticationModel.query().insert(FAKE_RECORDS);
+    });
+
+    it('it should handle server failure by returning an error', async () => {
+      let errorReturn = null;
+      await AuthenticationController.authenticate(null, null, function(error) {
+        errorReturn = error;
+      });
+
+      expect(errorReturn).to.be.an('error');
+    });
+
+    it('it should authenticate if the credentials are valid', async () => {
+      const response = await chai
+        .request(server)
+        .post('/api/v1/authentication/authenticate')
+        .set('content-type', 'application/json')
+        .send(FAKE_CREDENTIALS);
+
+      expect(response).to.have.status(200);
+      expect(response)
+        .to.have.property('body')
+        .be.a('string');
+    });
+
+    it('it should return a valid JWT token', async () => {
+      const response = await chai
+        .request(server)
+        .post('/api/v1/authentication/authenticate')
+        .set('content-type', 'application/json')
+        .send(FAKE_CREDENTIALS);
+
+      expect(response)
+        .to.have.property('body')
+        .be.a('string');
+
+      let verifiedToken = null;
+
+      try {
+        verifiedToken = jsonwebtoken.verify(response.body, process.env.JWT_SECRET);
+      } catch (error) {
+        verifiedToken = error;
+      }
+
+      expect(verifiedToken).to.be.an('object');
+      expect(verifiedToken)
+        .to.have.property('data')
+        .be.an('object');
+      expect(verifiedToken)
+        .to.have.nested.property('data.authorityId')
+        .be.a('number')
+        .and.equal(FAKE_RECORDS[0].authority_id);
+      expect(verifiedToken)
+        .to.have.property('iat')
+        .be.a('number');
+      expect(verifiedToken)
+        .to.have.property('exp')
+        .be.a('number');
+    });
+
+    it('it should fail if email is not found', async () => {
+      const response = await chai
+        .request(server)
+        .post('/api/v1/authentication/authenticate')
+        .set('content-type', 'application/json')
+        .send({
+          email: 'fakejohnsmith@example.com',
+          password: FAKE_CREDENTIALS.password,
+        });
+
+      expect(response).to.have.status(401);
+      expect(response)
+        .to.have.property('body')
+        .be.an('object');
+      expect(response)
+        .to.have.nested.property('body.type')
+        .equal('AuthenticationError');
+      expect(response)
+        .to.have.nested.property('body.status')
+        .equal(401);
+      expect(response)
+        .to.have.nested.property('body.message')
+        .equal('Authentication failed');
+      expect(response)
+        .to.have.nested.property('body.error')
+        .be.a('string')
+        .and.equal('no entry found');
+    });
+
+    it('it should fail if password is incorrect', async () => {
+      const response = await chai
+        .request(server)
+        .post('/api/v1/authentication/authenticate')
+        .set('content-type', 'application/json')
+        .send({
+          email: FAKE_CREDENTIALS.email,
+          password: 'wrongPassword',
+        });
+
+      expect(response).to.have.status(401);
+      expect(response)
+        .to.have.property('body')
+        .be.an('object');
+      expect(response)
+        .to.have.nested.property('body.type')
+        .equal('AuthenticationError');
+      expect(response)
+        .to.have.nested.property('body.status')
+        .equal(401);
+      expect(response)
+        .to.have.nested.property('body.message')
+        .equal('Authentication failed');
+      expect(response)
+        .to.have.nested.property('body.error')
+        .be.a('string')
+        .and.equal('invalid password');
+    });
+
+    // Validation tests
+    validation.authenticate.forEach((test) => {
+      it(test.message, async () => {
+        if (typeof test.prerequesite !== 'undefined') {
+          await test.prerequesite();
+        }
+
+        const response = await chai
+          .request(server)
+          .post('/api/v1/authentication/authenticate')
+          .set('content-type', 'application/json')
+          .send(test.record);
+
+        expect(response).to.have.status(400);
+        expect(response)
+          .to.have.property('body')
+          .be.an('object');
+        expect(response)
+          .to.have.nested.property('body.type')
+          .equal('ValidationError');
+        expect(response)
+          .to.have.nested.property('body.status')
+          .equal(400);
+        expect(response)
+          .to.have.nested.property('body.message')
+          .equal('Validation failed');
+        expect(response)
+          .to.have.nested.property('body.error')
+          .be.an('object');
+      });
+    });
+  });
+
+  ////////////////////////////////////////////////
+  //
+  //  GET /verify
+  //
+  ////////////////////////////////////////////////
+  describe('GET: /verify', () => {
+    beforeEach(async () => {
+      await AuthenticationModel.query().insert(FAKE_RECORDS);
+      jwtToken = await AuthenticationService.authenticate(FAKE_CREDENTIALS);
+    });
+
+    it('it should handle server failure by returning an error', async () => {
+      let errorReturn = null;
+      await AuthenticationController.verify(null, null, function(error) {
+        errorReturn = error;
+      });
+
+      expect(errorReturn).to.be.an('error');
+    });
+
+    it('it should return an authority object if JWT is valid', async () => {
+      const response = await chai
+        .request(server)
+        .get('/api/v1/authentication/verify')
+        .set('content-type', 'application/json')
+        .set('Authorization', `Bearer ${jwtToken}`);
+
+      expect(response).to.have.status(200);
+      expect(response)
+        .to.have.property('body')
+        .be.an('object');
+      expect(response)
+        .to.have.nested.property('body.data')
+        .be.an('object');
+      expect(response)
+        .to.have.nested.property('body.data.authorityId')
+        .be.a('number')
+        .and.equal(FAKE_RECORDS[0].authority_id);
+      expect(response)
+        .to.have.nested.property('body.iat')
+        .be.a('number');
+      expect(response)
+        .to.have.nested.property('body.exp')
+        .be.a('number');
+    });
+
+    it('it should fail if the JWT token is not valid', async () => {
+      const response = await chai
+        .request(server)
+        .get('/api/v1/authentication/verify')
+        .set('content-type', 'application/json')
+        .set('Authorization', 'Bearer not_a_real_token');
+
+      expect(response).to.have.status(401);
+      expect(response)
+        .to.have.property('body')
+        .be.an('object');
+      expect(response)
+        .to.have.nested.property('body.type')
+        .equal('InvalidTokenError');
+      expect(response)
+        .to.have.nested.property('body.error')
+        .equal('JsonWebTokenError: jwt malformed');
+    });
+  });
+});

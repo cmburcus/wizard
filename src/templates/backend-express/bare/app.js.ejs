@@ -22,7 +22,11 @@ const knex = Knex(databaseConfig[app.get('env') || 'development']);
 // the Model.bindKnex method.
 Model.knex(knex);
 
-app.use(logger('dev'));
+/* istanbul ignore next */
+if (!app.get('env') || app.get('env') === 'development') {
+  app.use(logger('dev'));
+}
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());

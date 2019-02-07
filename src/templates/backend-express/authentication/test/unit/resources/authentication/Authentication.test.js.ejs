@@ -10,8 +10,8 @@ const bcrypt = require('bcrypt');
 const FAKE_RECORD = {
   authority_id: 1,
   email: 'test@example.com',
-  password: 'testPassword'
-}
+  password: 'testPassword',
+};
 
 describe('TESTING: Authentication Model', () => {
   it('it should encrypt the password before inserting', async () => {
@@ -19,7 +19,9 @@ describe('TESTING: Authentication Model', () => {
 
     model.$beforeInsert();
 
-    expect(model).to.have.property('password').not.equal(FAKE_RECORD.password);
+    expect(model)
+      .to.have.property('password')
+      .not.equal(FAKE_RECORD.password);
     expect(bcrypt.compareSync(FAKE_RECORD.password, model.password)).to.equal(true);
   });
 
@@ -28,7 +30,9 @@ describe('TESTING: Authentication Model', () => {
 
     model.$beforeUpdate();
 
-    expect(model).to.have.property('password').not.equal(FAKE_RECORD.password);
+    expect(model)
+      .to.have.property('password')
+      .not.equal(FAKE_RECORD.password);
     expect(bcrypt.compareSync(FAKE_RECORD.password, model.password)).to.equal(true);
   });
 
@@ -44,7 +48,7 @@ describe('TESTING: Authentication Model', () => {
 
   it('it should not return the password when formatting as json', async () => {
     const model = await AuthenticationModel.fromJson(FAKE_RECORD);
-    
+
     expect(model.toJSON()).to.not.have.property('password');
   });
 });

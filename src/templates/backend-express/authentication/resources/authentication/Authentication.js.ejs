@@ -71,7 +71,7 @@ class Authentication extends Model {
   }
 
   // Gets the joi schema for update route validation
-  static get joiUpdateSchema() {
+  static get joiPatchSchema() {
     return Joi.object().keys({
       authority_id: this.joiAuthorityIdValidation.optional(),
       email: this.joiEmailValidation.optional(),

@@ -11,6 +11,7 @@ const service = {
   show: (id) => (id ? { col: 'value' } : null),
   create: (record) => record,
   update: (id, record) => record,
+  patch: (id, record) => record,
   delete: (id) => (id ? 1 : null),
 };
 const controller = AbstractController(service);
@@ -37,7 +38,7 @@ const next = (returnedError) => {
   status = returnedError.status || 500;
 };
 
-describe('TESTING: Controller class', () => {
+describe('TESTING: Controller', () => {
   beforeEach(() => {
     status = null;
     result = null;
@@ -172,6 +173,39 @@ describe('TESTING: Controller class', () => {
     it('it should handle errors', async () => {
       try {
         await controller.update(null, null, next);
+      } catch (codeError) {
+        error = codeError;
+      }
+
+      expect(status).to.equal(500);
+      expect(result).to.be.null;
+      expect(error).to.be.an('error');
+    });
+  });
+
+  describe('Controller.patch', () => {
+    it('it should be able to perform a patch operation', async () => {
+      const request = {
+        params: { id: 1 },
+        body: { col: 'value' },
+      };
+
+      try {
+        await controller.patch(request, response, next);
+      } catch (codeError) {
+        error = codeError;
+      }
+
+      expect(status).to.equal(200);
+      expect(result)
+        .to.be.an('object')
+        .and.have.property('col')
+        .equal('value');
+    });
+
+    it('it should handle errors', async () => {
+      try {
+        await controller.patch(null, null, next);
       } catch (codeError) {
         error = codeError;
       }

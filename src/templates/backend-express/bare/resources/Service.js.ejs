@@ -80,6 +80,22 @@ module.exports = (model) => ({
   },
 
   /**
+   * Patches a record
+   *
+   * @param {number} id
+   * @param {object} record
+   *
+   * @returns {Promise} Promise
+   */
+  patch: (id, record) => {
+    if (!id || !record) {
+      throw errorUtil.getInvalidArgumentError('patch');
+    }
+
+    return model.query().patchAndFetchById(id, record);
+  },
+
+  /**
    * Deletes a record from the database
    *
    * @param {number} id
