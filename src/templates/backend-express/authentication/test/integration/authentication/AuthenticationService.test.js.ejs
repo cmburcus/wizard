@@ -4,8 +4,8 @@ const chai = require('chai');
 
 const expect = chai.expect;
 
-const AuthenticationModel = require('../../../resources/authentication/Authentication');
-const AuthenticationService = require('../../../resources/authentication/AuthenticationService');
+const AuthenticationModel = require.main.app('resources/authentication/Authentication');
+const AuthenticationService = require.main.app('resources/authentication/AuthenticationService');
 
 const POSTGRESS_UNIQUE_FIELD_VIOLATION_CODE = '23505';
 const jsonwebtoken = require('jsonwebtoken');
@@ -49,11 +49,6 @@ describe('TESTING: AuthenticationService', () => {
     await AuthenticationModel.query().delete();
   });
 
-  ////////////////////////////////////////////////
-  //
-  //  QUERY
-  //
-  ////////////////////////////////////////////////
   describe('query', () => {
     beforeEach(async () => {
       await AuthenticationModel.query().insert(FAKE_RECORDS);
@@ -90,11 +85,6 @@ describe('TESTING: AuthenticationService', () => {
     });
   });
 
-  ////////////////////////////////////////////////
-  //
-  //  SHOW
-  //
-  ////////////////////////////////////////////////
   describe('show', () => {
     beforeEach(async () => {
       const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
@@ -165,11 +155,6 @@ describe('TESTING: AuthenticationService', () => {
     });
   });
 
-  ////////////////////////////////////////////////
-  //
-  //  CREATE
-  //
-  ////////////////////////////////////////////////
   describe('create', () => {
     it('it should create a record if the data is valid', async () => {
       const record = {
@@ -253,11 +238,6 @@ describe('TESTING: AuthenticationService', () => {
     });
   });
 
-  ////////////////////////////////////////////////
-  //
-  //  UPDATE
-  //
-  ////////////////////////////////////////////////
   describe('update', () => {
     beforeEach(async () => {
       const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
@@ -346,11 +326,6 @@ describe('TESTING: AuthenticationService', () => {
     });
   });
 
-  ////////////////////////////////////////////////
-  //
-  //  PATCH
-  //
-  ////////////////////////////////////////////////
   describe('patch', () => {
     beforeEach(async () => {
       const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
@@ -413,11 +388,6 @@ describe('TESTING: AuthenticationService', () => {
     });
   });
 
-  ////////////////////////////////////////////////
-  //
-  //  DELETE
-  //
-  ////////////////////////////////////////////////
   describe('delete', () => {
     beforeEach(async () => {
       const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
@@ -472,11 +442,6 @@ describe('TESTING: AuthenticationService', () => {
     });
   });
 
-  ////////////////////////////////////////////////
-  //
-  //  COUNT BY
-  //
-  ////////////////////////////////////////////////
   describe('countBy', () => {
     beforeEach(async () => {
       const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
@@ -524,11 +489,6 @@ describe('TESTING: AuthenticationService', () => {
     });
   });
 
-  ////////////////////////////////////////////////
-  //
-  //  REGISTER
-  //
-  ////////////////////////////////////////////////
   describe('register', () => {
     it('it should create an authentication record if the data is valid', async () => {
       let result = null;
@@ -902,11 +862,6 @@ describe('TESTING: AuthenticationService', () => {
     });
   });
 
-  ////////////////////////////////////////////////
-  //
-  //  AUTHENTICATE
-  //
-  ////////////////////////////////////////////////
   describe('authenticate', () => {
     beforeEach(async () => {
       const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
@@ -1093,11 +1048,6 @@ describe('TESTING: AuthenticationService', () => {
     });
   });
 
-  ////////////////////////////////////////////////
-  //
-  //  VERIFY
-  //
-  ////////////////////////////////////////////////
   describe('verify', () => {
     beforeEach(async () => {
       const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
@@ -1173,11 +1123,6 @@ describe('TESTING: AuthenticationService', () => {
     });
   });
 
-  ////////////////////////////////////////////////
-  //
-  //  DELETE BY AUTHORITY ID
-  //
-  ////////////////////////////////////////////////
   describe('deleteByAuthorityId', () => {
     beforeEach(async () => {
       const records = await AuthenticationModel.query().insert(FAKE_RECORDS);

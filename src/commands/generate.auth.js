@@ -45,7 +45,7 @@ module.exports = {
       // Adding new routes
       const routes = [{
         name: 'authentication',
-        path: '../resources/authentication/routes',
+        path: 'resources/authentication/routes',
       }]
       await context.addRoutes(routes)
       routes.forEach(route => {

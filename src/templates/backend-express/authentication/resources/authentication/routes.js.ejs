@@ -3,11 +3,14 @@
 const express = require('express');
 const router = express.Router();
 
-const validator = require('validator-util');
-
-const AuthenticationController = require('./AuthenticationController');
-const AuthenticationService = require('./AuthenticationService');
-const { joiSchema, joiPatchSchema, joiAuthenticateSchema } = require('./Authentication');
+const validator = require.main.app('utils/validator');
+const AuthenticationController = require.main.app(
+  'resources/authentication/AuthenticationController'
+);
+const AuthenticationService = require.main.app('resources/authentication/AuthenticationService');
+const { joiSchema, joiPatchSchema, joiAuthenticateSchema } = require.main.app(
+  'resources/authentication/Authentication'
+);
 
 /**
  * Authentication router

@@ -1,14 +1,13 @@
 'use strict';
 
-const Service = require('../Service');
-const AuthenticationModel = require('./Authentication');
-
-const errorUtil = require('error-util');
-
 const raw = require('objection').raw;
-
 const bcrypt = require('bcrypt');
 const jsonwebtoken = require('jsonwebtoken');
+
+const Service = require.main.app('resources/Service');
+const AuthenticationModel = require.main.app('resources/authentication/Authentication');
+
+const errorUtil = require.main.app('utils/errors');
 
 module.exports = {
   ...Service(AuthenticationModel),

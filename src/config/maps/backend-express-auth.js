@@ -24,8 +24,11 @@ module.exports = () => {
 
   const misc = [
     {
-      template: 'backend-express/authentication/utils/jwt.js.ejs',
-      target: 'utils/jwt.js',
+      template: 'backend-express/authentication/utils/jwt/readme.md.ejs',
+      target: 'utils/jwt/readme.md',
+    }, {
+      template: 'backend-express/authentication/utils/jwt/index.js.ejs',
+      target: 'utils/jwt/index.js',
     },
   ]
 

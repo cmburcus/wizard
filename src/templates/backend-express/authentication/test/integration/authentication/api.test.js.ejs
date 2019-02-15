@@ -3,7 +3,7 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const expect = chai.expect;
-const server = require('../../../app');
+const server = require.main.app('app');
 
 const bcrypt = require('bcrypt');
 const jsonwebtoken = require('jsonwebtoken');
@@ -12,9 +12,11 @@ chai.use(chaiHttp);
 
 const validation = require('./validation');
 
-const AuthenticationModel = require('../../../resources/authentication/Authentication');
-const AuthenticationController = require('../../../resources/authentication/AuthenticationController');
-const AuthenticationService = require('../../../resources/authentication/AuthenticationService');
+const AuthenticationModel = require.main.app('resources/authentication/Authentication');
+const AuthenticationController = require.main.app(
+  'resources/authentication/AuthenticationController'
+);
+const AuthenticationService = require.main.app('resources/authentication/AuthenticationService');
 
 // Fake data to be used for the tests
 const FAKE_RECORDS = [
@@ -49,11 +51,6 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     await AuthenticationModel.query().delete();
   });
 
-  ////////////////////////////////////////////////
-  //
-  //  GET /
-  //
-  ////////////////////////////////////////////////
   describe('GET: /', () => {
     beforeEach(async () => {
       await AuthenticationModel.query().insert(FAKE_RECORDS);
@@ -97,11 +94,6 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     });
   });
 
-  ////////////////////////////////////////////////
-  //
-  //  GET /:id
-  //
-  ////////////////////////////////////////////////
   describe('GET: /:id', () => {
     beforeEach(async () => {
       const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
@@ -159,11 +151,6 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     });
   });
 
-  ////////////////////////////////////////////////
-  //
-  //  POST /
-  //
-  ////////////////////////////////////////////////
   describe('POST: /', () => {
     it('it should handle server failure by returning an error', async () => {
       let errorReturn = null;
@@ -260,11 +247,6 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     });
   });
 
-  ////////////////////////////////////////////////
-  //
-  //  PUT /:id
-  //
-  ////////////////////////////////////////////////
   describe('PUT: /:id', () => {
     beforeEach(async () => {
       const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
@@ -366,11 +348,6 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     });
   });
 
-  ////////////////////////////////////////////////
-  //
-  //  PATCH /:id
-  //
-  ////////////////////////////////////////////////
   describe('PATCH: /:id', () => {
     beforeEach(async () => {
       const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
@@ -448,11 +425,6 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     });
   });
 
-  ////////////////////////////////////////////////
-  //
-  //  DELETE /:id
-  //
-  ////////////////////////////////////////////////
   describe('DELETE: /:id', () => {
     beforeEach(async () => {
       const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
@@ -495,11 +467,6 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     });
   });
 
-  ////////////////////////////////////////////////
-  //
-  //  POST /register
-  //
-  ////////////////////////////////////////////////
   describe('POST: /register', () => {
     it('it should handle server failure by returning an error', async () => {
       let errorReturn = null;
@@ -607,11 +574,6 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     });
   });
 
-  ////////////////////////////////////////////////
-  //
-  //  POST /authenticate
-  //
-  ////////////////////////////////////////////////
   describe('POST: /authenticate', () => {
     beforeEach(async () => {
       await AuthenticationModel.query().insert(FAKE_RECORDS);
@@ -765,11 +727,6 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     });
   });
 
-  ////////////////////////////////////////////////
-  //
-  //  GET /verify
-  //
-  ////////////////////////////////////////////////
   describe('GET: /verify', () => {
     beforeEach(async () => {
       await AuthenticationModel.query().insert(FAKE_RECORDS);

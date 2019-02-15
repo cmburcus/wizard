@@ -1,0 +1,17 @@
+## JWT
+
+This utility provides functionality for the JWT token communication
+
+**Table of contents**
+* [Usage](#usage)
+  * getTokenFromHeader(request)
+
+---
+
+## Usage
+
+Use the following functions as required:
+
+`getTokenFromHeader(request)` - Middleware returning the JWT token from the request header
+
+Throws `InvalidTokenError` if the headers are not present in the request or if the `Authorization` header doesn't contain a token
