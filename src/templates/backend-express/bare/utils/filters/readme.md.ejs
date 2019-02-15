@@ -1,0 +1,92 @@
+## Objection Filters Util
+
+This utility is used to add filters to an Objection query builder
+
+[Objection ORM](https://vincit.github.io/objection.js/) is added as a dependency in this project as certain functionalities are required.
+
+**Table of contents**
+* [Usage](#usage)
+  * [addSelect(queryBuilder, selectString)](#select-specific-columns)
+  * [addFilter(queryBuilder, filterString)](#add-filter-clauses)
+  * [addOrderBy(queryBuilder, orderByString)](#order-results)
+  * [addPagination(queryBuilder, page, pageSize)](#paginate-results)
+
+---
+
+## Usage
+
+Use the following functions as required:
+
+> The query builder is required at all times
+
+> If the parameters are undefined, the query builder will be returned as is
+
+> If the parameter are not a string or are not the right format, an error will be thrown (exception for pagination where numbers are allowed)
+
+#### Select specific columns
+
+Function: `addSelect(queryBuilder, selectString)`
+
+Appends a select query to the query builder. It assumes the string is comma separated.
+
+Example of properly formatted string: `'column_one,column_two'`
+
+#### Add filter clauses
+
+Function: `addFilter(queryBuilder, filterString)`
+
+Appends additional filters to the query. The filterString should be a valid JSON array containing filter objects
+
+_Allowed filter keys_:
+
+* `column`: the database column name 
+* `operator`: valid operator as defined below
+  * gt
+  * gte
+  * lt
+  * lte
+  * ne
+  * eq
+  * like
+* `value`: values to check against
+* `condition`: valid condition as defined below
+  * and
+  * or
+* `range`: valid range type as defined below
+  * in
+  * orIn
+  * notIn
+  * orNotIn
+  * between
+  * orBetween
+  * notBetween
+  * orNotBetween
+
+_Other notes_:
+
+* `column` and `value` must **ALWAYS** be defined
+* `column` must be a string
+* `condition` will be ignored if `range` is defined. Just use the conditional range if you need to (eg. orNotBetween)
+
+#### Order results
+
+Function: `addOrderBy(queryBuilder, orderByString)`
+
+Appends an order by to the query builder. If `ASC` or `DESC` is not defined, `ASC` will be default
+
+Examples of properly formatted string:
+
+  * `'column_one'` - Returns ascending order
+  * `'column_one,ASC'` or `'column_one,asc'` - Returns ascending order
+  * `'column_one,DESC'` or `'column_one,desc'` - Returns descending order
+
+#### Paginate results
+
+Function: `addPagination(queryBuilder, page, pageSize)`
+
+Adds pagination to the query builder
+
+Examples:
+
+ * `addPagination(queryBuilder, 1, 50);`
+ * `addPagination(queryBuilder, '1', '50');`

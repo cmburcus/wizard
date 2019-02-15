@@ -1,0 +1,502 @@
+'use strict';
+
+const chai = require('chai');
+
+const expect = chai.expect;
+
+const errorUtil = require.main.app('utils/errors');
+const AuthenticationError = require.main.app('utils/errors/types/AuthenticationError');
+const InvalidTokenError = require.main.app('utils/errors/types/InvalidTokenError');
+const InvalidArgumentError = require.main.app('utils/errors/types/InvalidArgumentError');
+const ValidationError = require.main.app('utils/errors/types/ValidationError');
+const SystemError = require.main.app('utils/errors/types/SystemError');
+const NotFoundError = require.main.app('utils/errors/types/NotFoundError');
+
+// Mock request and response
+const request = {
+  env: 'testing',
+  app: {
+    get: (variable) => request[variable],
+  },
+};
+
+const response = {
+  statusCode: undefined,
+  jsonObject: undefined,
+  status: (code) => {
+    response.statusCode = code;
+
+    return response;
+  },
+  json: (object) => {
+    response.jsonObject = JSON.stringify(object);
+
+    return response;
+  },
+};
+
+describe('TESTING UTIL: errors', () => {
+  describe('AuthenticationError', () => {
+    it('it should create a new object', () => {
+      const authenticationError = {
+        email: ['invalid email'],
+      };
+
+      const error = new AuthenticationError(authenticationError);
+
+      expect(error).to.be.an('error');
+      expect(error)
+        .to.have.property('type')
+        .equal('AuthenticationError');
+      expect(error)
+        .to.have.property('status')
+        .equal(401);
+      expect(error)
+        .to.have.property('error')
+        .equal(authenticationError);
+    });
+
+    it('it should have the error as null if no error is passed', () => {
+      const error = new AuthenticationError();
+
+      expect(error).to.be.an('error');
+      expect(error)
+        .to.have.property('type')
+        .equal('AuthenticationError');
+      expect(error)
+        .to.have.property('status')
+        .equal(401);
+      expect(error).to.have.property('error').be.null;
+    });
+  });
+
+  describe('getAuthenticationError', () => {
+    it('it should be throwable', () => {
+      const authenticationError = {
+        email: ['invalid email'],
+      };
+
+      let result = null;
+
+      try {
+        throw errorUtil.getAuthenticationError(authenticationError);
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('error');
+      expect(result)
+        .to.have.property('type')
+        .equal('AuthenticationError');
+      expect(result)
+        .to.have.property('status')
+        .equal(401);
+      expect(result)
+        .to.have.property('error')
+        .equal(authenticationError);
+    });
+  });
+
+  describe('InvalidTokenError', () => {
+    it('it should create a new object', () => {
+      const tokenName = 'token';
+
+      const error = new InvalidTokenError(tokenName);
+
+      expect(error).to.be.an('error');
+      expect(error)
+        .to.have.property('type')
+        .equal('InvalidTokenError');
+      expect(error)
+        .to.have.property('status')
+        .equal(401);
+      expect(error)
+        .to.have.property('error')
+        .equal(tokenName);
+    });
+
+    it('it should have the error as null if no error is passed', () => {
+      const error = new InvalidTokenError();
+
+      expect(error).to.be.an('error');
+      expect(error)
+        .to.have.property('type')
+        .equal('InvalidTokenError');
+      expect(error)
+        .to.have.property('status')
+        .equal(401);
+      expect(error).to.have.property('error').be.null;
+    });
+  });
+
+  describe('getInvalidTokenError', () => {
+    it('it should be throwable', () => {
+      const tokenName = 'token';
+
+      let result = null;
+
+      try {
+        throw errorUtil.getInvalidTokenError(tokenName);
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('error');
+      expect(result)
+        .to.have.property('type')
+        .equal('InvalidTokenError');
+      expect(result)
+        .to.have.property('status')
+        .equal(401);
+      expect(result)
+        .to.have.property('error')
+        .equal(tokenName);
+    });
+  });
+
+  describe('InvalidArgumentError', () => {
+    it('it should create a new object', () => {
+      const argument = 'variableName';
+      const error = new InvalidArgumentError(argument);
+
+      expect(error).to.be.an('error');
+      expect(error)
+        .to.have.property('type')
+        .equal('InvalidArgumentError');
+      expect(error)
+        .to.have.property('status')
+        .equal(400);
+      expect(error)
+        .to.have.property('error')
+        .equal(argument);
+    });
+
+    it('it should set error to null if one is not passed', () => {
+      const error = new InvalidArgumentError();
+
+      expect(error).to.be.an('error');
+      expect(error)
+        .to.have.property('type')
+        .equal('InvalidArgumentError');
+      expect(error)
+        .to.have.property('status')
+        .equal(400);
+      expect(error).to.have.property('error').be.null;
+    });
+  });
+
+  describe('getInvalidArgumentError', () => {
+    it('it should be throwable', () => {
+      const argument = 'variableName';
+
+      let result = null;
+
+      try {
+        throw errorUtil.getInvalidArgumentError(argument);
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('error');
+      expect(result)
+        .to.have.property('type')
+        .equal('InvalidArgumentError');
+      expect(result)
+        .to.have.property('status')
+        .equal(400);
+      expect(result)
+        .to.have.property('error')
+        .equal(argument);
+    });
+  });
+
+  describe('ValidationError', () => {
+    it('it should create a new object', () => {
+      const errorObject = { key1: ['Some error message'] };
+      const error = new ValidationError(errorObject);
+
+      expect(error).to.be.an('error');
+      expect(error)
+        .to.have.property('type')
+        .equal('ValidationError');
+      expect(error)
+        .to.have.property('status')
+        .equal(400);
+      expect(error)
+        .to.have.property('error')
+        .equal(errorObject);
+    });
+
+    it('it should have the error as null if no error is passed', () => {
+      const error = new ValidationError();
+
+      expect(error).to.be.an('error');
+      expect(error)
+        .to.have.property('type')
+        .equal('ValidationError');
+      expect(error)
+        .to.have.property('status')
+        .equal(400);
+      expect(error).to.have.property('error').be.null;
+    });
+  });
+
+  describe('getValidationError', () => {
+    it('it should be throwable', () => {
+      const errorObject = { key1: ['Some error message'] };
+
+      let result = null;
+
+      try {
+        throw errorUtil.getValidationError(errorObject);
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('error');
+      expect(result)
+        .to.have.property('type')
+        .equal('ValidationError');
+      expect(result)
+        .to.have.property('status')
+        .equal(400);
+      expect(result)
+        .to.have.property('error')
+        .equal(errorObject);
+    });
+  });
+
+  describe('SystemError', () => {
+    it('it should create a new object', () => {
+      let systemError = null;
+
+      try {
+        willNotWork = 'test';
+      } catch (error) {
+        systemError = error;
+      }
+
+      const error = new SystemError(systemError);
+
+      expect(error).to.be.an('error');
+      expect(error)
+        .to.have.property('type')
+        .equal('SystemError');
+      expect(error)
+        .to.have.property('status')
+        .equal(500);
+      expect(error)
+        .to.have.property('error')
+        .equal(systemError);
+    });
+  });
+
+  describe('getSystemError', () => {
+    it('it should be throwable', () => {
+      let result = null;
+
+      try {
+        throw errorUtil.getSystemError();
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('error');
+      expect(result)
+        .to.have.property('type')
+        .equal('SystemError');
+      expect(result)
+        .to.have.property('status')
+        .equal(500);
+    });
+  });
+
+  describe('AuthenticationError', () => {
+    it('it should create a new object', () => {
+      const notFoundError = 'entity not found';
+
+      const error = new NotFoundError(notFoundError);
+
+      expect(error).to.be.an('error');
+      expect(error)
+        .to.have.property('type')
+        .equal('NotFoundError');
+      expect(error)
+        .to.have.property('status')
+        .equal(404);
+      expect(error)
+        .to.have.property('error')
+        .equal(notFoundError);
+    });
+
+    it('it should have the error as null if no error is passed', () => {
+      const error = new NotFoundError();
+
+      expect(error).to.be.an('error');
+      expect(error)
+        .to.have.property('type')
+        .equal('NotFoundError');
+      expect(error)
+        .to.have.property('status')
+        .equal(404);
+      expect(error).to.have.property('error').be.null;
+    });
+  });
+
+  describe('getNotFoundError', () => {
+    it('it should be throwable', () => {
+      let result = null;
+
+      try {
+        throw errorUtil.getNotFoundError();
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('error');
+      expect(result)
+        .to.have.property('type')
+        .equal('NotFoundError');
+      expect(result)
+        .to.have.property('status')
+        .equal(404);
+    });
+  });
+
+  describe('notFoundHandler', () => {
+    it('it should call the callback with a NotFoundError', async () => {
+      let errorReturn = null;
+
+      await errorUtil.notFoundHandler(null, null, function(error) {
+        errorReturn = error;
+      });
+
+      expect(errorReturn).to.be.an('error');
+      expect(errorReturn)
+        .to.have.property('type')
+        .equal('NotFoundError');
+      expect(errorReturn)
+        .to.have.property('status')
+        .equal(404);
+      expect(errorReturn)
+        .to.have.property('error')
+        .equal(null);
+    });
+  });
+
+  describe('errorHandler', () => {
+    beforeEach(async () => {
+      request.env = 'testing';
+
+      response.statusCode = 'undefined';
+      response.jsonObject = 'undefined';
+    });
+
+    it('it should handle system errors', async () => {
+      let systemError = null;
+
+      try {
+        thisWillFail = null;
+      } catch (error) {
+        systemError = error;
+      }
+
+      await errorUtil.errorHandler(systemError, request, response, null);
+
+      expect(response)
+        .to.have.property('statusCode')
+        .be.a('number')
+        .and.equal(500);
+      expect(response)
+        .to.have.property('jsonObject')
+        .be.a('string');
+
+      const jsonObject = JSON.parse(response.jsonObject);
+
+      expect(jsonObject)
+        .to.have.property('type')
+        .be.a('string')
+        .and.equal('SystemError');
+      expect(jsonObject)
+        .to.have.property('status')
+        .be.a('number')
+        .and.equal(500);
+      expect(jsonObject)
+        .to.have.property('message')
+        .be.a('string')
+        .and.equal('Internal server error');
+      expect(jsonObject)
+        .to.have.property('error')
+        .be.a('string')
+        .and.equal(systemError.stack);
+    });
+
+    it('it should handle system errors but not return the full error in production', async () => {
+      request.env = 'production';
+
+      let systemError = null;
+
+      try {
+        thisWillFail = null;
+      } catch (error) {
+        systemError = error;
+      }
+
+      await errorUtil.errorHandler(systemError, request, response, null);
+
+      expect(response)
+        .to.have.property('statusCode')
+        .be.a('number')
+        .and.equal(500);
+      expect(response)
+        .to.have.property('jsonObject')
+        .be.a('string');
+
+      const jsonObject = JSON.parse(response.jsonObject);
+
+      expect(jsonObject)
+        .to.have.property('type')
+        .be.a('string')
+        .and.equal('SystemError');
+      expect(jsonObject)
+        .to.have.property('status')
+        .be.a('number')
+        .and.equal(500);
+      expect(jsonObject)
+        .to.have.property('message')
+        .be.a('string')
+        .and.equal('Internal server error');
+      expect(jsonObject).to.have.property('error').be.null;
+    });
+
+    it('it should handle errors thrown on purpose', async () => {
+      let error = new InvalidArgumentError();
+
+      await errorUtil.errorHandler(error, request, response, null);
+
+      expect(response)
+        .to.have.property('statusCode')
+        .be.a('number')
+        .and.equal(400);
+      expect(response)
+        .to.have.property('jsonObject')
+        .be.a('string');
+
+      const jsonObject = JSON.parse(response.jsonObject);
+
+      expect(jsonObject)
+        .to.have.property('type')
+        .be.a('string')
+        .and.equal('InvalidArgumentError');
+      expect(jsonObject)
+        .to.have.property('status')
+        .be.a('number')
+        .and.equal(400);
+      expect(jsonObject)
+        .to.have.property('message')
+        .be.a('string')
+        .and.equal('Invalid argument');
+      expect(jsonObject).to.have.property('error').be.null;
+    });
+  });
+});

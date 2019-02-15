@@ -1,0 +1,88 @@
+## Validator Util
+
+This utility is used to give the ability to format Joi validation errors and perform different types of data validation. It also allows to get a validation object that would follow the same format as a formatted joi validation error would.
+
+**Table of contents**
+* [Usage](#usage)
+  * [validate(data, schema)](#validate)
+  * [validateSchema(schema)](#validate-schema)
+  * [uniqueField(field, uniqueCheckFunction, excludeCurrentKey)](#unique-field-check)
+  * [formatJoiError(error)](#format-joi-error)
+  * [getUniqueFieldError(name, original)](#get-unique-field-error)
+
+---
+
+## Usage
+
+Use the following functions as required:
+
+#### Validate
+
+`validate(data, schema)` - Returns a Joi validation
+* **data** - The object to be validated
+* **schema** - The Joi schema that data should be validated against
+
+The following settings are used as Joi options when performing a validation:
+
+```
+"abortEarly": false
+"allowUnknown": true
+"stripUnknown": true
+```
+
+#### Validate Schema
+
+`validateSchema(schema)` - Middleware validating a schema against the request body
+* **schema**
+
+The same settings are used as the `validate` function
+
+#### Unique Field Check
+
+`uniqueField(field, uniqueCheckFunction, excludeCurrentKey)` - Middleware checking if a field is unique in the database
+* **field** - The field to check
+* **uniqueCheckFunction** - Function callback that performs the check
+* **excludeCurrentKey** - (Optional) resource to be ignored if this key matches
+
+The `uniqueCheckFunction` will be called with an array of objects containing a key, value and sometimes a condition:
+
+```
+[
+  {
+    key: fieldInDatabase,
+    value: valueOfField
+    condition: '!=' (if excludeCurrentKey is set)
+  }
+]
+```
+
+#### Format Joi Error
+
+`formatJoiError(error)` - Formats a Joi error (produced after a validation failed)
+
+* **error** - Error produced by Joi
+
+```
+Format: {
+   status: failed'
+   original: {
+     key: value,
+   },
+   errors: {
+     key: [
+       {
+         type: joi.error
+         message: Human readable string
+       }
+     ]
+   }
+}
+```
+
+#### Get Unique Field Error
+
+`getUniqueFieldError(name, original)` - Returns error formatted the same way as formatJoiError for a unique field validation error
+* **name** - Object key or path
+* **original** - Original object that was being validated
+
+_NOTE_: The reason why such a function is required is because Joi doesn't allow for async validation and database calls can only be done async. Therefore, you will need to check if the field is unique manually and then throw an error with this format if the validation fails.

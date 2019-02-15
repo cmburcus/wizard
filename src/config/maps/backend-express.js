@@ -93,6 +93,52 @@ module.exports = (answers) => {
     },
   ]
 
+  const misc = [
+    {
+      template: 'backend-express/bare/utils/errors/readme.md.ejs',
+      target: `${answers.folderName}/utils/errors/readme.md`,
+    }, {
+      template: 'backend-express/bare/utils/errors/index.js.ejs',
+      target: `${answers.folderName}/utils/errors/index.js`,
+    }, {
+      template: 'backend-express/bare/utils/errors/types/AuthenticationError.js.ejs',
+      target: `${answers.folderName}/utils/errors/types/AuthenticationError.js`,
+    }, {
+      template: 'backend-express/bare/utils/errors/types/InvalidArgumentError.js.ejs',
+      target: `${answers.folderName}/utils/errors/types/InvalidArgumentError.js`,
+    }, {
+      template: 'backend-express/bare/utils/errors/types/InvalidTokenError.js.ejs',
+      target: `${answers.folderName}/utils/errors/types/InvalidTokenError.js`,
+    }, {
+      template: 'backend-express/bare/utils/errors/types/NotFoundError.js.ejs',
+      target: `${answers.folderName}/utils/errors/types/NotFoundError.js`,
+    }, {
+      template: 'backend-express/bare/utils/errors/types/SystemError.js.ejs',
+      target: `${answers.folderName}/utils/errors/types/SystemError.js`,
+    }, {
+      template: 'backend-express/bare/utils/errors/types/ValidationError.js.ejs',
+      target: `${answers.folderName}/utils/errors/types/ValidationError.js`,
+    }, {
+      template: 'backend-express/bare/utils/filters/readme.md.ejs',
+      target: `${answers.folderName}/utils/filters/readme.md`,
+    }, {
+      template: 'backend-express/bare/utils/filters/index.js.ejs',
+      target: `${answers.folderName}/utils/filters/index.js`,
+    }, {
+      template: 'backend-express/bare/utils/filters/constants/filters.json.ejs',
+      target: `${answers.folderName}/utils/filters/constants/filters.json`,
+    }, {
+      template: 'backend-express/bare/utils/validator/readme.md.ejs',
+      target: `${answers.folderName}/utils/validator/readme.md`,
+    }, {
+      template: 'backend-express/bare/utils/validator/index.js.ejs',
+      target: `${answers.folderName}/utils/validator/index.js`,
+    }, {
+      template: 'backend-express/bare/utils/validator/config/joi.json.ejs',
+      target: `${answers.folderName}/utils/validator/config/joi.json`,
+    },
+  ]
+
   const testing = [
     {
       template: 'backend-express/bare/nodemon.json.ejs',
@@ -109,6 +155,15 @@ module.exports = (answers) => {
     }, {
       template: 'backend-express/bare/test/unit/resources/Controller.test.js.ejs',
       target: `${answers.folderName}/test/unit/resources/Controller.test.js`
+    }, {
+      template: 'backend-express/bare/test/unit/utils/errors.test.js.ejs',
+      target: `${answers.folderName}/test/unit/utils/errors.test.js`
+    }, {
+      template: 'backend-express/bare/test/unit/utils/filters.test.js.ejs',
+      target: `${answers.folderName}/test/unit/utils/filters.test.js`
+    }, {
+      template: 'backend-express/bare/test/unit/utils/validator.test.js.ejs',
+      target: `${answers.folderName}/test/unit/utils/validator.test.js`
     },
   ]
 
@@ -118,6 +173,7 @@ module.exports = (answers) => {
     ...docker,
     ...database,
     ...app,
+    ...misc,
     ...testing,
     {
       template: '.wizard.ejs',

@@ -1,7 +1,8 @@
 'use strict';
 
 // Update with your config settings.
-
+// Because this file is used by knex, we cannot use
+// the require.main.app as it will be undefined at runtime
 const config = require('../config/database');
 
 module.exports = {

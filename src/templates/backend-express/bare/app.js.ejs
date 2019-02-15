@@ -1,13 +1,18 @@
 'use strict';
 
-const errorUtil = require('error-util');
+// Defining require for local dependencies to use absolute paths
+const path = require('path');
+require.main.app = (filepath) => require(path.join(__dirname, filepath));
+
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const Knex = require('knex');
-const databaseConfig = require('./config/database');
-const routesConfig = require('./config/routes');
 const Model = require('objection').Model;
+
+const errorUtil = require.main.app('utils/errors');
+const databaseConfig = require.main.app('config/database');
+const routesConfig = require.main.app('config/routes');
 
 require('dotenv').config();
 

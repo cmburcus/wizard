@@ -3,7 +3,7 @@
 const chai = require('chai');
 
 const expect = chai.expect;
-const AbstractController = require('../../../resources/Controller');
+const AbstractController = require.main.app('resources/Controller');
 
 // Mocking service so that we don't touch the database
 const service = {

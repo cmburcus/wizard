@@ -3,13 +3,13 @@
 const chai = require('chai');
 
 const expect = chai.expect;
-const AbstractService = require('../../../resources/Service');
-const AbstractModel = require('../../../resources/Model');
+const AbstractService = require.main.app('resources/Service');
+const AbstractModel = require.main.app('resources/Model');
 
 const service = AbstractService(AbstractModel);
 
 describe('TESTING: Service', () => {
-  describe('Service.query', () => {
+  describe('query', () => {
     it('it should be able to perform a query operation without a query', () => {
       expect(service.query()).to.be.an('object');
       expect(service.query().constructor.name).to.equal('QueryBuilder');
@@ -40,7 +40,7 @@ describe('TESTING: Service', () => {
     });
   });
 
-  describe('Service.show', () => {
+  describe('show', () => {
     it('it should be able to retrieve one record by id', () => {
       let result = null;
 
@@ -89,7 +89,7 @@ describe('TESTING: Service', () => {
     });
   });
 
-  describe('Service.create', () => {
+  describe('create', () => {
     it('it should be able to perform a create operation', () => {
       const record = { col: 'value' };
       let result = null;
@@ -141,7 +141,7 @@ describe('TESTING: Service', () => {
     });
   });
 
-  describe('Service.update', () => {
+  describe('update', () => {
     it('it should be able to perform an update operation', () => {
       const record = { id: 1, col: 'value' };
       let result = null;
@@ -192,7 +192,7 @@ describe('TESTING: Service', () => {
     });
   });
 
-  describe('Service.patch', () => {
+  describe('patch', () => {
     it('it should be able to perform a patch operation', () => {
       const record = { id: 1, col: 'value' };
       let result = null;
@@ -243,7 +243,7 @@ describe('TESTING: Service', () => {
     });
   });
 
-  describe('Service.delete', () => {
+  describe('delete', () => {
     it('it should be able to perform a delete operation', () => {
       let result = null;
 
@@ -295,7 +295,7 @@ describe('TESTING: Service', () => {
     });
   });
 
-  describe('Service.countBy', () => {
+  describe('countBy', () => {
     it('it should be able to perform a count operation if the condition is not defined', () => {
       let result = null;
 

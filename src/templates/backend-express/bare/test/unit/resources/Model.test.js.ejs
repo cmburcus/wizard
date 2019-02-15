@@ -3,7 +3,7 @@
 const chai = require('chai');
 
 const expect = chai.expect;
-const AbstractModel = require('../../../resources/Model');
+const AbstractModel = require.main.app('resources/Model');
 
 describe('TESTING: Objection Model', () => {
   it('it should create a new instance of Model', () => {

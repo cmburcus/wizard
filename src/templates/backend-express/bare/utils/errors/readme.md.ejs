@@ -1,0 +1,65 @@
+## Error Util
+
+This utility is used to define Javascript errors that can be thrown from within the application. Instead of throwing generic Javascript errors that are non descriptive.
+
+**Table of contents**
+* [Usage](#usage)
+  * getAuthenticationError(error)
+  * getInvalidTokenError(error)
+  * getInvalidArgumentError(error)
+  * getValidationError(error)
+  * getSystemError(error)
+  * getNotFoundError(error)
+  * notFoundHandler
+  * errorHandler
+
+---
+
+## Usage
+
+Use the following functions as required:
+
+`getAuthenticationError(error)` - Gets an authentication error
+* type: AuthenticationError
+* message: 'Authentication failed'
+* status: `401`
+* error: `error` as passed as an argument or null
+
+`getInvalidTokenError(error)` - Gets an invalid token error
+* type: InvalidTokenError
+* message: 'Invalid token'
+* status: `401`
+* error: `error` as passed as an argument or null
+
+`getInvalidArgumentError(error)` - Gets an invalid argument error
+* type: InvalidArgumentError
+* message: 'Invalid argument'
+* status: `400`
+* error: `error` as passed as an argument or null
+
+`getValidationError(error)` - Gets a validation error
+* type: ValidationError
+* message: 'Validation failed'
+* status: `400`
+* error: `error` as passed as an argument or null
+
+`getSystemError(error)` - Gets a system error
+* type: SystemError
+* message: 'Internal server error'
+* status: `500`
+* error: `error` as passed as an argument or null
+
+`getNotFoundError(error)` - Gets a not found error
+* type: NotFoundError
+* message: 'Not found'
+* status: `404`
+* error: `error` as passed as an argument or null
+
+`notFoundHandler(request, response, next)` - Middleware to handle 404 routes
+Calls the `next` callback with a NotFoundError and no argument
+
+`errorHandler(error, request, response, next)` - Middleware to handle error responses
+Returns a json response with the error. The status code of the response will be determined by the error
+
+If the error is a system error not thrown on purpose, a `SystemError` will be returned that will include the stack trace of the error.
+If the environment is production, the stack trace will not be included.
