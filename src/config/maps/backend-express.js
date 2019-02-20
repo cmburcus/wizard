@@ -30,37 +30,10 @@ module.exports = (answers) => {
     },
   ]
 
-  const docker = [
-    {
-      template: 'backend-express/bare/node.dev.Dockerfile.ejs',
-      target: `${answers.folderName}/node.dev.Dockerfile`,
-      props: answers
-    }, {
-      template: 'backend-express/bare/node.test.Dockerfile.ejs',
-      target: `${answers.folderName}/node.test.Dockerfile`,
-      props: answers
-    }, {
-      template: 'backend-express/bare/docker-compose.yml.ejs',
-      target: `${answers.folderName}/docker-compose.yml`
-    }, {
-      template: 'backend-express/bare/docker-compose.dev.yml.ejs',
-      target: `${answers.folderName}/docker-compose.dev.yml`,
-      props: answers
-    }, {
-      template: 'backend-express/bare/docker-compose.test.yml.ejs',
-      target: `${answers.folderName}/docker-compose.test.yml`,
-      props: answers
-    }, {
-      template: 'backend-express/bare/.dockerignore.ejs',
-      target: `${answers.folderName}/.dockerignore`
-    },
-  ]
-
   const database = [
     {
       template: 'backend-express/bare/config/database.js.ejs',
-      target: `${answers.folderName}/config/database.js`,
-      props: answers
+      target: `${answers.folderName}/config/database.js`
     }, {
       template: 'backend-express/bare/database/knexfile.js.ejs',
       target: `${answers.folderName}/database/knexfile.js`
@@ -170,7 +143,6 @@ module.exports = (answers) => {
   return [
     ...newProjectMap(answers.folderName),
     ...environment,
-    ...docker,
     ...database,
     ...app,
     ...misc,
@@ -178,7 +150,10 @@ module.exports = (answers) => {
     {
       template: '.wizard.ejs',
       target: `${answers.folderName}/.wizard`,
-      props: { projectType: projectTypes.backendExpress }
+      props: {
+        ...answers,
+        projectType: projectTypes.backendExpress,
+      }
     },
   ]
 }

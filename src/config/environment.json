@@ -1,16 +1,12 @@
 {
   "builds": {
-    "dev": "dev",
-    "test": "test",
-    "prod": "prod"
-  },
-  "dockerfiles": {
-    "main": "docker-compose.yml",
-    "dev": "docker-compose.dev.yml",
-    "test": "docker-compose.test.yml"
+    "dev": "development",
+    "test": "testing",
+    "prod": "production"
   },
   "bins": {
     "node": "node",
+    "postgres": "postgres",
     "knex": "node_modules/.bin/knex",
     "knexfile": "database/knexfile.js"
   }

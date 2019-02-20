@@ -29,11 +29,12 @@ module.exports = {
 
     try {
       print.warning('Running seed files')
-      print.info('Command: '.yellow + `docker-compose exec ${bins.node} ${bins.knex} --knexfile ${bins.knexfile} seed:run`.muted)
+      print.info('Command: '.yellow + `docker exec -it ${bins.node} ${bins.knex} --knexfile ${bins.knexfile} seed:run`.muted)
       print.info('')
 
-      await childProcess.execFileSync('docker-compose', [
+      await childProcess.execFileSync('docker', [
         'exec',
+        '-it',
         bins.node,
         bins.knex,
         '--knexfile',

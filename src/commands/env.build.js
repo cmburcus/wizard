@@ -1,5 +1,5 @@
 const { print } = require('gluegun/print')
-const { builds, dockerfiles, bins } = require('../config/environment')
+const { builds, bins } = require('../config/environment')
 const childProcess = require('child_process')
 const projectTypes = require('../config/project-types')
 
@@ -9,7 +9,7 @@ module.exports = {
   name: 'env:build',
   description: description,
   run: async (context) => {
-    const { parameters, system } = context
+    const { parameters, filesystem, system } = context
 
     if (!context.canRunCommand(projectTypes.backendExpress)) {
       return
@@ -25,49 +25,96 @@ module.exports = {
     /// ////////////////////////////////
     // RUNNING COMMANDS
     /// ////////////////////////////////
+    const projectConfig = JSON.parse(filesystem.read('.wizard'));
     const buildType = context.getBuildType(parameters.options)
 
     const timer = system.startTimer()
 
     try {
-      // Building the docker containers
-      print.warning('Building docker containers')
-      print.info('Command: '.yellow + `docker-compose -f ${dockerfiles.main} -f ${dockerfiles[buildType]} up -d --build`.muted)
+      print.success(`Creating environment for ${buildType}\n`)
+
+      // Creating docker network
+      print.warning('Creating docker network')
+      print.info('Command: '.yellow + `docker network create ${projectConfig.projectName}`.muted)
+      await childProcess.execFileSync('docker', [
+        'network',
+        'create',
+        projectConfig.projectName,
+      ], { stdio: 'inherit' })
       print.info('')
-      await childProcess.execFileSync('docker-compose', [
-        '-f',
-        dockerfiles.main,
-        '-f',
-        dockerfiles[buildType],
-        'up',
+
+      // Building docker containers
+      print.warning('Building database docker container')
+      print.info('Command: '.yellow + `docker run -d --name postgres --network ${projectConfig.projectName} -p 21000:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=password -e POSTGRES_DB=${buildType} --rm postgres:10.4`.muted)
+      await childProcess.execFileSync('docker', [
+        'run',
         '-d',
-        '--build'
-      ], {stdio: 'inherit'})
+        '--name',
+        'postgres',
+        '--network',
+        projectConfig.projectName,
+        '-p',
+        '21000:5432',
+        '-e',
+        'POSTGRES_USER=postgres',
+        '-e',
+        'POSTGRES_PASSWORD=password',
+        '-e',
+        `POSTGRES_DB=${buildType}`,
+        '--rm',
+        'postgres:10.4'
+      ], { stdio: 'inherit' })
+      print.info('')
+
+      print.warning('Building app docker container')
+      print.info('Command: '.yellow + `docker run -dit --name node --network ${projectConfig.projectName} -p 5000:5000 -e NODE_ENV=${buildType} -v ${filesystem.cwd()}:/app -v /app/node_modules -w /app --rm node:9.11.1`.muted)
+      await childProcess.execFileSync('docker', [
+        'run',
+        '-dit',
+        '--name',
+        'node',
+        '--network',
+        projectConfig.projectName,
+        '-p',
+        '5000:5000',
+        '-e',
+        `NODE_ENV=${buildType}`,
+        '-v',
+        `${filesystem.cwd()}:/app`,
+        '-v',
+        '/app/node_modules',
+        '-w',
+        '/app',
+        '--rm',
+        'node:9.11.1'
+      ], { stdio: 'inherit' })
       print.info('')
 
       // Installing project dependencies
       print.warning('Installing project dependencies')
-      print.info('Command: '.yellow + `docker-compose exec ${bins.node} yarn`.muted)
+      print.info('Command: '.yellow + `docker exec -it ${bins.node} yarn`.muted)
       print.info('')
-      await childProcess.execFileSync('docker-compose', [
+      await childProcess.execFileSync('docker', [
         'exec',
+        '-it',
         bins.node,
         'yarn'
-      ], {stdio: 'inherit'})
+      ], { stdio: 'inherit' })
       print.info('')
 
       // Migrating database
       print.warning('Migrating database')
-      print.info('Command: '.yellow + `docker-compose exec ${bins.node} ${bins.knex} --knexfile database/knexfile.js migrate:latest`.muted)
+      print.info('Command: '.yellow + `docker exec -it ${bins.node} ${bins.knex} --knexfile database/knexfile.js migrate:latest`.muted)
       print.info('')
-      await childProcess.execFileSync('docker-compose', [
+      await childProcess.execFileSync('docker', [
         'exec',
+        '-it',
         bins.node,
         bins.knex,
         '--knexfile',
         'database/knexfile.js',
         'migrate:latest'
-      ], {stdio: 'inherit'})
+      ], { stdio: 'inherit' })
       print.info('')
 
       print.info(`Executed in ${timer() * 0.001} s`)

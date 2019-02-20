@@ -27,7 +27,7 @@ module.exports = {
     /// ////////////////////////////////
     try {
       print.warning('Displaying docker container logs')
-      print.info('Command: '.yellow + `docker-compose logs ${parameters.options.f ? '-f ' : ''}${parameters.options.t ? '-t ' : ''}${bins.node} bash`.muted)
+      print.info('Command: '.yellow + `docker logs ${parameters.options.f ? '-f ' : ''}${parameters.options.t ? '-t ' : ''}${!parameters.options.db ? bins.node : bins.postgres}`.muted)
       print.info('')
 
       const options = []
@@ -40,10 +40,10 @@ module.exports = {
         options.push('-t')
       }
 
-      await childProcess.execFileSync('docker-compose', [
+      await childProcess.execFileSync('docker', [
         'logs',
         ...options,
-        bins.node
+        !parameters.options.db ? bins.node : bins.postgres
       ], {stdio: 'inherit'})
       print.info('')
     } catch (error) {
@@ -63,6 +63,7 @@ function printHelp (context) {
   print.info('  env:logs [options]')
   print.info('')
   print.info('  Docker container must already be running')
+  print.info('    By default, the node container logs are displayed')
   print.info('')
 
   // Options
@@ -70,6 +71,8 @@ function printHelp (context) {
   print.info('  -h, --help'.green + '\t\tDisplay help message')
   print.info('  -f        '.green + '\t\tFollow log output')
   print.info('  -t        '.green + '\t\tShow timestamps')
+  print.info('')
+  print.info(' --db        '.green + '\t\tShow database container logs')
   print.info('')
 
   // Help title

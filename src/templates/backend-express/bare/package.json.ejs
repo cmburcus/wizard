@@ -7,9 +7,9 @@
     "node": "<%= props.nodeVersion %>"
   },
   "scripts": {
-    "node:dev": "DEBUG=app:* && nodemon ./bin/www",
-    "node:prod": "DEBUG=app:* && node ./bin/www",
-    "node:test": "DEBUG=app:* && nyc mocha --file app.js -t 10000 --recursive --exit",
+    "node:dev": "NODE_ENV=development && DEBUG=app:* && nodemon ./bin/www",
+    "node:prod": "NODE_ENV=production && DEBUG=app:* && node ./bin/www",
+    "node:test": "NODE_ENV=testing && DEBUG=app:* && nyc mocha --file app.js -t 10000 --recursive --exit",
     "format": "eslint --quiet --report-unused-disable-directives --fix '**/*.js' || true"
   },
   "dependencies": {

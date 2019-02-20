@@ -19,9 +19,9 @@ module.exports = {
     client: 'pg',
     connection: {
       host: 'postgres',
-      user: '<%= props.projectNameAlias %>',
-      password: 'developmentPassword',
-      database: '<%= props.projectNameAlias %>',
+      user: 'postgres',
+      password: 'password',
+      database: 'postgres',
     },
     migrations: {
       tableName: 'migrations',
@@ -31,10 +31,10 @@ module.exports = {
   testing: {
     client: 'pg',
     connection: {
-      host: 'postgres_testing',
-      user: '<%= props.projectNameAlias %>_test',
-      password: 'testingPassword',
-      database: '<%= props.projectNameAlias %>_test',
+      host: 'postgres',
+      user: 'postgres',
+      password: 'password',
+      database: 'postgres',
     },
     migrations: {
       tableName: 'migrations',

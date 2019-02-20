@@ -44,11 +44,12 @@ module.exports = {
 
     try {
       print.warning('Creating migration file')
-      print.info('Command: '.yellow + `docker-compose exec ${bins.node} ${bins.knex} --knexfile ${bins.knexfile} migrate:make ${name}`.muted)
+      print.info('Command: '.yellow + `docker exec -it ${bins.node} ${bins.knex} --knexfile ${bins.knexfile} migrate:make ${name}`.muted)
       print.info('')
 
-      await childProcess.execFileSync('docker-compose', [
+      await childProcess.execFileSync('docker', [
         'exec',
+        '-it',
         bins.node,
         bins.knex,
         '--knexfile',

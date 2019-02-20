@@ -28,11 +28,11 @@ module.exports = {
     const timer = system.startTimer()
 
     try {
-      print.warning('Running app in docker container')
-      print.info('Command: '.yellow + `docker-compose exec ${bins.node} yarn format`.muted)
+      print.warning('Formatting code')
+      print.info('Command: '.yellow + `docker exec -it ${bins.node} yarn format`.muted)
       print.info('')
 
-      await childProcess.execFileSync('docker-compose', [
+      await childProcess.execFileSync('docker', [
         'exec',
         bins.node,
         'yarn',

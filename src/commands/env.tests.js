@@ -29,10 +29,11 @@ module.exports = {
 
     try {
       print.warning('Running tests inside docker container')
-      print.info('Command: '.yellow + `docker-compose exec ${bins.node} yarn node:test`.muted)
+      print.info('Command: '.yellow + `docker exec -it ${bins.node} yarn node:test`.muted)
       print.info('')
-      await childProcess.execFileSync('docker-compose', [
+      await childProcess.execFileSync('docker', [
         'exec',
+        '-it',
         bins.node,
         'yarn',
         'node:test'

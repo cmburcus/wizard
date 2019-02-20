@@ -27,11 +27,12 @@ module.exports = {
     /// ////////////////////////////////
     try {
       print.warning('Attempting environment SSH')
-      print.info('Command: '.yellow + `docker-compose exec ${bins.node} bash`.muted)
+      print.info('Command: '.yellow + `docker exec -it ${bins.node} bash`.muted)
       print.info('')
 
-      await childProcess.execFileSync('docker-compose', [
+      await childProcess.execFileSync('docker', [
         'exec',
+        '-it',
         bins.node,
         'bash'
       ], {stdio: 'inherit'})

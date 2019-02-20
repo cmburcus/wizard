@@ -29,7 +29,7 @@ module.exports = {
 
     try {
       print.warning('Running app in docker container')
-      print.info('Command: '.yellow + `docker-compose exec ${parameters.options.d ? '-d ' : ''} ${bins.node} yarn node:dev`.muted)
+      print.info('Command: '.yellow + `docker exec -it ${parameters.options.d ? '-d ' : ''}${bins.node} yarn node:dev`.muted)
       print.info('')
 
       const options = []
@@ -38,8 +38,9 @@ module.exports = {
         options.push('-d')
       }
 
-      await childProcess.execFileSync('docker-compose', [
+      await childProcess.execFileSync('docker', [
         'exec',
+        '-it',
         ...options,
         bins.node,
         'yarn',

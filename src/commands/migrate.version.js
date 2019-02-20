@@ -29,11 +29,12 @@ module.exports = {
 
     try {
       print.warning('Checking current migration version')
-      print.info('Command: '.yellow + `docker-compose exec ${bins.node} ${bins.knex} --knexfile ${bins.knexfile} migrate:currentVersion`.muted)
+      print.info('Command: '.yellow + `docker exec -it ${bins.node} ${bins.knex} --knexfile ${bins.knexfile} migrate:currentVersion`.muted)
       print.info('')
 
-      await childProcess.execFileSync('docker-compose', [
+      await childProcess.execFileSync('docker', [
         'exec',
+        '-it',
         bins.node,
         bins.knex,
         '--knexfile',
