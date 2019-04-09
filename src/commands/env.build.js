@@ -138,7 +138,7 @@ function printHelp (context) {
   // Options
   context.helpOptionsTitle()
   print.info('  -h, --help'.green + '\t\tDisplay help message')
-  print.info(`      --${builds.dev}`.green + '\t\tBuild dev docker containers')
+  print.info(`      --${builds.dev}`.green + '\tBuild dev docker containers')
   print.info(`      --${builds.test}`.green + '\t\tBuild test docker containers')
   print.info('')
 

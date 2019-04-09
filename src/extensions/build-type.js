@@ -7,11 +7,11 @@ module.exports = (context) => {
    * @param { option: boolean } options
    */
   context.getBuildType = (options) => {
-    if (typeof options.prod !== 'undefined') {
+    if (typeof options[builds.prod] !== 'undefined') {
       return builds.prod
     }
 
-    if (typeof options.test !== 'undefined') {
+    if (typeof options[builds.test] !== 'undefined') {
       return builds.test
     }
 
