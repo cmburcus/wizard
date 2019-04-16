@@ -104,7 +104,7 @@ module.exports = {
 
       // Migrating database
       print.warning('Migrating database')
-      print.info('Command: '.yellow + `docker exec -it ${bins.node} ${bins.knex} --knexfile database/knexfile.js migrate:latest`.muted)
+      print.info('Command: '.yellow + `docker exec -it ${bins.node} ${bins.knex} --knexfile src/database/knexfile.js migrate:latest`.muted)
       print.info('')
       await childProcess.execFileSync('docker', [
         'exec',
@@ -112,7 +112,7 @@ module.exports = {
         bins.node,
         bins.knex,
         '--knexfile',
-        'database/knexfile.js',
+        'src/database/knexfile.js',
         'migrate:latest'
       ], { stdio: 'inherit' })
       print.info('')

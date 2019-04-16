@@ -8,6 +8,6 @@
     "node": "node",
     "postgres": "postgres",
     "knex": "node_modules/.bin/knex",
-    "knexfile": "database/knexfile.js"
+    "knexfile": "src/database/knexfile.js"
   }
 }
