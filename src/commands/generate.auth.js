@@ -1,5 +1,6 @@
 const projectTypes = require('../config/project-types')
 const authenticationMap = require('../config/maps/backend-express-auth')
+const projectPaths = require('../config/paths/backend-express.json').project
 
 const { print } = require('gluegun/print')
 const description = 'Generates authentication components'
@@ -49,7 +50,7 @@ module.exports = {
       }]
       await context.addRoutes(routes)
       routes.forEach(route => {
-        print.info('config/routes.js: '.yellow + `New routes added for /${route.name}`)
+        print.info(`${projectPaths.config}/routes.js :`.yellow + `New routes added for /${route.name}`)
       })
 
       // Adding JWT variables in the .env file

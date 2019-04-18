@@ -1,3 +1,5 @@
+const projectPaths = require('../config/paths/backend-express.json').project
+
 module.exports = (context) => {
   const { filesystem } = context
 
@@ -5,7 +7,7 @@ module.exports = (context) => {
    * Adds routes to the config routes file for the backend
    */
   context.addRoutes = async (routes) => {
-    const routesFile = await filesystem.read('config/routes.js')
+    const routesFile = await filesystem.read(`${projectPaths.config}/routes.js`)
     const routesEndIndex = routesFile.search(']; // Application routes')
 
     const preFile = routesFile.substring(0, routesEndIndex - 1)
@@ -33,6 +35,6 @@ module.exports = (context) => {
 
     newRoutes += '\n'
 
-    await filesystem.write('config/routes.js', preFile + newRoutes + postFile)
+    await filesystem.write(`${projectPaths.config}/routes.js`, preFile + newRoutes + postFile)
   }
 }

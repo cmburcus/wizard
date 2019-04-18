@@ -41,10 +41,10 @@ module.exports = {
     answers.projectNameAlias = answers.projectName.toLowerCase().replace(' ', '_')
 
     // Create migrations & seeds folder
-    filesystem.dir(`${answers.folderName}${projectPaths.project.database.migrations}`)
-    filesystem.dir(`${answers.folderName}${projectPaths.project.database.seeds}`)
-    filesystem.dir(`${answers.folderName}${projectPaths.project.test.integration.main}`)
-    filesystem.dir(`${answers.folderName}${projectPaths.project.test.unit.main}`)
+    filesystem.dir(`${answers.folderName}/${projectPaths.project.database.migrations}`)
+    filesystem.dir(`${answers.folderName}/${projectPaths.project.database.seeds}`)
+    filesystem.dir(`${answers.folderName}/${projectPaths.project.test.integration.main}`)
+    filesystem.dir(`${answers.folderName}/${projectPaths.project.test.unit.main}`)
 
     context.generateProject(answers.folderName, backendExpressMap(answers))
   }
