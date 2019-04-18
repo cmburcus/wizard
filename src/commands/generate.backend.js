@@ -7,6 +7,9 @@ const backendExpressMap = require('../config/maps/backend-express')
 // Project types
 const projectTypes = require('../config/project-types')
 
+// Project paths
+const projectPaths = require('../config/paths/backend-express.json')
+
 const { print } = require('gluegun/print')
 const description = 'Generate an express application'
 
@@ -38,10 +41,10 @@ module.exports = {
     answers.projectNameAlias = answers.projectName.toLowerCase().replace(' ', '_')
 
     // Create migrations & seeds folder
-    filesystem.dir(`${answers.folderName}/database/migrations`)
-    filesystem.dir(`${answers.folderName}/database/seeds`)
-    filesystem.dir(`${answers.folderName}/test/integration`)
-    filesystem.dir(`${answers.folderName}/test/unit`)
+    filesystem.dir(`${answers.folderName}${projectPaths.project.database.migrations}`)
+    filesystem.dir(`${answers.folderName}${projectPaths.project.database.seeds}`)
+    filesystem.dir(`${answers.folderName}${projectPaths.project.test.integration.main}`)
+    filesystem.dir(`${answers.folderName}${projectPaths.project.test.unit.main}`)
 
     context.generateProject(answers.folderName, backendExpressMap(answers))
   }

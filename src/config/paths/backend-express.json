@@ -1,0 +1,53 @@
+{
+  "templates": {
+    "bare": {
+      "main": "backend-express/bare",
+      "bin": "backend-express/bare/bin",
+      "src": "backend-express/bare/src",
+      "config": "backend-express/bare/src/config",
+      "database": "backend-express/bare/src/database",
+      "resources": "backend-express/bare/src/resources",
+      "test": {
+        "integration": {
+          "main": "backend-express/bare/src/test/integration"
+        },
+        "unit": {
+          "main": "backend-express/bare/src/test/unit",
+          "resources": "backend-express/bare/src/test/unit/resources",
+          "utils": "backend-express/bare/src/test/unit/utils"
+        }
+      },
+      "utils": {
+        "errors": "backend-express/bare/src/utils/errors",
+        "filters": "backend-express/bare/src/utils/filters",
+        "validator": "backend-express/bare/src/utils/validator"
+      }
+    }
+  },
+  "project": {
+    "bin": "/bin",
+    "src": "/src",
+    "config": "/src/config",
+    "database": {
+      "main": "/src/database",
+      "migrations": "/src/database/migrations",
+      "seeds": "/src/database/seeds"
+    },
+    "resources": "/src/resources",
+    "test": {
+      "integration": {
+        "main": "/src/test/integration"
+      },
+      "unit": {
+        "main": "/src/test/unit",
+        "resources": "/src/test/unit/resources",
+        "utils": "/src/test/unit/utils"
+      }
+    },
+    "utils": {
+      "errors": "/src/utils/errors",
+      "filters": "/src/utils/filters",
+      "validator": "/src/utils/validator"
+    }
+  }
+}
