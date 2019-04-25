@@ -1,18 +1,18 @@
 const { build } = require('gluegun')
 
-const yaml = require('js-yaml');
-const fs = require('fs');
+const yaml = require('js-yaml')
+const fs = require('fs')
 
 /**
  * Import a yaml file. The path should be from the root of the src directory with no leading slash
  */
 function importYaml (path) {
   try {
-    const file = yaml.safeLoad(fs.readFileSync(`${__dirname}/${path}`, 'utf8'));
+    const file = yaml.safeLoad(fs.readFileSync(`${__dirname}/${path}`, 'utf8'))
 
-    return file;
+    return file
   } catch (e) {
-    console.log(e);
+    console.log(e)
   }
 }
 

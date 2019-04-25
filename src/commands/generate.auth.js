@@ -5,7 +5,6 @@ const authenticationMap = require('../config/maps/backend-express-auth')
 const importYaml = require('../cli').importYaml
 const paths = importYaml('config/paths/express.yaml')
 const core = paths.core
-const authentication = paths.authentication
 
 const { print } = require('gluegun/print')
 const description = 'Generates authentication components'
@@ -14,7 +13,7 @@ module.exports = {
   name: 'generate:auth',
   description: description,
   run: async (context) => {
-    const { parameters, prompt, filesystem } = context
+    const { parameters, prompt } = context
 
     if (!context.canRunCommand(projectTypes.backendExpress)) {
       return
@@ -38,11 +37,11 @@ module.exports = {
       const addedDependencies = await context.addDependencies([{
         type: 'dependencies',
         name: 'bcrypt',
-        version: '3.0.4',
+        version: '3.0.4'
       }, {
         type: 'dependencies',
         name: 'jsonwebtoken',
-        version: '8.4.0',
+        version: '8.4.0'
       }])
       addedDependencies.forEach(dependency => {
         print.info(`${core.files.main.packageJson}: `.yellow + `New ${dependency.type} ${dependency.name}@${dependency.version}`)
@@ -51,7 +50,7 @@ module.exports = {
       // Adding new routes
       const routes = [{
         name: 'authentication',
-        path: 'resources/authentication/routes',
+        path: 'resources/authentication/routes'
       }]
       await context.addRoutes(routes)
       routes.forEach(route => {
@@ -63,11 +62,11 @@ module.exports = {
         comment: 'Environment data for the JWT token',
         variables: [{
           key: 'JWT_SECRET',
-          value: context.generateKey(16),
+          value: context.generateKey(16)
         }, {
           key: 'JWT_EXPIRES_IN',
           value: '30d'
-        }],
+        }]
       }]
       await context.addEnvironmentVariables(envVariableGroups)
       envVariableGroups.forEach(group => {

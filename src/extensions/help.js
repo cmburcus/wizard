@@ -1,8 +1,7 @@
-const { print, filesystem } = require('gluegun')
+const { print } = require('gluegun')
 const { version } = require('../../package')
 
 const commandTypes = require('../config/command-types')
-const projectTypes = require('../config/project-types')
 
 /**
  * Displays help message

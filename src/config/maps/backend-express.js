@@ -34,7 +34,7 @@ module.exports = (answers) => {
     }, {
       template: `${template}/${core.files.main.env}.ejs`,
       target: `${answers.folderName}/${core.files.main.env}`
-    },
+    }
   ]
 
   const database = [
@@ -47,7 +47,7 @@ module.exports = (answers) => {
     }, {
       template: `${template}/${core.directories.src.database.path}/${core.files.database.migrationStub}.ejs`,
       target: `${answers.folderName}/${core.directories.src.database.path}/${core.files.database.migrationStub}`
-    },
+    }
   ]
 
   const app = [
@@ -70,53 +70,53 @@ module.exports = (answers) => {
     }, {
       template: `${template}/${core.directories.src.resources.path}/${core.files.resources.controller}.ejs`,
       target: `${answers.folderName}/${core.directories.src.resources.path}/${core.files.resources.controller}`
-    },
+    }
   ]
 
   const misc = [
     {
       template: `${template}/${utils.directories.errors.path}/${utils.files.errors.readme}.ejs`,
-      target: `${answers.folderName}/${utils.directories.errors.path}/${utils.files.errors.readme}`,
+      target: `${answers.folderName}/${utils.directories.errors.path}/${utils.files.errors.readme}`
     }, {
       template: `${template}/${utils.directories.errors.path}/${utils.files.errors.index}.ejs`,
-      target: `${answers.folderName}/${utils.directories.errors.path}/${utils.files.errors.index}`,
+      target: `${answers.folderName}/${utils.directories.errors.path}/${utils.files.errors.index}`
     }, {
       template: `${template}/${utils.directories.errors.types.path}/${utils.files.errors.types.authenticationError}.ejs`,
-      target: `${answers.folderName}/${utils.directories.errors.types.path}/${utils.files.errors.types.authenticationError}`,
+      target: `${answers.folderName}/${utils.directories.errors.types.path}/${utils.files.errors.types.authenticationError}`
     }, {
       template: `${template}/${utils.directories.errors.types.path}/${utils.files.errors.types.invalidArgumentError}.ejs`,
-      target: `${answers.folderName}/${utils.directories.errors.types.path}/${utils.files.errors.types.invalidArgumentError}`,
+      target: `${answers.folderName}/${utils.directories.errors.types.path}/${utils.files.errors.types.invalidArgumentError}`
     }, {
       template: `${template}/${utils.directories.errors.types.path}/${utils.files.errors.types.invalidTokenError}.ejs`,
-      target: `${answers.folderName}/${utils.directories.errors.types.path}/${utils.files.errors.types.invalidTokenError}`,
+      target: `${answers.folderName}/${utils.directories.errors.types.path}/${utils.files.errors.types.invalidTokenError}`
     }, {
       template: `${template}/${utils.directories.errors.types.path}/${utils.files.errors.types.notFoundError}.ejs`,
-      target: `${answers.folderName}/${utils.directories.errors.types.path}/${utils.files.errors.types.notFoundError}`,
+      target: `${answers.folderName}/${utils.directories.errors.types.path}/${utils.files.errors.types.notFoundError}`
     }, {
       template: `${template}/${utils.directories.errors.types.path}/${utils.files.errors.types.systemError}.ejs`,
-      target: `${answers.folderName}/${utils.directories.errors.types.path}/${utils.files.errors.types.systemError}`,
+      target: `${answers.folderName}/${utils.directories.errors.types.path}/${utils.files.errors.types.systemError}`
     }, {
       template: `${template}/${utils.directories.errors.types.path}/${utils.files.errors.types.validationError}.ejs`,
-      target: `${answers.folderName}/${utils.directories.errors.types.path}/${utils.files.errors.types.validationError}`,
+      target: `${answers.folderName}/${utils.directories.errors.types.path}/${utils.files.errors.types.validationError}`
     }, {
       template: `${template}/${utils.directories.filters.path}/${utils.files.filters.readme}.ejs`,
-      target: `${answers.folderName}/${utils.directories.filters.path}/${utils.files.filters.readme}`,
+      target: `${answers.folderName}/${utils.directories.filters.path}/${utils.files.filters.readme}`
     }, {
       template: `${template}/${utils.directories.filters.path}/${utils.files.filters.index}.ejs`,
-      target: `${answers.folderName}/${utils.directories.filters.path}/${utils.files.filters.index}`,
+      target: `${answers.folderName}/${utils.directories.filters.path}/${utils.files.filters.index}`
     }, {
       template: `${template}/${utils.directories.filters.constants.path}/${utils.files.filters.constants.filters}.ejs`,
-      target: `${answers.folderName}/${utils.directories.filters.constants.path}/${utils.files.filters.constants.filters}`,
+      target: `${answers.folderName}/${utils.directories.filters.constants.path}/${utils.files.filters.constants.filters}`
     }, {
       template: `${template}/${utils.directories.validator.path}/${utils.files.validator.readme}.ejs`,
-      target: `${answers.folderName}/${utils.directories.validator.path}/${utils.files.validator.readme}`,
+      target: `${answers.folderName}/${utils.directories.validator.path}/${utils.files.validator.readme}`
     }, {
       template: `${template}/${utils.directories.validator.path}/${utils.files.validator.index}.ejs`,
-      target: `${answers.folderName}/${utils.directories.validator.path}/${utils.files.validator.index}`,
+      target: `${answers.folderName}/${utils.directories.validator.path}/${utils.files.validator.index}`
     }, {
       template: `${template}/${utils.directories.validator.config.path}/${utils.files.validator.config.joi}.ejs`,
-      target: `${answers.folderName}/${utils.directories.validator.config.path}/${utils.files.validator.config.joi}`,
-    },
+      target: `${answers.folderName}/${utils.directories.validator.config.path}/${utils.files.validator.config.joi}`
+    }
   ]
 
   const testing = [
@@ -144,7 +144,7 @@ module.exports = (answers) => {
     }, {
       template: `${template}/${utils.directories.validator.tests.unit.path}/${utils.files.validator.tests.unit.validator}.ejs`,
       target: `${answers.folderName}/${utils.directories.validator.tests.unit.path}/${utils.files.validator.tests.unit.validator}`
-    },
+    }
   ]
 
   return [
@@ -159,8 +159,8 @@ module.exports = (answers) => {
       target: `${answers.folderName}/${core.files.main.wizard}`,
       props: {
         ...answers,
-        projectType: projectTypes.backendExpress,
+        projectType: projectTypes.backendExpress
       }
-    },
+    }
   ]
 }

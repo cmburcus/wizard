@@ -24,7 +24,7 @@ module.exports = {
     /// ////////////////////////////////
     // RUNNING COMMANDS
     /// ////////////////////////////////
-    const projectConfig = JSON.parse(filesystem.read('.wizard'));
+    const projectConfig = JSON.parse(filesystem.read('.wizard'))
 
     const timer = system.startTimer()
 
@@ -43,7 +43,7 @@ module.exports = {
       await childProcess.execFileSync('docker', [
         'network',
         'remove',
-        projectConfig.projectName,
+        projectConfig.projectName
       ], { stdio: 'inherit' })
       print.info('')
 

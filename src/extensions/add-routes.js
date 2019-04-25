@@ -1,4 +1,7 @@
-const projectPaths = require('../config/paths/backend-express.json').project
+// Project paths
+const importYaml = require('../cli').importYaml
+const paths = importYaml('config/paths/express.yaml')
+const core = paths.core
 
 module.exports = (context) => {
   const { filesystem } = context
@@ -7,7 +10,7 @@ module.exports = (context) => {
    * Adds routes to the config routes file for the backend
    */
   context.addRoutes = async (routes) => {
-    const routesFile = await filesystem.read(`${projectPaths.config}/routes.js`)
+    const routesFile = await filesystem.read(`${core.directories.src.config.path}/${core.files.config.routes}`)
     const routesEndIndex = routesFile.search(']; // Application routes')
 
     const preFile = routesFile.substring(0, routesEndIndex - 1)
@@ -27,14 +30,14 @@ module.exports = (context) => {
         newRoutes += ' {\n'
       }
 
-      newRoutes += `    route: \'${route.name}\',\n`
-      newRoutes += `    path: \'${route.path}\',\n`
+      newRoutes += `    route: '${route.name}',\n`
+      newRoutes += `    path: '${route.path}',\n`
       newRoutes += '    version: routeVersions.v1,\n'
       newRoutes += '  },'
     })
 
     newRoutes += '\n'
 
-    await filesystem.write(`${projectPaths.config}/routes.js`, preFile + newRoutes + postFile)
+    await filesystem.write(`${core.directories.src.config.path}/${core.files.config.routes}`, preFile + newRoutes + postFile)
   }
 }

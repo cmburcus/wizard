@@ -1,6 +1,4 @@
 module.exports = (context) => {
-  const { filesystem } = context
-
   /**
    * Adds routes to the config routes file for the backend
    */
@@ -12,6 +10,6 @@ module.exports = (context) => {
       text += characters.charAt(Math.floor(Math.random() * characters.length))
     }
 
-    return text;
+    return text
   }
 }
