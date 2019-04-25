@@ -8,7 +8,7 @@ const description = 'View the current version for the migration'
 module.exports = {
   name: 'migrate:version',
   description: description,
-  run: async (context) => {
+  run: async context => {
     const { parameters, system } = context
 
     if (!context.canRunCommand(projectTypes.backendExpress)) {
@@ -29,18 +29,27 @@ module.exports = {
 
     try {
       print.warning('Checking current migration version')
-      print.info('Command: '.yellow + `docker exec -it ${bins.node} ${bins.knex} --knexfile ${bins.knexfile} migrate:currentVersion`.muted)
+      print.info(
+        'Command: '.yellow +
+          `docker exec -it ${bins.node} ${bins.knex} --knexfile ${
+            bins.knexfile
+          } migrate:currentVersion`.muted
+      )
       print.info('')
 
-      await childProcess.execFileSync('docker', [
-        'exec',
-        '-it',
-        bins.node,
-        bins.knex,
-        '--knexfile',
-        bins.knexfile,
-        'migrate:currentVersion'
-      ], {stdio: 'inherit'})
+      await childProcess.execFileSync(
+        'docker',
+        [
+          'exec',
+          '-it',
+          bins.node,
+          bins.knex,
+          '--knexfile',
+          bins.knexfile,
+          'migrate:currentVersion'
+        ],
+        { stdio: 'inherit' }
+      )
       print.info('')
 
       print.info(`Executed in ${timer() * 0.001} s`)

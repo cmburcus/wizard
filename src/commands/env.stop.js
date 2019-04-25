@@ -7,7 +7,7 @@ const description = 'Stops the docker containers if they are running (dev by def
 module.exports = {
   name: 'env:stop',
   description: description,
-  run: async (context) => {
+  run: async context => {
     const { parameters, filesystem, system } = context
 
     if (!context.canRunCommand(projectTypes.backendExpress)) {
@@ -31,20 +31,14 @@ module.exports = {
     try {
       print.warning('Stopping docker containers')
       print.info('Command: '.yellow + 'docker stop node postgres')
-      await childProcess.execFileSync('docker', [
-        'stop',
-        'node',
-        'postgres'
-      ], { stdio: 'inherit' })
+      await childProcess.execFileSync('docker', ['stop', 'node', 'postgres'], { stdio: 'inherit' })
       print.info('')
 
       print.warning('Removing docker network')
       print.info('Command: '.yellow + `docker network create ${projectConfig.projectName}`.muted)
-      await childProcess.execFileSync('docker', [
-        'network',
-        'remove',
-        projectConfig.projectName
-      ], { stdio: 'inherit' })
+      await childProcess.execFileSync('docker', ['network', 'remove', projectConfig.projectName], {
+        stdio: 'inherit'
+      })
       print.info('')
 
       print.info(`Executed in ${timer() * 0.001} s`)

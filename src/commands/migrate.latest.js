@@ -8,7 +8,7 @@ const description = 'Run all migrations that have not yet been run'
 module.exports = {
   name: 'migrate:latest',
   description: description,
-  run: async (context) => {
+  run: async context => {
     const { parameters, system } = context
 
     if (!context.canRunCommand(projectTypes.backendExpress)) {
@@ -29,18 +29,18 @@ module.exports = {
 
     try {
       print.warning('Running latest migrations')
-      print.info('Command: '.yellow + `docker exec -it ${bins.node} ${bins.knex} --knexfile ${bins.knexfile} migrate:latest`.muted)
+      print.info(
+        'Command: '.yellow +
+          `docker exec -it ${bins.node} ${bins.knex} --knexfile ${bins.knexfile} migrate:latest`
+            .muted
+      )
       print.info('')
 
-      await childProcess.execFileSync('docker', [
-        'exec',
-        '-it',
-        bins.node,
-        bins.knex,
-        '--knexfile',
-        bins.knexfile,
-        'migrate:latest'
-      ], {stdio: 'inherit'})
+      await childProcess.execFileSync(
+        'docker',
+        ['exec', '-it', bins.node, bins.knex, '--knexfile', bins.knexfile, 'migrate:latest'],
+        { stdio: 'inherit' }
+      )
       print.info('')
 
       print.info(`Executed in ${timer() * 0.001} s`)

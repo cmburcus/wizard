@@ -8,7 +8,7 @@ const description = 'Run seed files'
 module.exports = {
   name: 'seed:run',
   description: description,
-  run: async (context) => {
+  run: async context => {
     const { parameters, system } = context
 
     if (!context.canRunCommand(projectTypes.backendExpress)) {
@@ -29,18 +29,17 @@ module.exports = {
 
     try {
       print.warning('Running seed files')
-      print.info('Command: '.yellow + `docker exec -it ${bins.node} ${bins.knex} --knexfile ${bins.knexfile} seed:run`.muted)
+      print.info(
+        'Command: '.yellow +
+          `docker exec -it ${bins.node} ${bins.knex} --knexfile ${bins.knexfile} seed:run`.muted
+      )
       print.info('')
 
-      await childProcess.execFileSync('docker', [
-        'exec',
-        '-it',
-        bins.node,
-        bins.knex,
-        '--knexfile',
-        bins.knexfile,
-        'seed:run'
-      ], {stdio: 'inherit'})
+      await childProcess.execFileSync(
+        'docker',
+        ['exec', '-it', bins.node, bins.knex, '--knexfile', bins.knexfile, 'seed:run'],
+        { stdio: 'inherit' }
+      )
       print.info('')
 
       print.info(`Executed in ${timer() * 0.001} s`)

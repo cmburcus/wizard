@@ -6,7 +6,7 @@ const commandTypes = require('../config/command-types')
 /**
  * Displays help message
  */
-module.exports = (context) => {
+module.exports = context => {
   /**
    * Prints the help header
    */
@@ -99,16 +99,18 @@ module.exports = (context) => {
 }
 
 function printCommandsByType (commands, type) {
-  commands.filter(command => type.indexOf(command.name) >= 0).forEach(command => {
-    const commandLength = command.name.length
-    let tabs = '\t\t\t'
+  commands
+    .filter(command => type.indexOf(command.name) >= 0)
+    .forEach(command => {
+      const commandLength = command.name.length
+      let tabs = '\t\t\t'
 
-    if (commandLength >= 14) {
-      tabs = '\t'
-    } else if (commandLength >= 7) {
-      tabs = '\t\t'
-    }
+      if (commandLength >= 14) {
+        tabs = '\t'
+      } else if (commandLength >= 7) {
+        tabs = '\t\t'
+      }
 
-    print.info(`  ${command.name}`.green + `${tabs}${command.description}`)
-  })
+      print.info(`  ${command.name}`.green + `${tabs}${command.description}`)
+    })
 }

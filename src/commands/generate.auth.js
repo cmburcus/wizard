@@ -12,7 +12,7 @@ const description = 'Generates authentication components'
 module.exports = {
   name: 'generate:auth',
   description: description,
-  run: async (context) => {
+  run: async context => {
     const { parameters, prompt } = context
 
     if (!context.canRunCommand(projectTypes.backendExpress)) {
@@ -28,46 +28,62 @@ module.exports = {
 
     if (await prompt.confirm('Generate authentication')) {
       // Adding required files
-      authenticationMap().forEach(async (map) => {
+      authenticationMap().forEach(async map => {
         await context.template.generate(map)
         print.info('New file: '.green + map.target)
       })
 
       // Adding required dependencies
-      const addedDependencies = await context.addDependencies([{
-        type: 'dependencies',
-        name: 'bcrypt',
-        version: '3.0.4'
-      }, {
-        type: 'dependencies',
-        name: 'jsonwebtoken',
-        version: '8.4.0'
-      }])
+      const addedDependencies = await context.addDependencies([
+        {
+          type: 'dependencies',
+          name: 'bcrypt',
+          version: '3.0.4'
+        },
+        {
+          type: 'dependencies',
+          name: 'jsonwebtoken',
+          version: '8.4.0'
+        }
+      ])
       addedDependencies.forEach(dependency => {
-        print.info(`${core.files.main.packageJson}: `.yellow + `New ${dependency.type} ${dependency.name}@${dependency.version}`)
+        print.info(
+          `${core.files.main.packageJson}: `.yellow +
+            `New ${dependency.type} ${dependency.name}@${dependency.version}`
+        )
       })
 
       // Adding new routes
-      const routes = [{
-        name: 'authentication',
-        path: 'resources/authentication/routes'
-      }]
+      const routes = [
+        {
+          name: 'authentication',
+          path: 'resources/authentication/routes'
+        }
+      ]
       await context.addRoutes(routes)
       routes.forEach(route => {
-        print.info(`${core.directories.src.config}/${core.files.config.routes} :`.yellow + `New routes added for /${route.name}`)
+        print.info(
+          `${core.directories.src.config}/${core.files.config.routes} :`.yellow +
+            `New routes added for /${route.name}`
+        )
       })
 
       // Adding JWT variables in the .env file
-      const envVariableGroups = [{
-        comment: 'Environment data for the JWT token',
-        variables: [{
-          key: 'JWT_SECRET',
-          value: context.generateKey(16)
-        }, {
-          key: 'JWT_EXPIRES_IN',
-          value: '30d'
-        }]
-      }]
+      const envVariableGroups = [
+        {
+          comment: 'Environment data for the JWT token',
+          variables: [
+            {
+              key: 'JWT_SECRET',
+              value: context.generateKey(16)
+            },
+            {
+              key: 'JWT_EXPIRES_IN',
+              value: '30d'
+            }
+          ]
+        }
+      ]
       await context.addEnvironmentVariables(envVariableGroups)
       envVariableGroups.forEach(group => {
         group.variables.forEach(variable => {

@@ -8,7 +8,7 @@ const description = 'Runs the tests in the docker container'
 module.exports = {
   name: 'env:test',
   description: description,
-  run: async (context) => {
+  run: async context => {
     const { parameters, system } = context
 
     if (!context.canRunCommand(projectTypes.backendExpress)) {
@@ -31,13 +31,9 @@ module.exports = {
       print.warning('Running tests inside docker container')
       print.info('Command: '.yellow + `docker exec -it ${bins.node} yarn node:test`.muted)
       print.info('')
-      await childProcess.execFileSync('docker', [
-        'exec',
-        '-it',
-        bins.node,
-        'yarn',
-        'node:test'
-      ], {stdio: 'inherit'})
+      await childProcess.execFileSync('docker', ['exec', '-it', bins.node, 'yarn', 'node:test'], {
+        stdio: 'inherit'
+      })
       print.info('')
 
       print.info(`Executed in ${timer() * 0.001} s`)

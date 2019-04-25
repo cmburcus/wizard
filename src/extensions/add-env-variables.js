@@ -1,10 +1,10 @@
-module.exports = (context) => {
+module.exports = context => {
   const { filesystem } = context
 
   /**
    * Adds variables to the .env file
    */
-  context.addEnvironmentVariables = async (groupVariables) => {
+  context.addEnvironmentVariables = async groupVariables => {
     let text = ''
 
     groupVariables.forEach(group => {

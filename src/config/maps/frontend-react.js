@@ -5,7 +5,7 @@
 const newProjectMap = require('./new-project')
 const projectTypes = require('../project-types')
 
-module.exports = (answers) => {
+module.exports = answers => {
   const environment = []
 
   const docker = []

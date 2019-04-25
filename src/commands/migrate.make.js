@@ -9,7 +9,7 @@ const description = 'Create a named migration file'
 module.exports = {
   name: 'migrate:make',
   description: description,
-  run: async (context) => {
+  run: async context => {
     const { parameters, system, prompt } = context
 
     if (!context.canRunCommand(projectTypes.backendExpress)) {
@@ -31,7 +31,7 @@ module.exports = {
     let name = parameters.first
 
     if (typeof name === 'undefined') {
-      ({ name } = await prompt.ask({
+      ;({ name } = await prompt.ask({
         type: 'input',
         name: 'name',
         message: 'Name :',
@@ -44,19 +44,19 @@ module.exports = {
 
     try {
       print.warning('Creating migration file')
-      print.info('Command: '.yellow + `docker exec -it ${bins.node} ${bins.knex} --knexfile ${bins.knexfile} migrate:make ${name}`.muted)
+      print.info(
+        'Command: '.yellow +
+          `docker exec -it ${bins.node} ${bins.knex} --knexfile ${
+            bins.knexfile
+          } migrate:make ${name}`.muted
+      )
       print.info('')
 
-      await childProcess.execFileSync('docker', [
-        'exec',
-        '-it',
-        bins.node,
-        bins.knex,
-        '--knexfile',
-        bins.knexfile,
-        'migrate:make',
-        name
-      ], {stdio: 'inherit'})
+      await childProcess.execFileSync(
+        'docker',
+        ['exec', '-it', bins.node, bins.knex, '--knexfile', bins.knexfile, 'migrate:make', name],
+        { stdio: 'inherit' }
+      )
       print.info('')
 
       print.info(`Executed in ${timer() * 0.001} s`)

@@ -8,7 +8,7 @@ const description = 'Formats the code using eslint and prettier'
 module.exports = {
   name: 'env:format',
   description: description,
-  run: async (context) => {
+  run: async context => {
     const { parameters, system } = context
 
     if (!context.canRunCommand(projectTypes.backendExpress)) {
@@ -32,12 +32,9 @@ module.exports = {
       print.info('Command: '.yellow + `docker exec -it ${bins.node} yarn format`.muted)
       print.info('')
 
-      await childProcess.execFileSync('docker', [
-        'exec',
-        bins.node,
-        'yarn',
-        'format'
-      ], {stdio: 'inherit'})
+      await childProcess.execFileSync('docker', ['exec', bins.node, 'yarn', 'format'], {
+        stdio: 'inherit'
+      })
       print.info('')
 
       if (parameters.options.d) {

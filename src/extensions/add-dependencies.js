@@ -1,4 +1,4 @@
-module.exports = (context) => {
+module.exports = context => {
   const { filesystem } = context
 
   /**
@@ -8,7 +8,7 @@ module.exports = (context) => {
    *
    * Returns the list of dependencies that were added
    */
-  context.addDependencies = async (dependencies) => {
+  context.addDependencies = async dependencies => {
     const packageFile = await filesystem.read('package.json', 'json')
 
     const addedDependencies = []
@@ -22,14 +22,18 @@ module.exports = (context) => {
 
     // Reorder dependencies and devDependencies
     const orderedDependencies = {}
-    Object.keys(packageFile.dependencies).sort().forEach(key => {
-      orderedDependencies[key] = packageFile.dependencies[key]
-    })
+    Object.keys(packageFile.dependencies)
+      .sort()
+      .forEach(key => {
+        orderedDependencies[key] = packageFile.dependencies[key]
+      })
 
     const orderedDevDependencies = {}
-    Object.keys(packageFile.devDependencies).sort().forEach(key => {
-      orderedDevDependencies[key] = packageFile.devDependencies[key]
-    })
+    Object.keys(packageFile.devDependencies)
+      .sort()
+      .forEach(key => {
+        orderedDevDependencies[key] = packageFile.devDependencies[key]
+      })
 
     // Save the file if there are new dependencies
     if (addedDependencies.length > 0) {

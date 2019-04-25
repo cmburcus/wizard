@@ -1,8 +1,8 @@
-module.exports = (context) => {
+module.exports = context => {
   /**
    * Adds routes to the config routes file for the backend
    */
-  context.generateKey = (length) => {
+  context.generateKey = length => {
     let text = ''
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&&*()-_'
 

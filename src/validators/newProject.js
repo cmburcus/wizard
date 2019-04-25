@@ -2,7 +2,7 @@ const generalValidators = require('./general')
 const { filesystem } = require('gluegun/filesystem')
 
 module.exports = {
-  validateProjectName: (value) => {
+  validateProjectName: value => {
     let errorCheck = generalValidators.isRequired(value)
 
     if (typeof errorCheck === 'string') {
@@ -17,7 +17,7 @@ module.exports = {
 
     return true
   },
-  validateAuthorName: (value) => {
+  validateAuthorName: value => {
     let errorCheck = generalValidators.isRequired(value)
 
     if (typeof errorCheck === 'string') {
@@ -32,7 +32,7 @@ module.exports = {
 
     return true
   },
-  validateFolderName: (value) => {
+  validateFolderName: value => {
     let errorCheck = generalValidators.isRequired(value)
 
     if (typeof errorCheck === 'string') {

@@ -3,14 +3,16 @@ const importYaml = require('../cli').importYaml
 const paths = importYaml('config/paths/express.yaml')
 const core = paths.core
 
-module.exports = (context) => {
+module.exports = context => {
   const { filesystem } = context
 
   /**
    * Adds routes to the config routes file for the backend
    */
-  context.addRoutes = async (routes) => {
-    const routesFile = await filesystem.read(`${core.directories.src.config.path}/${core.files.config.routes}`)
+  context.addRoutes = async routes => {
+    const routesFile = await filesystem.read(
+      `${core.directories.src.config.path}/${core.files.config.routes}`
+    )
     const routesEndIndex = routesFile.search(']; // Application routes')
 
     const preFile = routesFile.substring(0, routesEndIndex - 1)
@@ -38,6 +40,9 @@ module.exports = (context) => {
 
     newRoutes += '\n'
 
-    await filesystem.write(`${core.directories.src.config.path}/${core.files.config.routes}`, preFile + newRoutes + postFile)
+    await filesystem.write(
+      `${core.directories.src.config.path}/${core.files.config.routes}`,
+      preFile + newRoutes + postFile
+    )
   }
 }

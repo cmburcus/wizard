@@ -13,7 +13,7 @@ const description = 'Generate an express application'
 module.exports = {
   name: 'generate:frontend',
   description: description,
-  run: async (context) => {
+  run: async context => {
     const { parameters, prompt } = context
 
     if (!context.canRunCommand()) {
@@ -29,9 +29,11 @@ module.exports = {
 
     print.info(`Generating ${projectTypes.frontendReactMap}...`.yellow)
 
-    const questions = newProjectPrompts.filter((question) => (
-      typeof question.projectType === 'undefined' || question.projectType === projectTypes.frontendReactMap
-    ))
+    const questions = newProjectPrompts.filter(
+      question =>
+        typeof question.projectType === 'undefined' ||
+        question.projectType === projectTypes.frontendReactMap
+    )
 
     const answers = await prompt.ask(questions)
 

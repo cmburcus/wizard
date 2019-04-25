@@ -8,7 +8,7 @@ const description = 'Display docker container logs'
 module.exports = {
   name: 'env:logs',
   description: description,
-  run: async (context) => {
+  run: async context => {
     const { parameters } = context
 
     if (!context.canRunCommand(projectTypes.backendExpress)) {
@@ -27,7 +27,12 @@ module.exports = {
     /// ////////////////////////////////
     try {
       print.warning('Displaying docker container logs')
-      print.info('Command: '.yellow + `docker logs ${parameters.options.f ? '-f ' : ''}${parameters.options.t ? '-t ' : ''}${!parameters.options.db ? bins.node : bins.postgres}`.muted)
+      print.info(
+        'Command: '.yellow +
+          `docker logs ${parameters.options.f ? '-f ' : ''}${parameters.options.t ? '-t ' : ''}${
+            !parameters.options.db ? bins.node : bins.postgres
+          }`.muted
+      )
       print.info('')
 
       const options = []
@@ -40,11 +45,11 @@ module.exports = {
         options.push('-t')
       }
 
-      await childProcess.execFileSync('docker', [
-        'logs',
-        ...options,
-        !parameters.options.db ? bins.node : bins.postgres
-      ], {stdio: 'inherit'})
+      await childProcess.execFileSync(
+        'docker',
+        ['logs', ...options, !parameters.options.db ? bins.node : bins.postgres],
+        { stdio: 'inherit' }
+      )
       print.info('')
     } catch (error) {
       print.error(error.stack)

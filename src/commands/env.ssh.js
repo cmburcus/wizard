@@ -8,7 +8,7 @@ const description = 'SSH into the docker environment'
 module.exports = {
   name: 'env:ssh',
   description: description,
-  run: async (context) => {
+  run: async context => {
     const { parameters } = context
 
     if (!context.canRunCommand(projectTypes.backendExpress)) {
@@ -30,12 +30,9 @@ module.exports = {
       print.info('Command: '.yellow + `docker exec -it ${bins.node} bash`.muted)
       print.info('')
 
-      await childProcess.execFileSync('docker', [
-        'exec',
-        '-it',
-        bins.node,
-        'bash'
-      ], {stdio: 'inherit'})
+      await childProcess.execFileSync('docker', ['exec', '-it', bins.node, 'bash'], {
+        stdio: 'inherit'
+      })
       print.info('')
     } catch (error) {
       if (error.status !== 130) {

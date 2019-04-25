@@ -8,7 +8,7 @@ const description = 'Runs the app in the docker container'
 module.exports = {
   name: 'env:run',
   description: description,
-  run: async (context) => {
+  run: async context => {
     const { parameters, system } = context
 
     if (!context.canRunCommand(projectTypes.backendExpress)) {
@@ -29,7 +29,10 @@ module.exports = {
 
     try {
       print.warning('Running app in docker container')
-      print.info('Command: '.yellow + `docker exec -it ${parameters.options.d ? '-d ' : ''}${bins.node} yarn node:dev`.muted)
+      print.info(
+        'Command: '.yellow +
+          `docker exec -it ${parameters.options.d ? '-d ' : ''}${bins.node} yarn node:dev`.muted
+      )
       print.info('')
 
       const options = []
@@ -38,14 +41,11 @@ module.exports = {
         options.push('-d')
       }
 
-      await childProcess.execFileSync('docker', [
-        'exec',
-        '-it',
-        ...options,
-        bins.node,
-        'yarn',
-        'node:dev'
-      ], {stdio: 'inherit'})
+      await childProcess.execFileSync(
+        'docker',
+        ['exec', '-it', ...options, bins.node, 'yarn', 'node:dev'],
+        { stdio: 'inherit' }
+      )
       print.info('')
 
       if (parameters.options.d) {
