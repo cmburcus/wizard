@@ -9,7 +9,7 @@
   "scripts": {
     "node:dev": "NODE_ENV=development && DEBUG=app:* && nodemon ./bin/www",
     "node:prod": "NODE_ENV=production && DEBUG=app:* && node ./bin/www",
-    "node:test": "NODE_ENV=testing && DEBUG=app:* && nyc mocha src/test/**/*.js --file src/app.js -t 10000 --recursive --exit",
+    "node:test": "NODE_ENV=testing && DEBUG=app:* && nyc mocha src/tests/**/*.js --file src/app.js -t 10000 --recursive --exit",
     "format": "eslint --quiet --report-unused-disable-directives --fix '**/*.js' || true"
   },
   "dependencies": {

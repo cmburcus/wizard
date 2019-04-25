@@ -1,55 +1,62 @@
-const projectPaths = require('../paths/backend-express.json')
+const importYaml = require('../../cli').importYaml
+
+// Paths
+const paths = importYaml('config/paths/express.yaml')
+const template = paths.templates.expressAuth.path
+const core = paths.core
+const utils = paths.utils
+const authentication = paths.authentication
 
 module.exports = () => {
   const database = [
     {
-      template: `${projectPaths.templates.authentication.database.migrations}/00000000000000_create_authentications_table.js.ejs`,
-      target: `${projectPaths.project.database.migrations}/00000000000000_create_authentications_table.js`,
+      template: `${template}/${core.directories.src.database.migrations.path}/${authentication.files.database.migrations.authenticationTable}.ejs`,
+      target: `${core.directories.src.database.migrations.path}/${authentication.files.database.migrations.authenticationTable}`,
     },
   ]
 
   const resources = [
     {
-      template: `${projectPaths.templates.authentication.resources}/authentication/Authentication.js.ejs`,
-      target: `${projectPaths.project.resources}/authentication/Authentication.js`,
+      template: `${template}/${core.directories.src.resources.path}/${authentication.directories.resources.path}/${authentication.files.resources.main.model}.ejs`,
+      target: `${core.directories.src.resources.path}/${authentication.directories.resources.path}/${authentication.files.resources.main.model}`,
     }, {
-      template: `${projectPaths.templates.authentication.resources}/authentication/AuthenticationService.js.ejs`,
-      target: `${projectPaths.project.resources}/authentication/AuthenticationService.js`,
+      template: `${template}/${core.directories.src.resources.path}/${authentication.directories.resources.path}/${authentication.files.resources.main.service}.ejs`,
+      target: `${core.directories.src.resources.path}/${authentication.directories.resources.path}/${authentication.files.resources.main.service}`,
     }, {
-      template: `${projectPaths.templates.authentication.resources}/authentication/AuthenticationController.js.ejs`,
-      target: `${projectPaths.project.resources}/authentication/AuthenticationController.js`,
+      template: `${template}/${core.directories.src.resources.path}/${authentication.directories.resources.path}/${authentication.files.resources.main.controller}.ejs`,
+      target: `${core.directories.src.resources.path}/${authentication.directories.resources.path}/${authentication.files.resources.main.controller}`,
     }, {
-      template: `${projectPaths.templates.authentication.resources}/authentication/routes.js.ejs`,
-      target: `${projectPaths.project.resources}/authentication/routes.js`,
+      template: `${template}/${core.directories.src.resources.path}/${authentication.directories.resources.path}/${authentication.files.resources.main.routes}.ejs`,
+      target: `${core.directories.src.resources.path}/${authentication.directories.resources.path}/${authentication.files.resources.main.routes}`,
     },
   ]
 
   const misc = [
     {
-      template: `${projectPaths.templates.authentication.utils.jwt}/readme.md.ejs`,
-      target: `${projectPaths.project.utils.jwt}/readme.md`,
+      template: `${template}/${utils.directories.jwt.path}/${utils.files.jwt.readme}.ejs`,
+      target: `${utils.directories.jwt.path}/${utils.files.jwt.readme}`,
     }, {
-      template: `${projectPaths.templates.authentication.utils.jwt}/index.js.ejs`,
-      target: `${projectPaths.project.utils.jwt}/index.js`,
+      template: `${template}/${utils.directories.jwt.path}/${utils.files.jwt.index}.ejs`,
+      target: `${utils.directories.jwt.path}/${utils.files.jwt.index}`,
     },
   ]
 
   const test = [
     {
-      template: `${projectPaths.templates.authentication.test.unit.utils}/jwt.test.js.ejs`,
-      target: `${projectPaths.project.test.unit.utils}/jwt.test.js`,
+      template: `${template}/${utils.directories.jwt.tests.unit.path}/${utils.files.jwt.tests.unit.jwt}.ejs`,
+      target: `${utils.directories.jwt.tests.unit.path}/${utils.files.jwt.tests.unit.jwt}`,
     }, {
-      template: `${projectPaths.templates.authentication.test.unit.resources}/authentication/Authentication.test.js.ejs`,
-      target: `${projectPaths.project.test.unit.resources}/authentication/Authentication.test.js`,
+      template: `${template}/${core.directories.src.tests.unit.resources.path}/${authentication.directories.resources.path}/${authentication.files.tests.unit.resources.model}.ejs`,
+      target: `${core.directories.src.tests.unit.resources.path}/${authentication.directories.resources.path}/${authentication.files.tests.unit.resources.model}`,
     }, {
-      template: `${projectPaths.templates.authentication.test.integration.main}/authentication/api.test.js.ejs`,
-      target: `${projectPaths.project.test.integration.main}/authentication/api.test.js`,
+      template: `${template}/${core.directories.src.tests.integration.path}/${authentication.directories.resources.path}/${authentication.files.tests.integration.api}.ejs`,
+      target: `${core.directories.src.tests.integration.path}/${authentication.directories.resources.path}/${authentication.files.tests.integration.api}`,
     }, {
-      template: `${projectPaths.templates.authentication.test.integration.main}/authentication/AuthenticationService.test.js.ejs`,
-      target: `${projectPaths.project.test.integration.main}/authentication/AuthenticationService.test.js`,
+      template: `${template}/${core.directories.src.tests.integration.path}/${authentication.directories.resources.path}/${authentication.files.tests.integration.service}.ejs`,
+      target: `${core.directories.src.tests.integration.path}/${authentication.directories.resources.path}/${authentication.files.tests.integration.service}`,
     }, {
-      template: `${projectPaths.templates.authentication.test.integration.main}/authentication/validation.js.ejs`,
-      target: `${projectPaths.project.test.integration.main}/authentication/validation.js`,
+      template: `${template}/${core.directories.src.tests.integration.path}/${authentication.directories.resources.path}/${authentication.files.tests.integration.validation}.ejs`,
+      target: `${core.directories.src.tests.integration.path}/${authentication.directories.resources.path}/${authentication.files.tests.integration.validation}`,
     },
   ]
 

@@ -4,140 +4,146 @@
 
 const newProjectMap = require('./new-project')
 const projectTypes = require('../project-types')
-const projectPaths = require('../paths/backend-express.json')
+const importYaml = require('../../cli').importYaml
+
+// Paths
+const paths = importYaml('config/paths/express.yaml')
+const template = paths.templates.express.path
+const core = paths.core
+const utils = paths.utils
 
 module.exports = (answers) => {
   const environment = [
     {
-      template: `${projectPaths.templates.bare.main}/package.json.ejs`,
-      target: `${answers.folderName}/package.json`,
+      template: `${template}/${core.files.main.packageJson}.ejs`,
+      target: `${answers.folderName}/${core.files.main.packageJson}`,
       props: answers
     }, {
-      template: `${projectPaths.templates.bare.main}/.node-version.ejs`,
-      target: `${answers.folderName}/.node-version`,
+      template: `${template}/${core.files.main.nodeVersion}.ejs`,
+      target: `${answers.folderName}/${core.files.main.nodeVersion}`,
       props: answers
     }, {
-      template: `${projectPaths.templates.bare.main}/.gitignore.ejs`,
-      target: `${answers.folderName}/.gitignore`
+      template: `${template}/${core.files.main.gitignore}.ejs`,
+      target: `${answers.folderName}/${core.files.main.gitignore}`
     }, {
-      template: `${projectPaths.templates.bare.main}/.eslintrc.ejs`,
-      target: `${answers.folderName}/.eslintrc`
+      template: `${template}/${core.files.main.eslintrc}.ejs`,
+      target: `${answers.folderName}/${core.files.main.eslintrc}`
     }, {
-      template: `${projectPaths.templates.bare.main}/.env.example.ejs`,
-      target: `${answers.folderName}/.env.example`
+      template: `${template}/${core.files.main.envExample}.ejs`,
+      target: `${answers.folderName}/${core.files.main.envExample}`
     }, {
-      template: `${projectPaths.templates.bare.main}/.env.ejs`,
-      target: `${answers.folderName}/.env`
+      template: `${template}/${core.files.main.env}.ejs`,
+      target: `${answers.folderName}/${core.files.main.env}`
     },
   ]
 
   const database = [
     {
-      template: `${projectPaths.templates.bare.config}/database.js.ejs`,
-      target: `${answers.folderName}/${projectPaths.project.config}/database.js`
+      template: `${template}/${core.directories.src.config.path}/${core.files.config.database}.ejs`,
+      target: `${answers.folderName}/${core.directories.src.config.path}/${core.files.config.database}`
     }, {
-      template: `${projectPaths.templates.bare.database}/knexfile.js.ejs`,
-      target: `${answers.folderName}/${projectPaths.project.database.main}/knexfile.js`
+      template: `${template}/${core.directories.src.database.path}/${core.files.database.knexfile}.ejs`,
+      target: `${answers.folderName}/${core.directories.src.database.path}/${core.files.database.knexfile}`
     }, {
-      template: `${projectPaths.templates.bare.database}/migration.stub.ejs`,
-      target: `${answers.folderName}/${projectPaths.project.database.main}/migration.stub`
+      template: `${template}/${core.directories.src.database.path}/${core.files.database.migrationStub}.ejs`,
+      target: `${answers.folderName}/${core.directories.src.database.path}/${core.files.database.migrationStub}`
     },
   ]
 
   const app = [
     {
-      template: `${projectPaths.templates.bare.src}/app.js.ejs`,
-      target: `${answers.folderName}/${projectPaths.project.src}/app.js`
+      template: `${template}/${core.directories.src.path}/${core.files.main.app}.ejs`,
+      target: `${answers.folderName}/${core.directories.src.path}/${core.files.main.app}`
     }, {
-      template: `${projectPaths.templates.bare.bin}/www.ejs`,
-      target: `${answers.folderName}/${projectPaths.project.bin}/www`,
+      template: `${template}/${core.directories.bin.path}/${core.files.main.www}.ejs`,
+      target: `${answers.folderName}/${core.directories.bin.path}/${core.files.main.www}`,
       props: answers
     }, {
-      template: `${projectPaths.templates.bare.config}/routes.js.ejs`,
-      target: `${answers.folderName}/${projectPaths.project.config}/routes.js`
+      template: `${template}/${core.directories.src.config.path}/${core.files.config.routes}.ejs`,
+      target: `${answers.folderName}/${core.directories.src.config.path}/${core.files.config.routes}`
     }, {
-      template: `${projectPaths.templates.bare.resources}/Model.js.ejs`,
-      target: `${answers.folderName}/${projectPaths.project.resources}/Model.js`
+      template: `${template}/${core.directories.src.resources.path}/${core.files.resources.model}.ejs`,
+      target: `${answers.folderName}/${core.directories.src.resources.path}/${core.files.resources.model}`
     }, {
-      template: `${projectPaths.templates.bare.resources}/Service.js.ejs`,
-      target: `${answers.folderName}/${projectPaths.project.resources}/Service.js`
+      template: `${template}/${core.directories.src.resources.path}/${core.files.resources.service}.ejs`,
+      target: `${answers.folderName}/${core.directories.src.resources.path}/${core.files.resources.service}`
     }, {
-      template: `${projectPaths.templates.bare.resources}/Controller.js.ejs`,
-      target: `${answers.folderName}/${projectPaths.project.resources}/Controller.js`
+      template: `${template}/${core.directories.src.resources.path}/${core.files.resources.controller}.ejs`,
+      target: `${answers.folderName}/${core.directories.src.resources.path}/${core.files.resources.controller}`
     },
   ]
 
   const misc = [
     {
-      template: `${projectPaths.templates.bare.utils.errors}/readme.md.ejs`,
-      target: `${answers.folderName}/${projectPaths.project.utils.errors}/readme.md`,
+      template: `${template}/${utils.directories.errors.path}/${utils.files.errors.readme}.ejs`,
+      target: `${answers.folderName}/${utils.directories.errors.path}/${utils.files.errors.readme}`,
     }, {
-      template: `${projectPaths.templates.bare.utils.errors}/index.js.ejs`,
-      target: `${answers.folderName}/${projectPaths.project.utils.errors}/index.js`,
+      template: `${template}/${utils.directories.errors.path}/${utils.files.errors.index}.ejs`,
+      target: `${answers.folderName}/${utils.directories.errors.path}/${utils.files.errors.index}`,
     }, {
-      template: `${projectPaths.templates.bare.utils.errors}/types/AuthenticationError.js.ejs`,
-      target: `${answers.folderName}/${projectPaths.project.utils.errors}/types/AuthenticationError.js`,
+      template: `${template}/${utils.directories.errors.types.path}/${utils.files.errors.types.authenticationError}.ejs`,
+      target: `${answers.folderName}/${utils.directories.errors.types.path}/${utils.files.errors.types.authenticationError}`,
     }, {
-      template: `${projectPaths.templates.bare.utils.errors}/types/InvalidArgumentError.js.ejs`,
-      target: `${answers.folderName}/${projectPaths.project.utils.errors}/types/InvalidArgumentError.js`,
+      template: `${template}/${utils.directories.errors.types.path}/${utils.files.errors.types.invalidArgumentError}.ejs`,
+      target: `${answers.folderName}/${utils.directories.errors.types.path}/${utils.files.errors.types.invalidArgumentError}`,
     }, {
-      template: `${projectPaths.templates.bare.utils.errors}/types/InvalidTokenError.js.ejs`,
-      target: `${answers.folderName}/${projectPaths.project.utils.errors}/types/InvalidTokenError.js`,
+      template: `${template}/${utils.directories.errors.types.path}/${utils.files.errors.types.invalidTokenError}.ejs`,
+      target: `${answers.folderName}/${utils.directories.errors.types.path}/${utils.files.errors.types.invalidTokenError}`,
     }, {
-      template: `${projectPaths.templates.bare.utils.errors}/types/NotFoundError.js.ejs`,
-      target: `${answers.folderName}/${projectPaths.project.utils.errors}/types/NotFoundError.js`,
+      template: `${template}/${utils.directories.errors.types.path}/${utils.files.errors.types.notFoundError}.ejs`,
+      target: `${answers.folderName}/${utils.directories.errors.types.path}/${utils.files.errors.types.notFoundError}`,
     }, {
-      template: `${projectPaths.templates.bare.utils.errors}/types/SystemError.js.ejs`,
-      target: `${answers.folderName}/${projectPaths.project.utils.errors}/types/SystemError.js`,
+      template: `${template}/${utils.directories.errors.types.path}/${utils.files.errors.types.systemError}.ejs`,
+      target: `${answers.folderName}/${utils.directories.errors.types.path}/${utils.files.errors.types.systemError}`,
     }, {
-      template: `${projectPaths.templates.bare.utils.errors}/types/ValidationError.js.ejs`,
-      target: `${answers.folderName}/${projectPaths.project.utils.errors}/types/ValidationError.js`,
+      template: `${template}/${utils.directories.errors.types.path}/${utils.files.errors.types.validationError}.ejs`,
+      target: `${answers.folderName}/${utils.directories.errors.types.path}/${utils.files.errors.types.validationError}`,
     }, {
-      template: `${projectPaths.templates.bare.utils.filters}/readme.md.ejs`,
-      target: `${answers.folderName}/${projectPaths.project.utils.filters}/readme.md`,
+      template: `${template}/${utils.directories.filters.path}/${utils.files.filters.readme}.ejs`,
+      target: `${answers.folderName}/${utils.directories.filters.path}/${utils.files.filters.readme}`,
     }, {
-      template: `${projectPaths.templates.bare.utils.filters}/index.js.ejs`,
-      target: `${answers.folderName}/${projectPaths.project.utils.filters}/index.js`,
+      template: `${template}/${utils.directories.filters.path}/${utils.files.filters.index}.ejs`,
+      target: `${answers.folderName}/${utils.directories.filters.path}/${utils.files.filters.index}`,
     }, {
-      template: `${projectPaths.templates.bare.utils.filters}/constants/filters.json.ejs`,
-      target: `${answers.folderName}/${projectPaths.project.utils.filters}/constants/filters.json`,
+      template: `${template}/${utils.directories.filters.constants.path}/${utils.files.filters.constants.filters}.ejs`,
+      target: `${answers.folderName}/${utils.directories.filters.constants.path}/${utils.files.filters.constants.filters}`,
     }, {
-      template: `${projectPaths.templates.bare.utils.validator}/readme.md.ejs`,
-      target: `${answers.folderName}/${projectPaths.project.utils.validator}/readme.md`,
+      template: `${template}/${utils.directories.validator.path}/${utils.files.validator.readme}.ejs`,
+      target: `${answers.folderName}/${utils.directories.validator.path}/${utils.files.validator.readme}`,
     }, {
-      template: `${projectPaths.templates.bare.utils.validator}/index.js.ejs`,
-      target: `${answers.folderName}/${projectPaths.project.utils.validator}/index.js`,
+      template: `${template}/${utils.directories.validator.path}/${utils.files.validator.index}.ejs`,
+      target: `${answers.folderName}/${utils.directories.validator.path}/${utils.files.validator.index}`,
     }, {
-      template: `${projectPaths.templates.bare.utils.validator}/config/joi.json.ejs`,
-      target: `${answers.folderName}/${projectPaths.project.utils.validator}/config/joi.json`,
+      template: `${template}/${utils.directories.validator.config.path}/${utils.files.validator.config.joi}.ejs`,
+      target: `${answers.folderName}/${utils.directories.validator.config.path}/${utils.files.validator.config.joi}`,
     },
   ]
 
   const testing = [
     {
-      template: `${projectPaths.templates.bare.main}/nodemon.json.ejs`,
-      target: `${answers.folderName}/nodemon.json`
+      template: `${template}/${core.files.main.nodemon}.ejs`,
+      target: `${answers.folderName}/${core.files.main.nodemon}`
     }, {
-      template: `${projectPaths.templates.bare.main}/.nycrc.ejs`,
-      target: `${answers.folderName}/.nycrc`
+      template: `${template}/${core.files.main.nycrc}.ejs`,
+      target: `${answers.folderName}/${core.files.main.nycrc}`
     }, {
-      template: `${projectPaths.templates.bare.test.unit.resources}/Model.test.js.ejs`,
-      target: `${answers.folderName}/${projectPaths.project.test.unit.resources}/Model.test.js`
+      template: `${template}/${core.directories.src.tests.unit.resources.path}/${core.files.tests.unit.resources.model}.ejs`,
+      target: `${answers.folderName}/${core.directories.src.tests.unit.resources.path}/${core.files.tests.unit.resources.model}`
     }, {
-      template: `${projectPaths.templates.bare.test.unit.resources}/Service.test.js.ejs`,
-      target: `${answers.folderName}/${projectPaths.project.test.unit.resources}/Service.test.js`
+      template: `${template}/${core.directories.src.tests.unit.resources.path}/${core.files.tests.unit.resources.service}.ejs`,
+      target: `${answers.folderName}/${core.directories.src.tests.unit.resources.path}/${core.files.tests.unit.resources.service}`
     }, {
-      template: `${projectPaths.templates.bare.test.unit.resources}/Controller.test.js.ejs`,
-      target: `${answers.folderName}/${projectPaths.project.test.unit.resources}/Controller.test.js`
+      template: `${template}/${core.directories.src.tests.unit.resources.path}/${core.files.tests.unit.resources.controller}.ejs`,
+      target: `${answers.folderName}/${core.directories.src.tests.unit.resources.path}/${core.files.tests.unit.resources.controller}`
     }, {
-      template: `${projectPaths.templates.bare.test.unit.utils}/errors.test.js.ejs`,
-      target: `${answers.folderName}/${projectPaths.project.test.unit.utils}/errors.test.js`
+      template: `${template}/${utils.directories.errors.tests.unit.path}/${utils.files.errors.tests.unit.errors}.ejs`,
+      target: `${answers.folderName}/${utils.directories.errors.tests.unit.path}/${utils.files.errors.tests.unit.errors}`
     }, {
-      template: `${projectPaths.templates.bare.test.unit.utils}/filters.test.js.ejs`,
-      target: `${answers.folderName}/${projectPaths.project.test.unit.utils}/filters.test.js`
+      template: `${template}/${utils.directories.filters.tests.unit.path}/${utils.files.filters.tests.unit.filters}.ejs`,
+      target: `${answers.folderName}/${utils.directories.filters.tests.unit.path}/${utils.files.filters.tests.unit.filters}`
     }, {
-      template: `${projectPaths.templates.bare.test.unit.utils}/validator.test.js.ejs`,
-      target: `${answers.folderName}/${projectPaths.project.test.unit.utils}/validator.test.js`
+      template: `${template}/${utils.directories.validator.tests.unit.path}/${utils.files.validator.tests.unit.validator}.ejs`,
+      target: `${answers.folderName}/${utils.directories.validator.tests.unit.path}/${utils.files.validator.tests.unit.validator}`
     },
   ]
 
@@ -149,8 +155,8 @@ module.exports = (answers) => {
     ...misc,
     ...testing,
     {
-      template: '.wizard.ejs',
-      target: `${answers.folderName}/.wizard`,
+      template: `${core.files.main.wizard}.ejs`,
+      target: `${answers.folderName}/${core.files.main.wizard}`,
       props: {
         ...answers,
         projectType: projectTypes.backendExpress,

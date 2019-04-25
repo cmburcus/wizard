@@ -1,6 +1,11 @@
 const projectTypes = require('../config/project-types')
 const authenticationMap = require('../config/maps/backend-express-auth')
-const projectPaths = require('../config/paths/backend-express.json').project
+
+// Project paths
+const importYaml = require('../cli').importYaml
+const paths = importYaml('config/paths/express.yaml')
+const core = paths.core
+const authentication = paths.authentication
 
 const { print } = require('gluegun/print')
 const description = 'Generates authentication components'
@@ -40,7 +45,7 @@ module.exports = {
         version: '8.4.0',
       }])
       addedDependencies.forEach(dependency => {
-        print.info('package.json: '.yellow + `New ${dependency.type} ${dependency.name}@${dependency.version}`)
+        print.info(`${core.files.main.packageJson}: `.yellow + `New ${dependency.type} ${dependency.name}@${dependency.version}`)
       })
 
       // Adding new routes
@@ -50,7 +55,7 @@ module.exports = {
       }]
       await context.addRoutes(routes)
       routes.forEach(route => {
-        print.info(`${projectPaths.config}/routes.js :`.yellow + `New routes added for /${route.name}`)
+        print.info(`${core.directories.src.config}/${core.files.config.routes} :`.yellow + `New routes added for /${route.name}`)
       })
 
       // Adding JWT variables in the .env file
@@ -67,7 +72,7 @@ module.exports = {
       await context.addEnvironmentVariables(envVariableGroups)
       envVariableGroups.forEach(group => {
         group.variables.forEach(variable => {
-          print.info('.env: '.yellow + `New variable ${variable.key} added`)
+          print.info(`${core.files.main.env}: `.yellow + `New variable ${variable.key} added`)
         })
       })
 
