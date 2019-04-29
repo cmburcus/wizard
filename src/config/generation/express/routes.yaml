@@ -1,0 +1,31 @@
+---
+################################################################################
+#
+# This file defines the routes config to be added to the project
+#
+# Each parent should follow the following structure
+#
+# [file : the relative path from the root of the project to the file]
+#
+# [parent : name to be referenced by]
+#   - [name : name of the route (usually the same as the resource name)]
+#     [path : path from the resources folder to the resource route definition
+#
+################################################################################
+
+################################################################################
+#
+# FILE
+#
+# The file where the resource routes are defined
+################################################################################
+file: src/config/routes.js
+
+################################################################################
+#
+# AUTHENTICATION
+#
+################################################################################
+authentication:
+  - name: authentication
+    path: resources/authentication/routes

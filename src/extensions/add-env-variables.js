@@ -1,19 +1,34 @@
 module.exports = context => {
-  const { filesystem } = context
+  const { print, filesystem } = context
 
   /**
    * Adds variables to the .env file
    */
-  context.addEnvironmentVariables = async groupVariables => {
+  context.addEnvironmentVariables = async (files, environmentVariables) => {
     let text = ''
 
-    groupVariables.forEach(group => {
-      text += `\n# ${group.comment}\n`
-      group.variables.forEach(variable => {
-        text += `${variable.key}=${variable.value}\n`
-      })
+    // Adding a comment if one exists
+    if (typeof environmentVariables.comment !== 'undefined') {
+      text += `\n# ${environmentVariables.comment}\n`
+    }
+
+    // Mapping the keys with the values
+    environmentVariables.variables.forEach(environmentVariable => {
+      if (typeof environmentVariable.generate !== 'undefined') {
+        environmentVariable.value = context.generateKey(environmentVariable.generate)
+      }
+
+      text += `${environmentVariable.key}=${environmentVariable.value}\n`
     })
 
-    await filesystem.append('.env', text)
+    // Write the changes to the files
+    files.forEach(async file => {
+      await filesystem.append(file, text)
+
+      // Print the changes
+      environmentVariables.variables.forEach(environmentVariable => {
+        print.info(`${file}: `.yellow + `New variable ${environmentVariable.key} added`)
+      })
+    })
   }
 }

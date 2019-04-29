@@ -1,0 +1,221 @@
+---
+################################################################################
+#
+# This file defines the paths of directories and subdirectories of an express
+# backend project
+#
+# Each parent should follow the following structure
+# Note: you can ignore the path if it's the root of a project folder
+# Note: Parents can be nested to created a subfolder structure
+#
+# [parent : name to be referenced by]
+#   [path : the relative path from the root of the project]
+#   [files : array of paths to the files]
+#
+################################################################################
+
+################################################################################
+#
+# GLOBALS
+#
+# Globals used at the creation of a new project
+################################################################################
+globals:
+  files:
+    - .prettierrc
+    - .wizard
+    - PULL_REQUEST_TEMPLATE.md
+
+################################################################################
+#
+# TEMPLATES
+#
+# The base template directories where the template files are found
+################################################################################
+templates:
+  express: backend-express/bare
+  expressAuth: backend-express/authentication
+
+################################################################################
+#
+# CORE
+#
+# The core directories and files of an express backend project (destination
+# folder)
+# The templates should use the same folder structure for easy mapping
+################################################################################
+core:
+  files:
+    - package.json
+    - .node-version
+    - .gitignore
+    - .eslintrc
+    - .env.example
+    - .env
+    - nodemon.json
+    - .nycrc
+  bin:
+    path: bin
+    files:
+      - bin/www
+  src:
+    path: src
+    files:
+      - src/app.js
+    config:
+      path: src/config
+      files:
+        - src/config/database.js
+        - src/config/routes.js
+    database:
+      path: src/database
+      files:
+        - src/database/knexfile.js
+        - src/database/migration.stub
+      migrations:
+        path: src/database/migrations
+      seeds:
+        path: src/database/seeds
+    resources:
+      path: src/resources
+      files:
+        - src/resources/Model.js
+        - src/resources/Service.js
+        - src/resources/Controller.js
+    tests:
+      path: src/tests
+      integration:
+        path: src/tests/integration
+      unit:
+        path: src/tests/unit
+        resources:
+          path: src/tests/unit/resources
+          files:
+            - src/tests/unit/resources/Model.test.js
+            - src/tests/unit/resources/Service.test.js
+            - src/tests/unit/resources/Controller.test.js
+
+################################################################################
+#
+# AUTHENTICATION
+#
+# The authentication directories and files of an express backend
+# project (destination folder)
+# The templates should use the same folder structure for easy mapping
+################################################################################
+
+authentication:
+  src:
+    path: src
+    database:
+      path: src/database
+      migrations:
+        path: src/database/migrations
+        files:
+          - src/database/migrations/00000000000000_create_authentications_table.js
+    resources:
+      path: src/resources
+      authentication:
+        path: src/resources/authentication
+        files:
+          - src/resources/authentication/Authentication.js
+          - src/resources/authentication/AuthenticationController.js
+          - src/resources/authentication/AuthenticationService.js
+          - src/resources/authentication/routes.js
+    tests:
+      path: src/tests
+      integration:
+        path: src/tests/integration
+        authentication:
+          path: src/tests/integration/authentication
+          files:
+            - src/tests/integration/authentication/api.test.js
+            - src/tests/integration/authentication/AuthenticationService.test.js
+            - src/tests/integration/authentication/validation.js
+      unit:
+        path: src/tests/unit
+        resources:
+          path: src/tests/unit/resources
+          authentication:
+            path: src/tests/unit/resources/authentication
+            files:
+              - src/tests/unit/resources/authentication/Authentication.test.js
+
+################################################################################
+#
+# UTILS
+#
+# Utils are essentially helpers that provide functionality to the core
+# application
+#
+# They are treated separately as they are not "required" for an application
+# to run
+#
+# They could also be exported to a package repository and imported using
+# package.json
+################################################################################
+
+# CORE UTILS
+core_utils:
+  path: src/utils
+  errors:
+    path: src/utils/errors
+    files:
+      - src/utils/errors/readme.md
+      - src/utils/errors/index.js
+    types:
+      path: src/utils/errors/types
+      files:
+        - src/utils/errors/types/AuthenticationError.js
+        - src/utils/errors/types/InvalidArgumentError.js
+        - src/utils/errors/types/InvalidTokenError.js
+        - src/utils/errors/types/NotFoundError.js
+        - src/utils/errors/types/SystemError.js
+        - src/utils/errors/types/ValidationError.js
+    tests:
+      unit:
+        path: src/tests/unit/utils
+        files:
+          - src/tests/unit/utils/errors.test.js
+  filters:
+    path: src/utils/filters
+    files:
+      - src/utils/filters/readme.md
+      - src/utils/filters/index.js
+    constants:
+      path: src/utils/filters/constants
+      files:
+        - src/utils/filters/constants/filters.json
+    tests:
+      unit:
+        path: src/tests/unit/utils
+        files:
+          - src/tests/unit/utils/filters.test.js
+  validator:
+    path: src/utils/validator
+    files:
+      - src/utils/validator/readme.md
+      - src/utils/validator/index.js
+    config:
+      path: src/utils/validator/config
+      files:
+        - src/utils/validator/config/joi.json
+    tests:
+      unit:
+        path: src/tests/unit/utils
+        files:
+          - src/tests/unit/utils/validator.test.js
+
+# AUTHENTICATION UTILS
+authentication_utils:
+  path: src/utils
+  jwt:
+    path: src/utils/jwt
+    files:
+      - src/utils/jwt/readme.md
+      - src/utils/jwt/index.js
+    tests:
+      unit:
+        path: src/tests/unit/utils
+        files:
+          - src/tests/unit/utils/jwt.test.js

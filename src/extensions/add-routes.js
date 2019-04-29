@@ -1,23 +1,20 @@
-// Project paths
-const importYaml = require('../cli').importYaml
-const paths = importYaml('config/paths/express.yaml')
-const core = paths.core
-
 module.exports = context => {
-  const { filesystem } = context
+  const { print, filesystem } = context
 
   /**
    * Adds routes to the config routes file for the backend
    */
-  context.addRoutes = async routes => {
-    const routesFile = await filesystem.read(
-      `${core.directories.src.config.path}/${core.files.config.routes}`
-    )
+  context.addRoutes = async (file, routes) => {
+    const routesFile = await filesystem.read(file)
+
+    // Anything past this index is not important
     const routesEndIndex = routesFile.search(']; // Application routes')
 
+    // We'll put our new routes in between these two points
     const preFile = routesFile.substring(0, routesEndIndex - 1)
     const postFile = routesFile.substring(routesEndIndex, routesFile.length)
 
+    // Some checks to define how and where to add the new routes
     const isFirstRoute = preFile.substring(preFile.length - 2, preFile.length) === '  '
     const hasTrailingComma = preFile.charAt(preFile.length - 1) === ','
 
@@ -40,9 +37,12 @@ module.exports = context => {
 
     newRoutes += '\n'
 
-    await filesystem.write(
-      `${core.directories.src.config.path}/${core.files.config.routes}`,
-      preFile + newRoutes + postFile
-    )
+    // Write the new routes to the file
+    await filesystem.write(file, preFile + newRoutes + postFile)
+
+    // Print the changes
+    routes.forEach(route => {
+      print.info(`${file}: `.yellow + `New routes added for /${route.name}`)
+    })
   }
 }
