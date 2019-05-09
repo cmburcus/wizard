@@ -7,7 +7,14 @@
   "bins": {
     "node": "node",
     "postgres": "postgres",
-    "knex": "node_modules/.bin/knex",
-    "knexfile": "src/database/knexfile.js"
+    "knex": "node_modules/.bin/knex"
+  },
+  "knex": {
+    "knexfile": "dist/database/knexfile.js",
+    "migrations": "dist/database/migrations",
+    "seeds": "dist/database/seeds"
+  },
+  "dependencies": {
+    "nodeModules": "node_modules"
   }
 }

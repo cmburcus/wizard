@@ -1,39 +1,40 @@
 'use strict';
 
-const chai = require('chai');
+import chai from 'chai';
+import AbstractController from '../../../resources/Controller';
+import { Error } from '../../../utils/errors';
 
 const expect = chai.expect;
-const AbstractController = require.main.app('resources/Controller');
 
 // Mocking service so that we don't touch the database
 const service = {
   query: () => [{ col: 'value' }, { col: 'value' }],
-  show: (id) => (id ? { col: 'value' } : null),
-  create: (record) => record,
-  update: (id, record) => record,
-  patch: (id, record) => record,
-  delete: (id) => (id ? 1 : null),
+  show: (id: number) => (id ? { col: 'value' } : null),
+  create: (record: object) => record,
+  update: (id: number, record: object) => record,
+  patch: (id: number, record: object) => record,
+  delete: (id: number) => (id ? 1 : null),
 };
 const controller = AbstractController(service);
 
 // Global variables used to monitor the results
-let status = null;
-let result = null;
-let error = null;
+let status: number = null;
+let result: any = null;
+let error: Error = null;
 
 // Mocked response and next functions
 const response = {
-  status: (returnedStatus) => {
+  status: (returnedStatus: number) => {
     status = returnedStatus;
 
     return {
-      json: (returnedRecords) => {
+      json: (returnedRecords: any) => {
         result = returnedRecords;
       },
     };
   },
 };
-const next = (returnedError) => {
+const next = (returnedError: Error) => {
   error = returnedError;
   status = returnedError.status || 500;
 };
@@ -50,6 +51,7 @@ describe('TESTING: Controller', () => {
       const request = {};
 
       try {
+        // @ts-ignore
         await controller.query(request, response, next);
       } catch (codeError) {
         error = codeError;
@@ -85,6 +87,7 @@ describe('TESTING: Controller', () => {
       const request = { params: { id: 1 } };
 
       try {
+        // @ts-ignore
         await controller.show(request, response, next);
       } catch (codeError) {
         error = codeError;
@@ -98,6 +101,7 @@ describe('TESTING: Controller', () => {
       const request = { params: {} };
 
       try {
+        // @ts-ignore
         await controller.show(request, response, next);
       } catch (codeError) {
         error = codeError;
@@ -125,6 +129,7 @@ describe('TESTING: Controller', () => {
       const request = { body: { col: 'value' } };
 
       try {
+        // @ts-ignore
         await controller.create(request, response, next);
       } catch (codeError) {
         error = codeError;
@@ -158,6 +163,7 @@ describe('TESTING: Controller', () => {
       };
 
       try {
+        // @ts-ignore
         await controller.update(request, response, next);
       } catch (codeError) {
         error = codeError;
@@ -191,6 +197,7 @@ describe('TESTING: Controller', () => {
       };
 
       try {
+        // @ts-ignore
         await controller.patch(request, response, next);
       } catch (codeError) {
         error = codeError;
@@ -221,6 +228,7 @@ describe('TESTING: Controller', () => {
       const request = { params: { id: 1 } };
 
       try {
+        // @ts-ignore
         await controller.delete(request, response, next);
       } catch (codeError) {
         error = codeError;
@@ -236,6 +244,7 @@ describe('TESTING: Controller', () => {
       const request = { params: {} };
 
       try {
+        // @ts-ignore
         await controller.delete(request, response, next);
       } catch (codeError) {
         error = codeError;

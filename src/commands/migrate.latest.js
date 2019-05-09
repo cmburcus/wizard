@@ -1,5 +1,5 @@
 const { print } = require('gluegun/print')
-const { bins } = require('../config/environment')
+const { bins, knex } = require('../config/environment')
 const childProcess = require('child_process')
 const projectTypes = require('../config/project-types')
 
@@ -9,7 +9,7 @@ module.exports = {
   name: 'migrate:latest',
   description: description,
   run: async context => {
-    const { parameters, system } = context
+    const { parameters, system, filesystem } = context
 
     if (!context.canRunCommand(projectTypes.backendExpress)) {
       return
@@ -27,18 +27,22 @@ module.exports = {
     /// ////////////////////////////////
     const timer = system.startTimer()
 
+    // Check if migrations and seeds folders exist and create them otherwise
+    filesystem.dir(knex.migrations)
+    filesystem.dir(knex.seeds)
+
     try {
       print.warning('Running latest migrations')
       print.info(
         'Command: '.yellow +
-          `docker exec -it ${bins.node} ${bins.knex} --knexfile ${bins.knexfile} migrate:latest`
+          `docker exec -it ${bins.node} ${bins.knex} --knexfile ${knex.knexfile} migrate:latest`
             .muted
       )
       print.info('')
 
       await childProcess.execFileSync(
         'docker',
-        ['exec', '-it', bins.node, bins.knex, '--knexfile', bins.knexfile, 'migrate:latest'],
+        ['exec', '-it', bins.node, bins.knex, '--knexfile', knex.knexfile, 'migrate:latest'],
         { stdio: 'inherit' }
       )
       print.info('')

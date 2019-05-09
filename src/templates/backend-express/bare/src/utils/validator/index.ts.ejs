@@ -1,20 +1,26 @@
 'use strict';
 
-const Joi = require('joi');
-const validationOptions = require('./config/joi.json');
+import { Request, Response, NextFunction } from 'express';
+import Joi from 'joi';
+import validationOptions from './config/joi.json';
 
-const errorUtil = require.main.app('utils/errors');
+import errorUtil from '../errors';
 
-module.exports = {
+interface KeyValueCondition { key: string; value: string; condition?: string; }
+interface CustomValidationError { type: string; message: string; }
+interface ValidationErrorsList { [key: string]: CustomValidationError[]; }
+interface FormattedValidationError { original: object; errors: ValidationErrorsList; }
+
+const validator = {
   /**
    * Returns a Joi validation
    */
-  validate: (data, schema) => Joi.validate(data, schema, validationOptions),
+  validate: (data: object, schema: Joi.Schema) => Joi.validate(data, schema, validationOptions),
 
   /**
    * Validates a schema against the request body
    */
-  validateSchema: (schema) => async (request, response, next) => {
+  validateSchema: (schema: Joi.Schema) => async (request: Request, response: Response, next: NextFunction) => {
     try {
       const result = await Joi.validate(request.body, schema, validationOptions);
 
@@ -23,7 +29,7 @@ module.exports = {
       next();
     } catch (error) {
       if (error.isJoi) {
-        error = errorUtil.getValidationError(module.exports.formatJoiError(error));
+        error = errorUtil.getValidationError(validator.formatJoiError(error));
       }
 
       next(error);
@@ -34,10 +40,10 @@ module.exports = {
    * Validates that a field in the body is unique. If excludeCurrentKey is true, then the
    * value of the key from the request.params will be passed to the unique check function
    */
-  uniqueField: (field, uniqueCheckFunction, excludeCurrentKey) => async (
-    request,
-    response,
-    next
+  uniqueField: (field: string, uniqueCheckFunction: any, excludeCurrentKey?: string) => async (
+    request: Request,
+    response: Response,
+    next: NextFunction
   ) => {
     try {
       if (
@@ -52,7 +58,7 @@ module.exports = {
         return next();
       }
 
-      const keyValueList = [{ key: field, value: request.body[field] }];
+      const keyValueList: KeyValueCondition[] = [{ key: field, value: request.body[field] }];
 
       // If we need to exclude current, we need to add a key/value pair with a negative condition
       if (excludeCurrentKey) {
@@ -66,7 +72,7 @@ module.exports = {
       const result = await uniqueCheckFunction(keyValueList);
 
       if (result[0].count > 0) {
-        throw errorUtil.getValidationError(module.exports.getUniqueFieldError(field, request.body));
+        throw errorUtil.getValidationError(validator.getUniqueFieldError(field, request.body));
       }
 
       next();
@@ -78,37 +84,22 @@ module.exports = {
   /**
    * Given a Joi error (produced after a failed validation), this function will return a
    * formatted object that is more user friendly
-   *
-   * Format: {
-   *    original: {
-   *      key: value,
-   *    },
-   *    errors: {
-   *      key: [
-   *        {
-   *          type: joi.error
-   *          message: Human readable string
-   *        }
-   *      ]
-   *    }
-   * }
    */
-  formatJoiError: (error) => {
-    const formattedError = {
+  formatJoiError: (error: Joi.ValidationError) => {
+    const formattedError: FormattedValidationError = {
       original: error._object,
       errors: {},
     };
 
     for (let index = 0; index < error.details.length; index++) {
       const errorDetail = error.details[index];
+      const path = errorDetail.path.join('.');
 
-      // The following comment is required so that code coverage skips next line
-      /* istanbul ignore next */
-      if (typeof formattedError.errors[errorDetail.path] === 'undefined') {
-        formattedError.errors[errorDetail.path] = [];
+      if (typeof formattedError.errors[path] === 'undefined') {
+        formattedError.errors[path] = [];
       }
 
-      formattedError.errors[errorDetail.path].push({
+      formattedError.errors[path].push({
         type: errorDetail.type,
         message: errorDetail.message.replace(/['"]/g, ''),
       });
@@ -124,7 +115,7 @@ module.exports = {
    * The reason why such a function is required is because Joi doesn't allow for async validation
    * and database calls can only be done async.
    */
-  getUniqueFieldError: (name, original) => ({
+  getUniqueFieldError: (name: string, original: object) => ({
     original: original,
     errors: {
       [name]: [
@@ -136,3 +127,5 @@ module.exports = {
     },
   }),
 };
+
+export default validator;

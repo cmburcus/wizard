@@ -54,6 +54,7 @@ core:
     - .env
     - nodemon.json
     - .nycrc
+    - tsconfig.json
   bin:
     path: bin
     files:
@@ -61,16 +62,16 @@ core:
   src:
     path: src
     files:
-      - src/app.js
+      - src/app.ts
     config:
       path: src/config
       files:
-        - src/config/database.js
-        - src/config/routes.js
+        - src/config/database.ts
+        - src/config/routes.ts
     database:
       path: src/database
       files:
-        - src/database/knexfile.js
+        - src/database/knexfile.ts
         - src/database/migration.stub
       migrations:
         path: src/database/migrations
@@ -79,9 +80,9 @@ core:
     resources:
       path: src/resources
       files:
-        - src/resources/Model.js
-        - src/resources/Service.js
-        - src/resources/Controller.js
+        - src/resources/Model.ts
+        - src/resources/Service.ts
+        - src/resources/Controller.ts
     tests:
       path: src/tests
       integration:
@@ -91,9 +92,9 @@ core:
         resources:
           path: src/tests/unit/resources
           files:
-            - src/tests/unit/resources/Model.test.js
-            - src/tests/unit/resources/Service.test.js
-            - src/tests/unit/resources/Controller.test.js
+            - src/tests/unit/resources/Model.test.ts
+            - src/tests/unit/resources/Service.test.ts
+            - src/tests/unit/resources/Controller.test.ts
 
 ################################################################################
 #
@@ -162,26 +163,26 @@ core_utils:
     path: src/utils/errors
     files:
       - src/utils/errors/readme.md
-      - src/utils/errors/index.js
+      - src/utils/errors/index.ts
     types:
       path: src/utils/errors/types
       files:
-        - src/utils/errors/types/AuthenticationError.js
-        - src/utils/errors/types/InvalidArgumentError.js
-        - src/utils/errors/types/InvalidTokenError.js
-        - src/utils/errors/types/NotFoundError.js
-        - src/utils/errors/types/SystemError.js
-        - src/utils/errors/types/ValidationError.js
+        - src/utils/errors/types/AuthenticationError.ts
+        - src/utils/errors/types/InvalidArgumentError.ts
+        - src/utils/errors/types/InvalidTokenError.ts
+        - src/utils/errors/types/NotFoundError.ts
+        - src/utils/errors/types/SystemError.ts
+        - src/utils/errors/types/ValidationError.ts
     tests:
       unit:
         path: src/tests/unit/utils
         files:
-          - src/tests/unit/utils/errors.test.js
+          - src/tests/unit/utils/errors.test.ts
   filters:
     path: src/utils/filters
     files:
       - src/utils/filters/readme.md
-      - src/utils/filters/index.js
+      - src/utils/filters/index.ts
     constants:
       path: src/utils/filters/constants
       files:
@@ -190,12 +191,12 @@ core_utils:
       unit:
         path: src/tests/unit/utils
         files:
-          - src/tests/unit/utils/filters.test.js
+          - src/tests/unit/utils/filters.test.ts
   validator:
     path: src/utils/validator
     files:
       - src/utils/validator/readme.md
-      - src/utils/validator/index.js
+      - src/utils/validator/index.ts
     config:
       path: src/utils/validator/config
       files:
@@ -204,7 +205,7 @@ core_utils:
       unit:
         path: src/tests/unit/utils
         files:
-          - src/tests/unit/utils/validator.test.js
+          - src/tests/unit/utils/validator.test.ts
 
 # AUTHENTICATION UTILS
 authentication_utils:

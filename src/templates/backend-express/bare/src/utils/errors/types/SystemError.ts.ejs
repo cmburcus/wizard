@@ -3,8 +3,17 @@
 /**
  * This class can be used to throw when an internal server error occured
  */
-class SystemError extends Error {
-  constructor(error) {
+export default class SystemError extends Error {
+  type: string;
+  message: string;
+  status: number;
+  error: object | null;
+  stack: string;
+
+  /**
+   * @param {*} error Error description (can be any type)
+   */
+  constructor(error?: any) {
     super('SystemError');
 
     this.type = this.constructor.name;
@@ -13,5 +22,3 @@ class SystemError extends Error {
     this.error = error || null;
   }
 }
-
-module.exports = SystemError;

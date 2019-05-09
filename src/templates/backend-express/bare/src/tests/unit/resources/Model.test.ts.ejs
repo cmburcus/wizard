@@ -1,11 +1,11 @@
 'use strict';
 
-const chai = require('chai');
+import chai from 'chai';
+import AbstractModel from '../../../resources/Model';
 
 const expect = chai.expect;
-const AbstractModel = require.main.app('resources/Model');
 
-describe('TESTING: Objection Model', () => {
+describe('TESTING: Model', () => {
   it('it should create a new instance of Model', () => {
     const model = new AbstractModel();
 

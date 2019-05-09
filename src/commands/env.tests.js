@@ -31,7 +31,7 @@ module.exports = {
       print.warning('Running tests inside docker container')
       print.info('Command: '.yellow + `docker exec -it ${bins.node} yarn node:test`.muted)
       print.info('')
-      await childProcess.execFileSync('docker', ['exec', '-it', bins.node, 'yarn', 'node:test'], {
+      await childProcess.execFileSync('docker', ['exec', '-u', 'node', '-it', bins.node, 'yarn', 'node:test'], {
         stdio: 'inherit'
       })
       print.info('')

@@ -1,5 +1,5 @@
 const { print } = require('gluegun/print')
-const { builds, bins } = require('../config/environment')
+const { builds, bins, dependencies } = require('../config/environment')
 const childProcess = require('child_process')
 const projectTypes = require('../config/project-types')
 
@@ -27,6 +27,13 @@ module.exports = {
     /// ////////////////////////////////
     const projectConfig = JSON.parse(filesystem.read('.wizard'))
     const buildType = context.getBuildType(parameters.options)
+
+    // First making sure the node_modules directory exists. Otherwise you will run into permission issues
+    // when trying to install project dependencies
+    await filesystem.dir(dependencies.nodeModules)
+
+    // const hostUserId = await system.run('id -u')
+    // const hostUserGroup = await system.run('id -g')
 
     const timer = system.startTimer()
 
@@ -86,6 +93,8 @@ module.exports = {
         'docker',
         [
           'run',
+          '-u',
+          'node',
           '-dit',
           '--name',
           'node',
@@ -98,7 +107,7 @@ module.exports = {
           '-v',
           `${filesystem.cwd()}:/app`,
           '-v',
-          '/app/node_modules',
+          `${filesystem.cwd()}/node_modules:/app/node_modules`,
           '-w',
           '/app',
           '--rm',
@@ -110,36 +119,26 @@ module.exports = {
 
       // Installing project dependencies
       print.warning('Installing project dependencies')
+
       print.info('Command: '.yellow + `docker exec -it ${bins.node} yarn`.muted)
       print.info('')
-      await childProcess.execFileSync('docker', ['exec', '-it', bins.node, 'yarn'], {
+      await childProcess.execFileSync('docker', ['exec', '-u', 'node', '-it', bins.node, 'yarn'], {
+        stdio: 'inherit'
+      })
+      print.info('')
+
+      // Compiling typescript
+      print.warning('Compiling typescript')
+      print.info('Command: '.yellow + `docker exec -it ${bins.node} yarn ts:build`)
+      print.info('')
+      await childProcess.execFileSync('docker', ['exec', '-u', 'node', '-it', bins.node, 'yarn', 'ts:build'], {
         stdio: 'inherit'
       })
       print.info('')
 
       // Migrating database
-      print.warning('Migrating database')
-      print.info(
-        'Command: '.yellow +
-          `docker exec -it ${bins.node} ${
-            bins.knex
-          } --knexfile src/database/knexfile.js migrate:latest`.muted
-      )
-      print.info('')
-      await childProcess.execFileSync(
-        'docker',
-        [
-          'exec',
-          '-it',
-          bins.node,
-          bins.knex,
-          '--knexfile',
-          'src/database/knexfile.js',
-          'migrate:latest'
-        ],
-        { stdio: 'inherit' }
-      )
-      print.info('')
+      // await childProcess.execFileSync('wizard', ['migrate:latest'], { stdio: 'inherit' })
+      // print.info('')
 
       print.info(`Executed in ${timer() * 0.001} s`)
     } catch (error) {

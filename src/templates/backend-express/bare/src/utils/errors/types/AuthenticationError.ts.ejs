@@ -3,8 +3,17 @@
 /**
  * This class can be used to throw when an authentication error occured
  */
-class AuthenticationError extends Error {
-  constructor(error) {
+export default class AuthenticationError extends Error {
+  type: string;
+  message: string;
+  status: number;
+  error: object | null;
+  stack: string;
+
+  /**
+   * @param {*} error Error description (can be any type)
+   */
+  constructor(error?: any) {
     super('AuthenticationError');
 
     this.type = this.constructor.name;
@@ -13,5 +22,3 @@ class AuthenticationError extends Error {
     this.error = error || null;
   }
 }
-
-module.exports = AuthenticationError;

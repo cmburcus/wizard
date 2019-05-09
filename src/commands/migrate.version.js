@@ -1,5 +1,5 @@
 const { print } = require('gluegun/print')
-const { bins } = require('../config/environment')
+const { bins, knex } = require('../config/environment')
 const childProcess = require('child_process')
 const projectTypes = require('../config/project-types')
 
@@ -32,7 +32,7 @@ module.exports = {
       print.info(
         'Command: '.yellow +
           `docker exec -it ${bins.node} ${bins.knex} --knexfile ${
-            bins.knexfile
+            knex.knexfile
           } migrate:currentVersion`.muted
       )
       print.info('')
@@ -45,7 +45,7 @@ module.exports = {
           bins.node,
           bins.knex,
           '--knexfile',
-          bins.knexfile,
+          knex.knexfile,
           'migrate:currentVersion'
         ],
         { stdio: 'inherit' }

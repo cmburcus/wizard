@@ -1,7 +1,15 @@
 'use strict';
 
-const objectionFiltersUtil = require.main.app('utils/filters');
-const errorUtil = require.main.app('utils/errors');
+import objectionFiltersUtil from '../utils/filters';
+import errorUtil from '../utils/errors';
+
+interface Query {
+  select?: string;
+  filter?: string;
+  order?: string;
+  page?: number;
+  pageSize?: number;
+}
 
 /**
  * This service is the connection between the application and
@@ -11,13 +19,13 @@ const errorUtil = require.main.app('utils/errors');
  *
  * All functions inside this class will return javascript promisses
  */
-module.exports = (model) => ({
+export default (model: any) => ({
   /**
    * Fetches a list of records from the database
    *
    * @returns {Promise} Promise
    */
-  query: (query) => {
+  query: (query?: Query) => {
     let queryBuilder = model.query();
 
     if (typeof query !== 'object') {
@@ -40,7 +48,7 @@ module.exports = (model) => ({
    *
    * @returns {Promise} Promise
    */
-  show: (id) => {
+  show: (id: number) => {
     if (!id) {
       throw errorUtil.getInvalidArgumentError('show');
     }
@@ -55,7 +63,7 @@ module.exports = (model) => ({
    *
    * @returns {Promise} Promise
    */
-  create: (record) => {
+  create: (record: object) => {
     if (!record) {
       throw errorUtil.getInvalidArgumentError('create');
     }
@@ -71,7 +79,7 @@ module.exports = (model) => ({
    *
    * @returns {Promise} Promise
    */
-  update: (id, record) => {
+  update: (id: number, record: object) => {
     if (!id || !record) {
       throw errorUtil.getInvalidArgumentError('update');
     }
@@ -87,7 +95,7 @@ module.exports = (model) => ({
    *
    * @returns {Promise} Promise
    */
-  patch: (id, record) => {
+  patch: (id: number, record: object) => {
     if (!id || !record) {
       throw errorUtil.getInvalidArgumentError('patch');
     }
@@ -102,7 +110,7 @@ module.exports = (model) => ({
    *
    * @returns {Promise} Promise
    */
-  delete: (id) => {
+  delete: (id: number) => {
     if (!id) {
       throw errorUtil.getInvalidArgumentError('delete');
     }
@@ -120,7 +128,7 @@ module.exports = (model) => ({
    *
    * @returns {Promise} Promise
    */
-  countBy: (keyValueList) => {
+  countBy: (keyValueList: any) => {
     if (typeof keyValueList === 'undefined') {
       throw errorUtil.getInvalidArgumentError('no argument found');
     }

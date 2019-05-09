@@ -1,22 +1,24 @@
 'use strict';
 
-const chai = require('chai');
+import chai from 'chai';
+import AbstractService from '../../../resources/Service';
+import AbstractModel from '../../../resources/Model';
 
 const expect = chai.expect;
-const AbstractService = require.main.app('resources/Service');
-const AbstractModel = require.main.app('resources/Model');
 
 const service = AbstractService(AbstractModel);
 
 describe('TESTING: Service', () => {
   describe('query', () => {
     it('it should be able to perform a query operation without a query', () => {
-      expect(service.query()).to.be.an('object');
-      expect(service.query().constructor.name).to.equal('QueryBuilder');
+      expect(service.query(undefined)).to.be.an('object');
+      expect(service.query(undefined).constructor.name).to.equal('QueryBuilder');
     });
 
     it('it should ignore query if it is not an object', () => {
+      // @ts-ignore
       expect(service.query('...')).to.be.an('object');
+      // @ts-ignore
       expect(service.query('...').constructor.name).to.equal('QueryBuilder');
     });
 
@@ -71,7 +73,7 @@ describe('TESTING: Service', () => {
       let result = null;
 
       try {
-        result = service.show();
+        result = service.show(undefined);
       } catch (error) {
         result = error;
       }
@@ -123,7 +125,7 @@ describe('TESTING: Service', () => {
       let result = null;
 
       try {
-        result = service.create();
+        result = service.create(undefined);
       } catch (error) {
         result = error;
       }
@@ -174,7 +176,7 @@ describe('TESTING: Service', () => {
       let result = null;
 
       try {
-        result = service.update();
+        result = service.update(undefined, undefined);
       } catch (error) {
         result = error;
       }
@@ -225,7 +227,7 @@ describe('TESTING: Service', () => {
       let result = null;
 
       try {
-        result = service.patch();
+        result = service.patch(undefined, undefined);
       } catch (error) {
         result = error;
       }
@@ -277,7 +279,7 @@ describe('TESTING: Service', () => {
       let result = null;
 
       try {
-        result = service.delete();
+        result = service.delete(undefined);
       } catch (error) {
         result = error;
       }
@@ -361,7 +363,7 @@ describe('TESTING: Service', () => {
       let result = null;
 
       try {
-        result = service.countBy();
+        result = service.countBy(undefined);
       } catch (error) {
         result = error;
       }

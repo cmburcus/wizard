@@ -1,15 +1,17 @@
 'use strict';
 
-const chai = require('chai');
-const Joi = require('joi');
+import chai from 'chai';
+import Joi from 'joi';
+
+import validationOptions from '../../../utils/validator/config/joi.json';
+import validator from '../../../utils/validator';
+
+import Error from '../../../utils/errors';
 
 const expect = chai.expect;
 
-const validationOptions = require.main.app('utils/validator/config/joi.json');
-const validator = require.main.app('utils/validator');
-
 // Mock data
-let mockRequest = null;
+let mockRequest: any = null;
 
 function truthyCondition() {
   return [{ count: 0 }];
@@ -32,7 +34,7 @@ describe('TESTING UTIL: validator', () => {
         keyTwo: Joi.string().email(),
         keyThree: Joi.number(),
       });
-      const data = {
+      const data: object = {
         keyOne: '123456',
         keyTwo: 'notanemail',
         keyThree: null,
@@ -346,8 +348,9 @@ describe('TESTING UTIL: validator', () => {
       let result = null;
 
       try {
+        // @ts-ignore
         await validator.uniqueField(123, truthyCondition)(mockRequest, null, function(
-          possibleError
+          possibleError: Error
         ) {
           result = possibleError;
         });
@@ -365,8 +368,9 @@ describe('TESTING UTIL: validator', () => {
       let result = null;
 
       try {
+        // @ts-ignore
         await validator.uniqueField('field', truthyCondition, 123)(mockRequest, null, function(
-          possibleError
+          possibleError: Error
         ) {
           result = possibleError;
         });
@@ -388,7 +392,7 @@ describe('TESTING UTIL: validator', () => {
         keyTwo: Joi.string().email(),
         keyThree: Joi.number(),
       });
-      const data = {
+      const data: object = {
         keyOne: '123456',
         keyTwo: 'notanemail',
         keyThree: null,

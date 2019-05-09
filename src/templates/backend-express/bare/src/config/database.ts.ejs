@@ -2,6 +2,7 @@
 
 /**
  * Configuration file to be used for database
+ * This file is also used by knex for migrations and seeds
  */
 
 const envConnection = {
@@ -14,7 +15,7 @@ const envConnection = {
   },
 };
 
-module.exports = {
+export default {
   development: {
     client: 'pg',
     connection: {

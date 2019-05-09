@@ -1,5 +1,5 @@
 const { print } = require('gluegun/print')
-const { bins } = require('../config/environment')
+const { bins, knex } = require('../config/environment')
 const childProcess = require('child_process')
 const projectTypes = require('../config/project-types')
 
@@ -31,14 +31,14 @@ module.exports = {
       print.warning('Rollback of last migration')
       print.info(
         'Command: '.yellow +
-          `docker exec -it ${bins.node} ${bins.knex} --knexfile ${bins.knexfile} migrate:rollback`
+          `docker exec -it ${bins.node} ${bins.knex} --knexfile ${knex.knexfile} migrate:rollback`
             .muted
       )
       print.info('')
 
       await childProcess.execFileSync(
         'docker',
-        ['exec', '-it', bins.node, bins.knex, '--knexfile', bins.knexfile, 'migrate:rollback'],
+        ['exec', '-it', bins.node, bins.knex, '--knexfile', knex.knexfile, 'migrate:rollback'],
         { stdio: 'inherit' }
       )
       print.info('')

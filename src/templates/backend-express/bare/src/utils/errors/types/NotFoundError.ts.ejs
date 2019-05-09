@@ -3,11 +3,17 @@
 /**
  * This class can be used to throw when a route is not found
  */
-class NotFoundError extends Error {
+export default class NotFoundError extends Error {
+  type: string;
+  message: string;
+  status: number;
+  error: object | null;
+  stack: string;
+
   /**
    * @param {*} error Error description (can be any type)
    */
-  constructor(error) {
+  constructor(error?: any) {
     super('NotFoundError');
 
     this.type = this.constructor.name;
@@ -16,5 +22,3 @@ class NotFoundError extends Error {
     this.error = error || null;
   }
 }
-
-module.exports = NotFoundError;

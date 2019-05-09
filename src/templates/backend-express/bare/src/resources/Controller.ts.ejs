@@ -1,13 +1,14 @@
 'use strict';
 
-const status = require('http-status');
+import { Request, Response, NextFunction } from 'express';
+import status from 'http-status';
 
 /**
  * This controller handles the route request/response lifecycle. It's assumed
  * the data passed to this controller has already passed through route validation
  * using middlewares
  */
-module.exports = (service) => ({
+export default (service: any) => ({
   /**
    * Fetches a list of records
    *
@@ -16,7 +17,7 @@ module.exports = (service) => ({
    *
    * @returns {json} List of records or error
    */
-  query: async (request, response, next) => {
+  query: async (request: Request, response: Response, next: NextFunction) => {
     try {
       const records = await service.query(request.query);
 
@@ -34,7 +35,7 @@ module.exports = (service) => ({
    *
    * @returns {json} Record or error
    */
-  show: async (request, response, next) => {
+  show: async (request: Request, response: Response, next: NextFunction) => {
     try {
       const record = await service.show(request.params.id);
 
@@ -52,7 +53,7 @@ module.exports = (service) => ({
    *
    * @returns {json} Record or error
    */
-  create: async (request, response, next) => {
+  create: async (request: Request, response: Response, next: NextFunction) => {
     try {
       const record = await service.create(request.body);
 
@@ -70,7 +71,7 @@ module.exports = (service) => ({
    *
    * @returns {json} Record or error
    */
-  update: async (request, response, next) => {
+  update: async (request: Request, response: Response, next: NextFunction) => {
     try {
       const record = await service.update(request.params.id, request.body);
 
@@ -88,7 +89,7 @@ module.exports = (service) => ({
    *
    * @returns {json} Record or error
    */
-  patch: async (request, response, next) => {
+  patch: async (request: Request, response: Response, next: NextFunction) => {
     try {
       const record = await service.patch(request.params.id, request.body);
 
@@ -106,7 +107,7 @@ module.exports = (service) => ({
    *
    * @returns {number} Number of deleted records
    */
-  delete: async (request, response, next) => {
+  delete: async (request: Request, response: Response, next: NextFunction) => {
     try {
       const numberOfRecords = await service.delete(request.params.id);
 

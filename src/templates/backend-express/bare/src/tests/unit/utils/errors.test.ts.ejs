@@ -1,34 +1,45 @@
 'use strict';
 
-const chai = require('chai');
+import chai from 'chai';
+
+import errorUtil from '../../../utils/errors';
+import AuthenticationError from '../../../utils/errors/types/AuthenticationError';
+import InvalidTokenError from '../../../utils/errors/types/InvalidTokenError';
+import InvalidArgumentError from '../../../utils/errors/types/InvalidArgumentError';
+import ValidationError from '../../../utils/errors/types/ValidationError';
+import SystemError from '../../../utils/errors/types/SystemError';
+import NotFoundError from '../../../utils/errors/types/NotFoundError';
 
 const expect = chai.expect;
 
-const errorUtil = require.main.app('utils/errors');
-const AuthenticationError = require.main.app('utils/errors/types/AuthenticationError');
-const InvalidTokenError = require.main.app('utils/errors/types/InvalidTokenError');
-const InvalidArgumentError = require.main.app('utils/errors/types/InvalidArgumentError');
-const ValidationError = require.main.app('utils/errors/types/ValidationError');
-const SystemError = require.main.app('utils/errors/types/SystemError');
-const NotFoundError = require.main.app('utils/errors/types/NotFoundError');
-
 // Mock request and response
-const request = {
+interface MockResponse {
+  statusCode?: number,
+  jsonObject?: string,
+  status(code: number): MockResponse,
+  json(object: object): MockResponse
+};
+
+interface IndexableInterface {
+  [index: string]: any;
+};
+
+const request: IndexableInterface = {
   env: 'testing',
   app: {
-    get: (variable) => request[variable],
+    get: (variable: 'string') => request[variable],
   },
 };
 
-const response = {
+const response: MockResponse = {
   statusCode: undefined,
   jsonObject: undefined,
-  status: (code) => {
+  status: (code: number) => {
     response.statusCode = code;
 
     return response;
   },
-  json: (object) => {
+  json: (object: object) => {
     response.jsonObject = JSON.stringify(object);
 
     return response;
@@ -271,6 +282,7 @@ describe('TESTING UTIL: errors', () => {
       let systemError = null;
 
       try {
+        // @ts-ignore
         willNotWork = 'test';
       } catch (error) {
         systemError = error;
@@ -388,19 +400,21 @@ describe('TESTING UTIL: errors', () => {
     beforeEach(async () => {
       request.env = 'testing';
 
-      response.statusCode = 'undefined';
-      response.jsonObject = 'undefined';
+      response.statusCode = undefined;
+      response.jsonObject = undefined;
     });
 
     it('it should handle system errors', async () => {
       let systemError = null;
 
       try {
+        // @ts-ignore
         thisWillFail = null;
       } catch (error) {
         systemError = error;
       }
 
+      // @ts-ignore
       await errorUtil.errorHandler(systemError, request, response, null);
 
       expect(response)
@@ -437,11 +451,13 @@ describe('TESTING UTIL: errors', () => {
       let systemError = null;
 
       try {
+        // @ts-ignore
         thisWillFail = null;
       } catch (error) {
         systemError = error;
       }
 
+      // @ts-ignore
       await errorUtil.errorHandler(systemError, request, response, null);
 
       expect(response)
@@ -472,6 +488,7 @@ describe('TESTING UTIL: errors', () => {
     it('it should handle errors thrown on purpose', async () => {
       let error = new InvalidArgumentError();
 
+      // @ts-ignore
       await errorUtil.errorHandler(error, request, response, null);
 
       expect(response)

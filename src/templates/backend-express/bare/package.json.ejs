@@ -7,9 +7,10 @@
     "node": "<%= props.nodeVersion %>"
   },
   "scripts": {
+    "ts:build": "tsc",
     "node:dev": "NODE_ENV=development && DEBUG=app:* && nodemon ./bin/www",
     "node:prod": "NODE_ENV=production && DEBUG=app:* && node ./bin/www",
-    "node:test": "NODE_ENV=testing && DEBUG=app:* && nyc mocha src/tests/**/*.js --file src/app.js -t 10000 --recursive --exit",
+    "node:test": "NODE_ENV=testing && DEBUG=app:* && nyc mocha dist/tests/**/*.js --file dist/app.js -t 10000 --recursive --exit",
     "format": "eslint --quiet --report-unused-disable-directives --fix '**/*.js' || true"
   },
   "dependencies": {
@@ -27,6 +28,12 @@
     "pg-hstore": "2.3.2"
   },
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.1",
+    "@types/dotenv": "^6.1.1",
+    "@types/express": "^4.16.1",
+    "@types/jest": "^24.0.12",
+    "@types/joi": "^14.3.3",
+    "@types/morgan": "^1.7.35",
     "chai": "4.2.0",
     "chai-http": "4.2.1",
     "eslint": "5.13.0",

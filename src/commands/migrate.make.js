@@ -1,5 +1,5 @@
 const { print } = require('gluegun/print')
-const { bins } = require('../config/environment')
+const { bins, knex } = require('../config/environment')
 const childProcess = require('child_process')
 const projectTypes = require('../config/project-types')
 const promptValidator = require('../validators/general')
@@ -47,14 +47,14 @@ module.exports = {
       print.info(
         'Command: '.yellow +
           `docker exec -it ${bins.node} ${bins.knex} --knexfile ${
-            bins.knexfile
+            knex.knexfile
           } migrate:make ${name}`.muted
       )
       print.info('')
 
       await childProcess.execFileSync(
         'docker',
-        ['exec', '-it', bins.node, bins.knex, '--knexfile', bins.knexfile, 'migrate:make', name],
+        ['exec', '-it', bins.node, bins.knex, '--knexfile', knex.knexfile, 'migrate:make', name],
         { stdio: 'inherit' }
       )
       print.info('')
