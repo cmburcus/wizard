@@ -14,15 +14,15 @@ const expect = chai.expect;
 
 // Mock request and response
 interface MockResponse {
-  statusCode?: number,
-  jsonObject?: string,
-  status(code: number): MockResponse,
-  json(object: object): MockResponse
-};
+  statusCode?: number;
+  jsonObject?: string;
+  status(code: number): MockResponse;
+  json(object: object): MockResponse;
+}
 
 interface IndexableInterface {
   [index: string]: any;
-};
+}
 
 const request: IndexableInterface = {
   env: 'testing',

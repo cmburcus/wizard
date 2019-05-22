@@ -6,23 +6,23 @@ import { Model as ObjectionModel } from 'objection';
  * Base model to be used by any objection models
  */
 export default class Model extends ObjectionModel {
-  created_at: string;
-  updated_at: string;
+  public created_at: string;
+  public updated_at: string;
 
   // If this is true only properties in jsonSchema are picked when inserting or updating a row in the database.
-  static get pickJsonSchemaProperties() {
+  public static get pickJsonSchemaProperties() {
     return true;
   }
 
   // Sets created_at and updated_at to current time
-  $beforeInsert() {
+  public $beforeInsert() {
     this.created_at = new Date().toISOString();
     this.updated_at = new Date().toISOString();
   }
 
   // Removes created_at so that it doesn't get updated
   // Sets updated_at to current time
-  $beforeUpdate() {
+  public $beforeUpdate() {
     if (this.created_at) {
       delete this.created_at;
     }

@@ -13,9 +13,9 @@ const order: Order = filterConstants.order;
 
 interface IndexableInterface {
   [index: string]: any;
-};
+}
 
-interface QueryBuilder extends ObjectionQueryBuilder<any>, IndexableInterface {};
+interface QueryBuilder extends ObjectionQueryBuilder<any>, IndexableInterface {}
 
 interface Operators extends IndexableInterface {
   gt: string;
@@ -25,11 +25,11 @@ interface Operators extends IndexableInterface {
   ne: string;
   eq: string;
   like: string;
-};
+}
 interface Conditions extends IndexableInterface {
   and: string;
   or: string;
-};
+}
 interface RangeConditions extends IndexableInterface {
   in: string;
   orIn: string;
@@ -39,14 +39,20 @@ interface RangeConditions extends IndexableInterface {
   orBetween: string;
   notBetween: string;
   orNotBetween: string;
-};
+}
 interface Order extends IndexableInterface {
   asc: string;
   desc: string;
   default: string;
 }
 
-interface Filter { column: string; value: string; operator?: string; condition?: string; range?: string }
+interface Filter {
+  column: string;
+  value: string;
+  operator?: string;
+  condition?: string;
+  range?: string;
+}
 
 /**
  * It will sanitize the column and return the proper values to be used in a where clause
@@ -55,7 +61,12 @@ interface Filter { column: string; value: string; operator?: string; condition?:
  *
  * Regardless of the operator, blank spaces will be removed from the beginning and end of the column
  */
-function getSanitizedCondtion(column: string, operator: string, value: string, conditionIndex: number) {
+function getSanitizedCondtion(
+  column: string,
+  operator: string,
+  value: string,
+  conditionIndex: number
+) {
   if (operator === operators.like && typeof value !== 'string') {
     throw errorUtil.getInvalidArgumentError(`filter[${conditionIndex}].value`);
   }
@@ -73,7 +84,14 @@ function getSanitizedCondtion(column: string, operator: string, value: string, c
  *
  * @returns {string|null} String if an invalid filter is found or null if everything is valid
  */
-function getInvalidFilterString(column: string, value: string | number | string[] | number[], conditionIndex: number, operator?: string, databaseOperator?: string, range?: string) {
+function getInvalidFilterString(
+  column: string,
+  value: string | number | string[] | number[],
+  conditionIndex: number,
+  operator?: string,
+  databaseOperator?: string,
+  range?: string
+) {
   if (typeof column !== 'string') {
     return `filter[${conditionIndex}].column`;
   }
@@ -159,7 +177,7 @@ export default {
       throw errorUtil.getInvalidArgumentError('filter');
     }
 
-    for (let index: number = 0; index < filters.length; index++) {
+    for (let index = 0; index < filters.length; index++) {
       const operator = operators[filters[index].operator];
       const condition = conditions[filters[index].condition];
       const range: string = rangeConditions[filters[index].range];

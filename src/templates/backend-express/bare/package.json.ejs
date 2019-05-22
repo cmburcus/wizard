@@ -11,7 +11,7 @@
     "node:dev": "NODE_ENV=development && DEBUG=app:* && nodemon ./bin/www",
     "node:prod": "NODE_ENV=production && DEBUG=app:* && node ./bin/www",
     "node:test": "NODE_ENV=testing && DEBUG=app:* && nyc mocha dist/tests/**/*.js --file dist/app.js -t 10000 --recursive --exit",
-    "format": "eslint --quiet --report-unused-disable-directives --fix '**/*.js' || true"
+    "format": "eslint --quiet --report-unused-disable-directives --fix '**/*.ts' || true"
   },
   "dependencies": {
     "cookie-parser": "1.4.3",
@@ -34,11 +34,12 @@
     "@types/jest": "^24.0.12",
     "@types/joi": "^14.3.3",
     "@types/morgan": "^1.7.35",
+    "@typescript-eslint/eslint-plugin": "^1.9.0",
+    "@typescript-eslint/parser": "^1.9.0",
     "chai": "4.2.0",
     "chai-http": "4.2.1",
     "eslint": "5.13.0",
-    "eslint-config-prettier": "4.0.0",
-    "eslint-plugin-node": "8.0.1",
+    "eslint-config-prettier": "^4.3.0",
     "eslint-plugin-prettier": "3.0.1",
     "mocha": "5.2.0",
     "nodemon": "1.18.9",

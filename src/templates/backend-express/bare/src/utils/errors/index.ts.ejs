@@ -9,7 +9,13 @@ import ValidationError from './types/ValidationError';
 import SystemError from './types/SystemError';
 import NotFoundError from './types/NotFoundError';
 
-export interface Error extends AuthenticationError, InvalidTokenError, InvalidArgumentError, ValidationError, SystemError, NotFoundError {};
+export interface Error
+  extends AuthenticationError,
+    InvalidTokenError,
+    InvalidArgumentError,
+    ValidationError,
+    SystemError,
+    NotFoundError {}
 
 export default {
   /**

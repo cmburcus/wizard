@@ -6,10 +6,22 @@ import validationOptions from './config/joi.json';
 
 import errorUtil from '../errors';
 
-interface KeyValueCondition { key: string; value: string; condition?: string; }
-interface CustomValidationError { type: string; message: string; }
-interface ValidationErrorsList { [key: string]: CustomValidationError[]; }
-interface FormattedValidationError { original: object; errors: ValidationErrorsList; }
+interface KeyValueCondition {
+  key: string;
+  value: string;
+  condition?: string;
+}
+interface CustomValidationError {
+  type: string;
+  message: string;
+}
+interface ValidationErrorsList {
+  [key: string]: CustomValidationError[];
+}
+interface FormattedValidationError {
+  original: object;
+  errors: ValidationErrorsList;
+}
 
 const validator = {
   /**
@@ -20,7 +32,11 @@ const validator = {
   /**
    * Validates a schema against the request body
    */
-  validateSchema: (schema: Joi.Schema) => async (request: Request, response: Response, next: NextFunction) => {
+  validateSchema: (schema: Joi.Schema) => async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) => {
     try {
       const result = await Joi.validate(request.body, schema, validationOptions);
 

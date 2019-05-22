@@ -1,21 +1,13 @@
 {
-  "plugins": ["node"],
-  "extends": ["plugin:prettier/recommended", "plugin:node/recommended"],
-  "rules": {
-      "node/exports-style": ["error", "module.exports"]
-  },
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "extends": ["plugin:@typescript-eslint/recommended", "plugin:prettier/recommended", "prettier/@typescript-eslint"],
+  "rules": {},
   "parserOptions":{
+    "project": "./tsconfig.json",
     "ecmaVersion": 6,
     "ecmaFeatures": {
       "experimentalObjectRestSpread": true
     }
-  },
-  "overrides": [{
-    "files": "**/*.test.js",
-    "rules": {
-        "node/no-unpublished-require": 0,
-        "node/no-missing-require": 0
-    }
-  }]
+  }
 }
-  

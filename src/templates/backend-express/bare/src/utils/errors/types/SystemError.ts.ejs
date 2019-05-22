@@ -4,16 +4,16 @@
  * This class can be used to throw when an internal server error occured
  */
 export default class SystemError extends Error {
-  type: string;
-  message: string;
-  status: number;
-  error: object | null;
-  stack: string;
+  public type: string;
+  public message: string;
+  public status: number;
+  public error: object | null;
+  public stack: string;
 
   /**
    * @param {*} error Error description (can be any type)
    */
-  constructor(error?: any) {
+  public constructor(error?: any) {
     super('SystemError');
 
     this.type = this.constructor.name;
