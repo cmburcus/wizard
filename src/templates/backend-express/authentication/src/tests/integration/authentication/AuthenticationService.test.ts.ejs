@@ -1,17 +1,24 @@
 'use strict';
 
-const chai = require('chai');
+import chai from 'chai';
+import jsonwebtoken from 'jsonwebtoken';
+
+import AuthenticationModel from '../../../resources/authentication/Authentication';
+import AuthenticationService from '../../../resources/authentication/AuthenticationService';
 
 const expect = chai.expect;
 
-const AuthenticationModel = require.main.app('resources/authentication/Authentication');
-const AuthenticationService = require.main.app('resources/authentication/AuthenticationService');
-
-const POSTGRESS_UNIQUE_FIELD_VIOLATION_CODE = '23505';
-const jsonwebtoken = require('jsonwebtoken');
+const POSTGRESS_UNIQUE_FIELD_VIOLATION_CODE: string = '23505';
 
 // Fake data to be used for the tests
-const FAKE_RECORDS = [
+interface FakeRecord {
+  id?: any
+  authority_id?: any
+  email: any
+  password: any
+}
+
+const FAKE_RECORDS: FakeRecord[] = [
   {
     authority_id: 1,
     email: 'test@example.com',
@@ -24,18 +31,18 @@ const FAKE_RECORDS = [
   },
 ];
 
-const FAKE_CREDENTIALS = {
+const FAKE_CREDENTIALS: FakeRecord = {
   email: FAKE_RECORDS[0].email,
   password: FAKE_RECORDS[0].password,
 };
 
-const FAKE_AUTHORITY_ID = 1;
-const FAKE_EMAIL = 'johnsmith@example.com';
-const FAKE_PASSWORD = 'testPassword';
+const FAKE_AUTHORITY_ID: any = 1;
+const FAKE_EMAIL: any = 'johnsmith@example.com';
+const FAKE_PASSWORD: any = 'testPassword';
 
-let recordId = null;
-let storedRecord = null;
-let token = null;
+let recordId: any = null;
+let storedRecord: FakeRecord = null;
+let token: string = null;
 
 describe('TESTING: AuthenticationService', () => {
   beforeEach(async () => {
@@ -137,6 +144,7 @@ describe('TESTING: AuthenticationService', () => {
       let result = null;
 
       try {
+        // @ts-ignore
         result = await AuthenticationService.show();
       } catch (error) {
         result = error;
@@ -220,6 +228,7 @@ describe('TESTING: AuthenticationService', () => {
       let result = null;
 
       try {
+        // @ts-ignore
         result = await AuthenticationService.create();
       } catch (error) {
         result = error;
@@ -241,7 +250,7 @@ describe('TESTING: AuthenticationService', () => {
   describe('update', () => {
     beforeEach(async () => {
       const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
-      storedRecord = records[0];
+      storedRecord = <FakeRecord> records[0];
     });
 
     it('it should update the record if the data is valid', async () => {
@@ -308,6 +317,7 @@ describe('TESTING: AuthenticationService', () => {
       let result = null;
 
       try {
+        // @ts-ignore
         result = await AuthenticationService.update(storedRecord.id);
       } catch (error) {
         result = error;
@@ -329,7 +339,7 @@ describe('TESTING: AuthenticationService', () => {
   describe('patch', () => {
     beforeEach(async () => {
       const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
-      storedRecord = records[0];
+      storedRecord = <FakeRecord> records[0];
     });
 
     it('it should update the record if the data is valid', async () => {
@@ -370,6 +380,7 @@ describe('TESTING: AuthenticationService', () => {
       let result = null;
 
       try {
+        // @ts-ignore
         result = await AuthenticationService.patch(storedRecord.id);
       } catch (error) {
         result = error;
@@ -424,6 +435,7 @@ describe('TESTING: AuthenticationService', () => {
       let result = null;
 
       try {
+        // @ts-ignore
         result = await AuthenticationService.delete();
       } catch (error) {
         result = error;
@@ -493,13 +505,14 @@ describe('TESTING: AuthenticationService', () => {
     it('it should create an authentication record if the data is valid', async () => {
       let result = null;
 
-      const record = {
+      const record: FakeRecord = {
         authority_id: FAKE_AUTHORITY_ID,
         email: FAKE_EMAIL,
         password: FAKE_PASSWORD,
       };
 
       try {
+        // @ts-ignore
         result = await AuthenticationService.register(record);
       } catch (error) {
         result = error;
@@ -527,6 +540,7 @@ describe('TESTING: AuthenticationService', () => {
       let result = null;
 
       try {
+        // @ts-ignore
         result = await AuthenticationService.register();
       } catch (error) {
         result = error;
@@ -549,13 +563,14 @@ describe('TESTING: AuthenticationService', () => {
     it('it should create an authentication record if authority_id is null', async () => {
       let result = null;
 
-      const record = {
+      const record: FakeRecord = {
         authority_id: null,
         email: FAKE_EMAIL,
         password: FAKE_PASSWORD,
       };
 
       try {
+        // @ts-ignore
         result = await AuthenticationService.register(record);
       } catch (error) {
         result = error;
@@ -582,13 +597,14 @@ describe('TESTING: AuthenticationService', () => {
     it('it should fail if authority_id is not a number', async () => {
       let result = null;
 
-      const record = {
+      const record: FakeRecord = {
         authority_id: '1',
         email: FAKE_EMAIL,
         password: FAKE_PASSWORD,
       };
 
       try {
+        // @ts-ignore
         result = await AuthenticationService.register(record);
       } catch (error) {
         result = error;
@@ -615,13 +631,14 @@ describe('TESTING: AuthenticationService', () => {
     it('it should fail if authority_id is a negative number', async () => {
       let result = null;
 
-      const record = {
+      const record: FakeRecord = {
         authority_id: -1,
         email: FAKE_EMAIL,
         password: FAKE_PASSWORD,
       };
 
       try {
+        // @ts-ignore
         result = await AuthenticationService.register(record);
       } catch (error) {
         result = error;
@@ -641,12 +658,12 @@ describe('TESTING: AuthenticationService', () => {
     it('it should fail if authority_id is not unique', async () => {
       let result = null;
 
-      const recordOne = {
+      const recordOne: FakeRecord = {
         authority_id: FAKE_AUTHORITY_ID,
         email: FAKE_EMAIL,
         password: FAKE_PASSWORD,
       };
-      const recordTwo = {
+      const recordTwo: FakeRecord = {
         authority_id: FAKE_AUTHORITY_ID,
         email: `2${FAKE_EMAIL}`,
         password: FAKE_PASSWORD,
@@ -655,6 +672,7 @@ describe('TESTING: AuthenticationService', () => {
       try {
         await AuthenticationModel.query().insert(recordOne);
 
+        // @ts-ignore
         result = await AuthenticationService.register(recordTwo);
       } catch (error) {
         result = error;
@@ -677,13 +695,14 @@ describe('TESTING: AuthenticationService', () => {
     it('it should fail if email is null', async () => {
       let result = null;
 
-      const record = {
+      const record: FakeRecord = {
         authority_id: FAKE_AUTHORITY_ID,
         email: null,
         password: FAKE_PASSWORD,
       };
 
       try {
+        // @ts-ignore
         result = await AuthenticationService.register(record);
       } catch (error) {
         result = error;
@@ -711,6 +730,7 @@ describe('TESTING: AuthenticationService', () => {
       };
 
       try {
+        // @ts-ignore
         result = await AuthenticationService.register(record);
       } catch (error) {
         result = error;
@@ -745,6 +765,7 @@ describe('TESTING: AuthenticationService', () => {
       };
 
       try {
+        // @ts-ignore
         result = await AuthenticationService.register(record);
       } catch (error) {
         result = error;
@@ -771,12 +792,12 @@ describe('TESTING: AuthenticationService', () => {
     it('it should fail if email is not unique', async () => {
       let result = null;
 
-      const recordOne = {
+      const recordOne: FakeRecord = {
         authority_id: FAKE_AUTHORITY_ID,
         email: FAKE_EMAIL,
         password: FAKE_PASSWORD,
       };
-      const recordTwo = {
+      const recordTwo: FakeRecord = {
         authority_id: FAKE_AUTHORITY_ID + 1,
         email: FAKE_EMAIL,
         password: FAKE_PASSWORD,
@@ -785,6 +806,7 @@ describe('TESTING: AuthenticationService', () => {
       try {
         await AuthenticationModel.query().insert(recordOne);
 
+        // @ts-ignore
         result = await AuthenticationService.register(recordTwo);
       } catch (error) {
         result = error;
@@ -807,13 +829,14 @@ describe('TESTING: AuthenticationService', () => {
     it('it should fail if password is null', async () => {
       let result = null;
 
-      const record = {
+      const record: FakeRecord = {
         authority_id: FAKE_AUTHORITY_ID,
         email: FAKE_EMAIL,
         password: null,
       };
 
       try {
+        // @ts-ignore
         result = await AuthenticationService.register(record);
       } catch (error) {
         result = error;
@@ -841,6 +864,7 @@ describe('TESTING: AuthenticationService', () => {
       };
 
       try {
+        // @ts-ignore
         result = await AuthenticationService.register(record);
       } catch (error) {
         result = error;
@@ -865,7 +889,7 @@ describe('TESTING: AuthenticationService', () => {
   describe('authenticate', () => {
     beforeEach(async () => {
       const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
-      storedRecord = records[0];
+      storedRecord = <FakeRecord> records[0];
     });
 
     it('it should authenticate if the credentials are valid', async () => {
@@ -978,6 +1002,7 @@ describe('TESTING: AuthenticationService', () => {
       let result = null;
 
       try {
+        // @ts-ignore
         result = await AuthenticationService.authenticate();
       } catch (error) {
         result = error;
@@ -1051,7 +1076,7 @@ describe('TESTING: AuthenticationService', () => {
   describe('verify', () => {
     beforeEach(async () => {
       const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
-      storedRecord = records[0];
+      storedRecord = <FakeRecord> records[0];
       token = await AuthenticationService.authenticate(FAKE_CREDENTIALS);
     });
 
@@ -1105,6 +1130,7 @@ describe('TESTING: AuthenticationService', () => {
       let result = null;
 
       try {
+        // @ts-ignore
         result = await AuthenticationService.verify();
       } catch (error) {
         result = error;
@@ -1159,6 +1185,7 @@ describe('TESTING: AuthenticationService', () => {
       let result = null;
 
       try {
+        // @ts-ignore
         result = await AuthenticationService.deleteByAuthorityId();
       } catch (error) {
         result = error;

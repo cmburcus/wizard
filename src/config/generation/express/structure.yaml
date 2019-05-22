@@ -113,16 +113,16 @@ authentication:
       migrations:
         path: src/database/migrations
         files:
-          - src/database/migrations/00000000000000_create_authentications_table.js
+          - src/database/migrations/00000000000000_create_authentications_table.ts
     resources:
       path: src/resources
       authentication:
         path: src/resources/authentication
         files:
-          - src/resources/authentication/Authentication.js
-          - src/resources/authentication/AuthenticationController.js
-          - src/resources/authentication/AuthenticationService.js
-          - src/resources/authentication/routes.js
+          - src/resources/authentication/Authentication.ts
+          - src/resources/authentication/AuthenticationController.ts
+          - src/resources/authentication/AuthenticationService.ts
+          - src/resources/authentication/routes.ts
     tests:
       path: src/tests
       integration:
@@ -130,9 +130,9 @@ authentication:
         authentication:
           path: src/tests/integration/authentication
           files:
-            - src/tests/integration/authentication/api.test.js
-            - src/tests/integration/authentication/AuthenticationService.test.js
-            - src/tests/integration/authentication/validation.js
+            - src/tests/integration/authentication/api.test.ts
+            - src/tests/integration/authentication/AuthenticationService.test.ts
+            - src/tests/integration/authentication/validation.ts
       unit:
         path: src/tests/unit
         resources:
@@ -140,7 +140,7 @@ authentication:
           authentication:
             path: src/tests/unit/resources/authentication
             files:
-              - src/tests/unit/resources/authentication/Authentication.test.js
+              - src/tests/unit/resources/authentication/Authentication.test.ts
 
 ################################################################################
 #
@@ -214,9 +214,9 @@ authentication_utils:
     path: src/utils/jwt
     files:
       - src/utils/jwt/readme.md
-      - src/utils/jwt/index.js
+      - src/utils/jwt/index.ts
     tests:
       unit:
         path: src/tests/unit/utils
         files:
-          - src/tests/unit/utils/jwt.test.js
+          - src/tests/unit/utils/jwt.test.ts

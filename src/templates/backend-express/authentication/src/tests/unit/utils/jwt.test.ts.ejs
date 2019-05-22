@@ -1,16 +1,23 @@
 'use strict';
 
-const chai = require('chai');
+import chai from 'chai';
+import jwtUtil from '../../../utils/jwt'
 
 const expect = chai.expect;
 
-const jwtUtil = require.main.app('utils/jwt');
+interface MockHeaders {
+  authorization?: string
+}
+
+interface MockRequest {
+  headers?: MockHeaders
+}
 
 describe('TESTING UTIL: jwt', () => {
   describe('getTokenFromHeader', () => {
     it('it should return a string if the authorization header exists and is valid', () => {
       const mockToken = 'mockToken';
-      const mockRequest = {
+      const mockRequest: MockRequest = {
         headers: {
           authorization: `Bearer ${mockToken}`,
         },
@@ -19,6 +26,7 @@ describe('TESTING UTIL: jwt', () => {
       let result = null;
 
       try {
+        // @ts-ignore
         result = jwtUtil.getTokenFromHeader(mockRequest);
       } catch (error) {
         result = error;
@@ -30,11 +38,12 @@ describe('TESTING UTIL: jwt', () => {
     });
 
     it('it should throw error if the headers are missing', () => {
-      const mockRequest = {};
+      const mockRequest: MockRequest = {};
 
       let result = null;
 
       try {
+        // @ts-ignore
         result = jwtUtil.getTokenFromHeader(mockRequest);
       } catch (error) {
         result = error;
@@ -53,13 +62,14 @@ describe('TESTING UTIL: jwt', () => {
     });
 
     it('it should throw error if the authorization header is missing', () => {
-      const mockRequest = {
+      const mockRequest: MockRequest = {
         headers: {},
       };
 
       let result = null;
 
       try {
+        // @ts-ignore
         result = jwtUtil.getTokenFromHeader(mockRequest);
       } catch (error) {
         result = error;
@@ -78,13 +88,14 @@ describe('TESTING UTIL: jwt', () => {
     });
 
     it('it should throw error if the authorization header has no value', () => {
-      const mockRequest = {
+      const mockRequest: MockRequest = {
         headers: { authorization: null },
       };
 
       let result = null;
 
       try {
+        // @ts-ignore
         result = jwtUtil.getTokenFromHeader(mockRequest);
       } catch (error) {
         result = error;
@@ -104,7 +115,7 @@ describe('TESTING UTIL: jwt', () => {
 
     it('it should throw error if the authorization header does not include the word Bearer', () => {
       const mockToken = 'mockToken';
-      const mockRequest = {
+      const mockRequest: MockRequest = {
         headers: {
           authorization: ` ${mockToken}`,
         },
@@ -113,6 +124,7 @@ describe('TESTING UTIL: jwt', () => {
       let result = null;
 
       try {
+        // @ts-ignore
         result = jwtUtil.getTokenFromHeader(mockRequest);
       } catch (error) {
         result = error;
@@ -132,7 +144,7 @@ describe('TESTING UTIL: jwt', () => {
 
     it('it should throw error if the authorization header does not include space between Bearer and token', () => {
       const mockToken = 'mockToken';
-      const mockRequest = {
+      const mockRequest: MockRequest = {
         headers: {
           authorization: `Bearer${mockToken}`,
         },
@@ -141,6 +153,7 @@ describe('TESTING UTIL: jwt', () => {
       let result = null;
 
       try {
+        // @ts-ignore
         result = jwtUtil.getTokenFromHeader(mockRequest);
       } catch (error) {
         result = error;
@@ -160,7 +173,7 @@ describe('TESTING UTIL: jwt', () => {
 
     it('it should throw error if the authorization header has too many elements', () => {
       const mockToken = 'mockToken';
-      const mockRequest = {
+      const mockRequest: MockRequest = {
         headers: {
           authorization: `Bearer ${mockToken} test`,
         },
@@ -169,6 +182,7 @@ describe('TESTING UTIL: jwt', () => {
       let result = null;
 
       try {
+        // @ts-ignore
         result = jwtUtil.getTokenFromHeader(mockRequest);
       } catch (error) {
         result = error;

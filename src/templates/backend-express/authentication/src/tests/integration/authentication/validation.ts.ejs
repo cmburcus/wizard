@@ -1,10 +1,10 @@
-const AuthenticationModel = require.main.app('resources/authentication/Authentication');
+import AuthenticationModel from '../../../resources/authentication/Authentication';
 
-const FAKE_AUTHORITY_ID = 1;
-const FAKE_EMAIL = 'test@example.com';
-const FAKE_PASSWORD = 'asdfasdf';
+const FAKE_AUTHORITY_ID: number = 1;
+const FAKE_EMAIL: string = 'test@example.com';
+const FAKE_PASSWORD: string = 'asdfasdf';
 
-module.exports = {
+export default {
   register: [
     {
       message: 'it should fail if authority_id is empty',

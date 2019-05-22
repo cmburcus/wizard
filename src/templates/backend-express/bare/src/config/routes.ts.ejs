@@ -8,12 +8,14 @@ const routeApiPrefix = 'api';
 const routeVersions = {
   v1: 'v1',
 };
-const routes: any = []; // Application routes
+const routes: any = [
+
+]; // Application routes
 
 export default {
   setRoutes: (app: any) => {
     routes.forEach((route: any) => {
-      app.use(`/${routeApiPrefix}/${route.version}/${route.route}`, require(route.path));
+      app.use(`/${routeApiPrefix}/${route.version}/${route.route}`, require(route.path).default);
     });
 
     return app;

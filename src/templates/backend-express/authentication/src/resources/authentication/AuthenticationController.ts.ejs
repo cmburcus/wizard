@@ -1,12 +1,14 @@
 'use strict';
 
-const status = require('http-status');
+import { Request, Response, NextFunction } from 'express';
+import status from 'http-status';
 
-const Controller = require.main.app('resources/Controller');
-const AuthenticationService = require.main.app('resources/authentication/AuthenticationService');
-const jwtUtil = require.main.app('utils/jwt');
+import Controller from '../Controller';
+import AuthenticationService from './AuthenticationService';
 
-module.exports = {
+import jwtUtil from '../../utils/jwt'
+
+export default {
   ...Controller(AuthenticationService),
 
   /**
@@ -15,7 +17,7 @@ module.exports = {
    * @param {object} request
    * @param {object} response
    */
-  register: async (request, response, next) => {
+  register: async (request: Request, response: Response, next: NextFunction) => {
     try {
       await AuthenticationService.register(request.body);
 
@@ -31,7 +33,7 @@ module.exports = {
    * @param {object} request
    * @param {object} response
    */
-  authenticate: async (request, response, next) => {
+  authenticate: async (request: Request, response: Response, next: NextFunction) => {
     try {
       const token = await AuthenticationService.authenticate(request.body);
 
@@ -47,7 +49,7 @@ module.exports = {
    * @param {object} request
    * @param {object} response
    */
-  verify: async (request, response, next) => {
+  verify: async (request: Request, response: Response, next: NextFunction) => {
     try {
       const jwtToken = jwtUtil.getTokenFromHeader(request);
 

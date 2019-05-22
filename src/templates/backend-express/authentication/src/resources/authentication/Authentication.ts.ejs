@@ -1,14 +1,21 @@
 'use strict';
 
-const Joi = require('joi');
-const bcrypt = require('bcrypt');
+import Joi from 'joi';
+import bcrypt from 'bcrypt';
 
-const Model = require.main.app('resources/Model');
+import Model from '../Model';
 
 /**
  * This represents an authentication model
  */
-class Authentication extends Model {
+export default class Authentication extends Model {
+  public id: number
+  public authority_id: number
+  public email: string
+  public password: string
+  public created_at: string
+  public updated_at: string
+
   // Name of database table for this model
   static get tableName() {
     return 'authentications';
@@ -54,7 +61,7 @@ class Authentication extends Model {
     }
   }
 
-  $formatJson(json) {
+  $formatJson(json: any) {
     delete json.password;
 
     json = super.$formatJson(json);
@@ -121,5 +128,3 @@ class Authentication extends Model {
     };
   }
 }
-
-module.exports = Authentication;

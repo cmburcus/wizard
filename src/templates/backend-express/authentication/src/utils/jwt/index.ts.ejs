@@ -1,12 +1,13 @@
 'use strict';
 
-const errorUtil = require.main.app('utils/errors');
+import { Request } from 'express';
+import errorUtil from '../errors';
 
-module.exports = {
+export default {
   /**
    * Gets the token from the authorization header or throws invalid token
    */
-  getTokenFromHeader: (request) => {
+  getTokenFromHeader: (request: Request) => {
     if (!request.headers || !request.headers.authorization) {
       throw errorUtil.getInvalidTokenError('No authorization header found');
     }

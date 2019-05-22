@@ -19,7 +19,7 @@
 #
 # The file where the resource routes are defined
 ################################################################################
-file: src/config/routes.js
+file: src/config/routes.ts
 
 ################################################################################
 #
@@ -28,4 +28,4 @@ file: src/config/routes.js
 ################################################################################
 authentication:
   - name: authentication
-    path: resources/authentication/routes
+    path: ../resources/authentication/routes

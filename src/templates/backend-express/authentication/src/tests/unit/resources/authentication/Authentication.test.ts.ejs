@@ -1,12 +1,11 @@
 'use strict';
 
-const chai = require('chai');
+import chai from 'chai';
+import bcrypt from 'bcrypt';
+
+import AuthenticationModel from '../../../../resources/authentication/Authentication';
 
 const expect = chai.expect;
-
-const bcrypt = require('bcrypt');
-
-const AuthenticationModel = require.main.app('resources/authentication/Authentication');
 
 const FAKE_RECORD = {
   authority_id: 1,

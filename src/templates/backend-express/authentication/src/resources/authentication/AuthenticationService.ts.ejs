@@ -1,15 +1,20 @@
 'use strict';
 
-const raw = require('objection').raw;
-const bcrypt = require('bcrypt');
-const jsonwebtoken = require('jsonwebtoken');
+import { raw } from 'objection';
+import bcrypt from 'bcrypt';
+import jsonwebtoken from 'jsonwebtoken';
 
-const Service = require.main.app('resources/Service');
-const AuthenticationModel = require.main.app('resources/authentication/Authentication');
+import Service from '../Service';
+import AuthenticationModel from './Authentication'
 
-const errorUtil = require.main.app('utils/errors');
+import errorUtil from '../../utils/errors'
 
-module.exports = {
+interface Credentials {
+  email: string
+  password: string
+}
+
+export default {
   ...Service(AuthenticationModel),
 
   /**
@@ -17,7 +22,7 @@ module.exports = {
    *
    * @param {object} record
    */
-  register: (record) => {
+  register: (record: AuthenticationModel) => {
     if (
       !record ||
       (typeof record.authority_id !== 'undefined' &&
@@ -37,7 +42,7 @@ module.exports = {
    *
    * @param {object} credentials
    */
-  authenticate: (credentials) => {
+  authenticate: (credentials: Credentials) => {
     if (!credentials || !credentials.email || !credentials.password) {
       throw errorUtil.getInvalidArgumentError('authenticate');
     }
@@ -71,7 +76,7 @@ module.exports = {
    *
    * @param {string} token
    */
-  verify: (token) => {
+  verify: (token: string) => {
     if (!token) {
       throw errorUtil.getInvalidArgumentError('verify');
     }
@@ -90,7 +95,7 @@ module.exports = {
    *
    * @returns {Promise} Promise
    */
-  deleteByAuthorityId: (authorityId) => {
+  deleteByAuthorityId: (authorityId: number) => {
     if (!authorityId) {
       throw errorUtil.getInvalidArgumentError('delete');
     }

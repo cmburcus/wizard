@@ -18,13 +18,14 @@ const environment = require.main.yaml('config/generation/express/environment.yam
 const { print } = require('gluegun/print')
 const description = 'Generates authentication components'
 
-module.exports = {
+const command = {
   name: 'generate:auth',
-  description: description,
+  description: 'Generates authentication components',
+  types: [project.types.backend.express],
   run: async context => {
     const { parameters, prompt } = context
 
-    if (!context.canRunCommand(project.types.backend.express)) {
+    if (!context.canRunCommand(command)) {
       return
     }
 
@@ -64,6 +65,8 @@ module.exports = {
   }
 }
 
+module.exports = command
+
 /**
  * Prints the help message of this command
  */
@@ -82,5 +85,5 @@ function printHelp (context) {
 
   // Help title
   context.helpTitle()
-  print.info(`  ${description}`)
+  print.info(`  ${command.description}`)
 }
