@@ -1,4 +1,4 @@
-const projectTypes = require('../config/project-types')
+const project = require.main.yaml('config/project.yaml')
 
 // Project paths
 const paths = require.main.yaml('config/generation/express/structure.yaml')
@@ -24,7 +24,7 @@ module.exports = {
   run: async context => {
     const { parameters, prompt } = context
 
-    if (!context.canRunCommand(projectTypes.backendExpress)) {
+    if (!context.canRunCommand(project.types.backend.express)) {
       return
     }
 

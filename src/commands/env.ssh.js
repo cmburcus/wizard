@@ -1,17 +1,14 @@
 const { print } = require('gluegun/print')
-const { bins } = require('../config/environment')
-const childProcess = require('child_process')
-const projectTypes = require('../config/project-types')
+const project = require.main.yaml('config/project.yaml')
 
-const description = 'SSH into the docker environment'
-
-module.exports = {
+const command = {
   name: 'env:ssh',
-  description: description,
+  description: 'SSH into the docker environment',
+  types: [project.types.backend.express, project.types.frontend.react],
   run: async context => {
     const { parameters } = context
 
-    if (!context.canRunCommand(projectTypes.backendExpress)) {
+    if (!context.canRunCommand(command)) {
       return
     }
 
@@ -25,15 +22,13 @@ module.exports = {
     /// ////////////////////////////////
     // RUNNING COMMANDS
     /// ////////////////////////////////
-    try {
-      print.warning('Attempting environment SSH')
-      print.info('Command: '.yellow + `docker exec -it ${bins.node} bash`.muted)
-      print.info('')
+    const projectEnvironment = context.getProjectEnvironment()
 
-      await childProcess.execFileSync('docker', ['exec', '-it', bins.node, 'bash'], {
-        stdio: 'inherit'
-      })
-      print.info('')
+    try {
+      context.executeCommandInsideContainer(
+        projectEnvironment.bins.app,
+        projectEnvironment.commands.ssh
+      )
     } catch (error) {
       if (error.status !== 130) {
         print.error(error.stack)
@@ -41,6 +36,8 @@ module.exports = {
     }
   }
 }
+
+module.exports = command
 
 /**
  * Prints the help message of this command
@@ -62,5 +59,5 @@ function printHelp (context) {
 
   // Help title
   context.helpTitle()
-  print.info(`  ${description}`)
+  print.info(`  ${command.description}`)
 }

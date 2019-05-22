@@ -3,8 +3,7 @@ const generalValidator = require('../../validators/general')
 const newProjectValidator = require('../../validators/newProject')
 
 // List options
-const projectTypes = require('../../config/project-types')
-const nodeVersions = require('../../config/node-versions')
+const project = require.main.yaml('config/project.yaml')
 
 module.exports = [
   {
@@ -29,8 +28,8 @@ module.exports = [
     type: 'list',
     name: 'nodeVersion',
     message: 'Node version',
-    choices: nodeVersions,
+    choices: project.node,
     validate: generalValidator.isRequired,
-    projectType: projectTypes.backendExpress
+    projectType: project.types.backend.express
   }
 ]

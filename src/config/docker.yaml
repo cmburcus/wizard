@@ -1,0 +1,139 @@
+---
+################################################################################
+#
+# This file defines configurations to use with Docker. It contains trivial
+# name definitions as well as paths to modules required to build a docker
+# container for the project
+#
+################################################################################
+
+################################################################################
+#
+# BUILDS
+#
+# Environment build types
+################################################################################
+builds:
+  development: development
+  testing: testing
+  production: production
+
+################################################################################
+#
+# COMMANDS
+#
+# Snippets of command arguments to be run by docker. They can be used
+# by childProcess.execFileSync and they can be combined. By themselves, these
+# snippets will not run correctly as there are missing arguments values
+#
+# Always make sure to include the third argument as { stdio: 'inherit' } inside
+# of execFileSync. Otherwise, an error will be thrown
+################################################################################
+commands:
+  command: docker
+  create:
+    network:
+      - network
+      - create
+    container:
+      - run
+      - --name
+  execute:
+    - exec
+    - -it
+  stop:
+    - stop
+  remove:
+    network:
+      - network
+      - remove
+  options:
+    # Standalone options
+    detach: -d # Run container in background and print container ID
+    interactive: -i # Keep STDIN open even if not attached
+    removeOnStop: --rm # Removes the container when stopped
+    tty: -t # Allocate a pseudo-TTY
+    attachToNetwork: --network # Attach to an existing network
+
+    # Options requiring params (should be defined under runtime)
+    addVolume: -v # Create a volume from path (/hostPath:/containerPath)
+    envVariable: -e # Set environment variables (KEY=value)
+    mapPorts: -p # Map internal to external ports (external:internal)
+    runAsUser: -u # Username or UID (<name|uid>[:<group|gid>])
+    workingDirectory: -w # Working directory inside the container
+
+################################################################################
+#
+# CONTAINERS
+#
+# Definitions for the different types of docker containers required. These lists
+# will be used at the creation of the container
+#
+# For all options requiring params, you need to define the options in the
+# in the runtime definition below containers.  Use the name of the
+# container as the key of the environment
+#
+# NOTE: The option to attach to network will attach the container to a
+#       pre-existing network using the application name
+################################################################################
+containers:
+  express:
+    - name: postgres
+      image: postgres:10.4
+      options:
+        - detach
+        - attachToNetwork
+        - removeOnStop
+
+    - name: node
+      image: node:9.11.1
+      workDir: /app
+      options:
+        - detach
+        - interactive
+        - tty
+        - attachToNetwork
+        - removeOnStop
+
+################################################################################
+#
+# RUNTIME
+#
+# Based on the containers defined above, you can define different param
+# configs for runtime
+#
+# - user: run as this specific user
+# - env: [ { key: string, value: string } ]
+# - ports: { external: number, internal: number }
+# - volumes: [ { host: string, container: string } ]
+# - workDir: string
+#
+# NOTE:
+#   - For environment variables, do not supply a value for NODE_ENV
+#   - For volumes, if you don't define the host, the base directory will
+#     be used
+################################################################################
+runtime:
+  postgres:
+    env:
+      - key: POSTGRES_USER
+        value: postgres
+      - key: POSTGRES_PASSWORD
+        value: password
+      - key: POSTGRES_DB
+        value: postgres
+    ports:
+      external: 21000
+      internal: 5432
+  node:
+    env:
+      - key: NODE_ENV
+    ports:
+      external: 5000
+      internal: 5000
+    user: node
+    volumes:
+      - container: /app
+      - host: /node_modules
+        container: /app/node_modules
+    workDir: /app

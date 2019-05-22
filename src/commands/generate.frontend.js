@@ -2,7 +2,7 @@
 const newProjectPrompts = require('../config/prompts/new-project')
 
 // Project types
-const projectTypes = require('../config/project-types')
+const project = require.main.yaml('config/project.yaml')
 
 const { print } = require('gluegun/print')
 const description = 'Generate an express application'
@@ -24,12 +24,12 @@ module.exports = {
       return
     }
 
-    print.info(`Generating ${projectTypes.frontendReact}...`.yellow)
+    print.info(`Generating ${project.types.frontend.react}...`.yellow)
 
     const questions = newProjectPrompts.filter(
       question =>
         typeof question.projectType === 'undefined' ||
-        question.projectType === projectTypes.frontendReact
+        question.projectType === project.types.frontend.react
     )
 
     let answers = await prompt.ask(questions)
@@ -39,7 +39,7 @@ module.exports = {
     // For now the project type is always react so we'll hardcode it
     answers = {
       ...answers,
-      projectType: projectTypes.frontendReact
+      projectType: project.types.frontend.react
     }
 
     // TODO generate the frontend project

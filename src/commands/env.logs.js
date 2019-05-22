@@ -1,7 +1,7 @@
 const { print } = require('gluegun/print')
 const { bins } = require('../config/environment')
 const childProcess = require('child_process')
-const projectTypes = require('../config/project-types')
+const project = require.main.yaml('config/project.yaml')
 
 const description = 'Display docker container logs'
 
@@ -11,7 +11,7 @@ module.exports = {
   run: async context => {
     const { parameters } = context
 
-    if (!context.canRunCommand(projectTypes.backendExpress)) {
+    if (!context.canRunCommand(project.types.backend.express)) {
       return
     }
 

@@ -1,7 +1,7 @@
 const { print } = require('gluegun/print')
 const { bins } = require('../config/environment')
 const childProcess = require('child_process')
-const projectTypes = require('../config/project-types')
+const project = require.main.yaml('config/project.yaml')
 const promptValidator = require('../validators/general')
 
 const description = 'Create a named seed file'
@@ -12,7 +12,7 @@ module.exports = {
   run: async context => {
     const { parameters, system, prompt } = context
 
-    if (!context.canRunCommand(projectTypes.backendExpress)) {
+    if (!context.canRunCommand(project.types.backend.express)) {
       return
     }
 

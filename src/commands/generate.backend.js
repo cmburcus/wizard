@@ -2,7 +2,7 @@
 const newProjectPrompts = require('../config/prompts/new-project')
 
 // Project types
-const projectTypes = require('../config/project-types')
+const project = require.main.yaml('config/project.yaml')
 
 // Project paths
 const paths = require.main.yaml('config/generation/express/structure.yaml')
@@ -13,15 +13,15 @@ const utils = paths.core_utils
 
 // Others
 const { print } = require('gluegun/print')
-const description = 'Generate an express application'
 
-module.exports = {
+const command = {
   name: 'generate:backend',
-  description: description,
+  description: 'Generate an express application',
+  types: [],
   run: async context => {
     const { parameters, prompt } = context
 
-    if (!context.canRunCommand()) {
+    if (!context.canRunCommand(command)) {
       return
     }
 
@@ -32,13 +32,13 @@ module.exports = {
       return
     }
 
-    print.info(`Generating ${projectTypes.backendExpress}...`.yellow)
+    print.info(`Generating ${project.types.backend.express}...`.yellow)
 
     // Gathering project information
     const questions = newProjectPrompts.filter(
       question =>
         typeof question.projectType === 'undefined' ||
-        question.projectType === projectTypes.backendExpress
+        question.projectType === project.types.backend.express
     )
 
     let answers = await prompt.ask(questions)
@@ -49,7 +49,7 @@ module.exports = {
     // For now the project type is always express so we'll hardcode it
     answers = {
       ...answers,
-      projectType: projectTypes.backendExpress
+      projectType: project.types.backend.express
     }
 
     // Folders to be generated
@@ -69,6 +69,8 @@ module.exports = {
   }
 }
 
+module.exports = command
+
 /**
  * Prints the help message of this command
  */
@@ -87,5 +89,5 @@ function printHelp (context) {
 
   // Help title
   context.helpTitle()
-  print.info(`  ${description}`)
+  print.info(`  ${command.description}`)
 }

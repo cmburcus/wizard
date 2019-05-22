@@ -1,0 +1,61 @@
+---
+################################################################################
+#
+# This file defines the list of commands available depending on where the user
+# is located. Certain commands are only available in specific type of projects
+# while others are only available outside of a project
+#
+################################################################################
+
+################################################################################
+#
+# GLOBAL COMMANDS
+#
+# Available from anywhere
+################################################################################
+global:
+  - help
+
+################################################################################
+#
+# GENERATION COMMANDS
+#
+# Available to generate a new project or to generate elements inside of one
+################################################################################
+generate:
+  bare:
+    - generate:backend
+    - generate:frontend
+  express:
+    - generate:auth
+
+################################################################################
+#
+# ENVIRONMENT COMMANDS
+#
+# Commands to handle a project environment
+################################################################################
+environment:
+  - env:build
+  - env:run
+  - env:stop
+  - env:test
+  - env:ssh
+  - env:logs
+  - env:format
+
+################################################################################
+#
+# DATABASE COMMANDS
+#
+# Commands to handle a project environment
+################################################################################
+database:
+  migrate:
+    - migrate:latest
+    - migrate:rollback
+    - migrate:version
+    - migrate:make
+  seed:
+    - seed:run
+    - seed:make
