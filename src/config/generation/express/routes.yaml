@@ -9,7 +9,8 @@
 #
 # [parent : name to be referenced by]
 #   - [name : name of the route (usually the same as the resource name)]
-#     [path : path from the resources folder to the resource route definition
+#     [path : path from the resources folder to the resource route definition]
+#     [version : version of the route. If not defined, v1 will be used]
 #
 ################################################################################
 
@@ -19,7 +20,7 @@
 #
 # The file where the resource routes are defined
 ################################################################################
-file: src/config/routes.ts
+file: src/config/routes.json
 
 ################################################################################
 #
@@ -28,4 +29,4 @@ file: src/config/routes.ts
 ################################################################################
 authentication:
   - name: authentication
-    path: ../resources/authentication/routes
+    path: ./resources/authentication/routes

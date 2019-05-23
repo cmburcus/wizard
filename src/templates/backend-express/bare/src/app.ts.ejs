@@ -12,7 +12,7 @@ import { Model } from 'objection';
 
 import errorUtil from './utils/errors';
 import databaseConfig from './config/database';
-import routesConfig from './config/routes';
+import routes from './config/routes.json';
 
 // Initialize dotenv
 dotenv.config();
@@ -38,7 +38,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-routesConfig.setRoutes(app);
+routes.forEach((route: any) => {
+  app.use(`/api/${route.version}/${route.route}`, require(route.path).default);
+});
 
 // Error and 404 handlers
 app.use(errorUtil.notFoundHandler);

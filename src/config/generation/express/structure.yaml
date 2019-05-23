@@ -67,7 +67,7 @@ core:
       path: src/config
       files:
         - src/config/database.ts
-        - src/config/routes.ts
+        - src/config/routes.json
     database:
       path: src/database
       files:
