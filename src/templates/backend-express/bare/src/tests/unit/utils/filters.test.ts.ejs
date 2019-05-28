@@ -85,6 +85,7 @@ describe('TESTING UTIL: filters', () => {
       let result = null;
 
       try {
+        // @ts-ignore
         result = filtersUtil.addSelect(Model.query(), null);
       } catch (error) {
         result = error;
@@ -213,6 +214,7 @@ describe('TESTING UTIL: filters', () => {
       let result = null;
 
       try {
+        // @ts-ignore
         result = filtersUtil.addFilter(Model.query(), null);
       } catch (error) {
         result = error;
@@ -1713,6 +1715,7 @@ describe('TESTING UTIL: filters', () => {
       let result = null;
 
       try {
+        // @ts-ignore
         result = filtersUtil.addOrderBy(Model.query(), null);
       } catch (error) {
         result = error;
@@ -1802,6 +1805,7 @@ describe('TESTING UTIL: filters', () => {
       let result = null;
 
       try {
+        // @ts-ignore
         result = filtersUtil.addPagination(Model.query(), undefined, undefined);
       } catch (error) {
         result = error;
@@ -1937,6 +1941,7 @@ describe('TESTING UTIL: filters', () => {
       let result = null;
 
       try {
+        // @ts-ignore
         result = filtersUtil.addPagination(Model.query(), 1, undefined);
       } catch (error) {
         result = error;
@@ -1958,6 +1963,7 @@ describe('TESTING UTIL: filters', () => {
       let result = null;
 
       try {
+        // @ts-ignore
         result = filtersUtil.addPagination(Model.query(), null, null);
       } catch (error) {
         result = error;

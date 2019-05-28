@@ -1,4 +1,5 @@
 {
+  "_comment": "This file is deprecated. Please use the yaml files instead. Kept for retro-compatibility until project is updated",
   "builds": {
     "dev": "development",
     "test": "testing",

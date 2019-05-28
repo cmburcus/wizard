@@ -36,13 +36,13 @@ const FAKE_CREDENTIALS: FakeRecord = {
   password: FAKE_RECORDS[0].password,
 };
 
-const FAKE_AUTHORITY_ID: any = 1;
-const FAKE_EMAIL: any = 'johnsmith@example.com';
-const FAKE_PASSWORD: any = 'testPassword';
+const FAKE_AUTHORITY_ID: number = 1;
+const FAKE_EMAIL: string = 'johnsmith@example.com';
+const FAKE_PASSWORD: string = 'testPassword';
 
-let recordId: any = null;
-let storedRecord: FakeRecord = null;
-let token: string = null;
+let recordId: number | null | undefined = null;
+let storedRecord: FakeRecord | null = null;
+let token: string | null = null;
 
 describe('TESTING: AuthenticationService', () => {
   beforeEach(async () => {
@@ -102,7 +102,7 @@ describe('TESTING: AuthenticationService', () => {
       let result = null;
 
       try {
-        result = await AuthenticationService.show(recordId);
+        result = await AuthenticationService.show(<number> recordId);
       } catch (error) {
         result = error;
       }
@@ -254,6 +254,12 @@ describe('TESTING: AuthenticationService', () => {
     });
 
     it('it should update the record if the data is valid', async () => {
+      expect(storedRecord).to.be.an('object');
+
+      if (!storedRecord) {
+        return;
+      }
+
       const record = {
         authority_id: 2,
         email: 'newtest@example.com',
@@ -290,6 +296,12 @@ describe('TESTING: AuthenticationService', () => {
     });
 
     it('it should fail if required fields are not defined', async () => {
+      expect(storedRecord).to.be.an('object');
+
+      if (!storedRecord) {
+        return;
+      }
+
       let result = null;
 
       try {
@@ -343,6 +355,12 @@ describe('TESTING: AuthenticationService', () => {
     });
 
     it('it should update the record if the data is valid', async () => {
+      expect(storedRecord).to.be.an('object');
+
+      if (!storedRecord) {
+        return;
+      }
+
       const record = {
         email: 'newtest@example.com',
       };
@@ -409,7 +427,7 @@ describe('TESTING: AuthenticationService', () => {
       let result = null;
 
       try {
-        result = await AuthenticationService.delete(recordId);
+        result = await AuthenticationService.delete(<number> recordId);
       } catch (error) {
         result = error;
       }
@@ -935,9 +953,16 @@ describe('TESTING: AuthenticationService', () => {
       let verifiedToken = null;
 
       try {
+        // @ts-ignore
         verifiedToken = await jsonwebtoken.verify(result, process.env.JWT_SECRET);
       } catch (error) {
         verifiedToken = error;
+      }
+
+      expect(storedRecord).to.be.an('object');
+
+      if (!storedRecord) {
+        return;
       }
 
       expect(verifiedToken).to.be.an('object');
@@ -973,10 +998,16 @@ describe('TESTING: AuthenticationService', () => {
       process.env.JWT_EXPIRES_IN = currentJwtExpiration;
 
       expect(result).to.be.a('string');
+      expect(storedRecord).to.be.an('object');
+
+      if (!storedRecord) {
+        return;
+      }
 
       let verifiedToken = null;
 
       try {
+        // @ts-ignore
         verifiedToken = await jsonwebtoken.verify(result, process.env.JWT_SECRET);
       } catch (error) {
         verifiedToken = error;
@@ -1084,9 +1115,15 @@ describe('TESTING: AuthenticationService', () => {
       let result = null;
 
       try {
-        result = await AuthenticationService.verify(token);
+        result = await AuthenticationService.verify(<string> token);
       } catch (error) {
         result = error;
+      }
+
+      expect(storedRecord).to.be.an('object');
+
+      if (!storedRecord) {
+        return;
       }
 
       expect(result).to.be.an('object');
@@ -1159,7 +1196,7 @@ describe('TESTING: AuthenticationService', () => {
       let result = null;
 
       try {
-        result = await AuthenticationService.deleteByAuthorityId(recordId);
+        result = await AuthenticationService.deleteByAuthorityId(<number> recordId);
       } catch (error) {
         result = error;
       }

@@ -1,6 +1,6 @@
 'use strict';
 
-import { Request, Response, NextFunction, ErrorRequestHandler } from 'express';
+import { Request, Response, NextFunction } from 'express';
 
 import AuthenticationError from './types/AuthenticationError';
 import InvalidTokenError from './types/InvalidTokenError';
@@ -51,14 +51,15 @@ export default {
   /**
    * Error handler middleware for routes that do not exist
    */
-  notFoundHandler: (request: Request, response: Response, next: NextFunction) => {
+  notFoundHandler: (_request: Request, _response: Response, next: NextFunction) => {
     next(new NotFoundError());
   },
 
   /**
    * Error handler middleware that can be used to handle all route errors
+   * TODO Check if we need _next
    */
-  errorHandler: (error: Error, request: Request, response: Response, next: NextFunction) => {
+  errorHandler: (error: Error, request: Request, response: Response, _next: NextFunction) => {
     let errorObject: Error = error;
     let errorResponse = null;
 

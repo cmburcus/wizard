@@ -154,7 +154,7 @@ module.exports = context => {
     if (!projectConfig) {
       return
     }
-    
+
     print.warning('Removing docker network')
 
     const params = [...docker.commands.remove.network, projectConfig.projectName]
@@ -259,6 +259,10 @@ function getUser (container) {
   return params
 }
 
+/**
+ * Gets the volumes for the container to be added as params
+ * if they exist or returns an empty array
+ */
 function getVolumes (container) {
   const runtime = docker.runtime[container]
   const params = []
@@ -277,6 +281,10 @@ function getVolumes (container) {
   return params
 }
 
+/**
+ * Gets the working directory for the container to be added as params
+ * if one exists or returns an empty array
+ */
 function getWorkingDirectory (container) {
   const runtime = docker.runtime[container]
   const params = []

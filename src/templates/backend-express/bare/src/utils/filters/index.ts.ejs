@@ -46,14 +46,6 @@ interface Order extends IndexableInterface {
   default: string;
 }
 
-interface Filter {
-  column: string;
-  value: string;
-  operator?: string;
-  condition?: string;
-  range?: string;
-}
-
 /**
  * It will sanitize the column and return the proper values to be used in a where clause
  *
@@ -164,7 +156,7 @@ export default {
       return queryBuilder;
     }
 
-    let filters: Filter[] | null = null;
+    let filters = null;
 
     try {
       filters = JSON.parse(filterString);
@@ -180,7 +172,7 @@ export default {
     for (let index = 0; index < filters.length; index++) {
       const operator = operators[filters[index].operator];
       const condition = conditions[filters[index].condition];
-      const range: string = rangeConditions[filters[index].range];
+      const range = rangeConditions[filters[index].range];
 
       // Making sure that column is a string and value is defined
       // Also making sure that if an operator was supplied it is valid
@@ -275,7 +267,7 @@ export default {
    *
    * Both page and pageSize are required to paginate the results
    */
-  addPagination: (queryBuilder: QueryBuilder, page?: number, pageSize?: number) => {
+  addPagination: (queryBuilder: QueryBuilder, page: number, pageSize: number) => {
     if (typeof page === 'undefined' && typeof pageSize === 'undefined') {
       return queryBuilder;
     }

@@ -41,12 +41,6 @@ environment:
     bins:
       app: node
       database: postgres
-    database:
-      command: node_modules/.bin/knex
-      knexfile: dist/database/knexfile.js
-      migrations: dist/database/migrations
-      seeds: dist/database/seeds
-    dependencies: node_modules
     commands:
       formatCode:
         comment: Formatting code

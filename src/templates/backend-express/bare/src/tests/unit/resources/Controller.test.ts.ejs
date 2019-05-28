@@ -11,16 +11,16 @@ const service = {
   query: () => [{ col: 'value' }, { col: 'value' }],
   show: (id: number) => (id ? { col: 'value' } : null),
   create: (record: object) => record,
-  update: (id: number, record: object) => record,
-  patch: (id: number, record: object) => record,
+  update: (_id: number, record: object) => record,
+  patch: (_id: number, record: object) => record,
   delete: (id: number) => (id ? 1 : null),
 };
 const controller = AbstractController(service);
 
 // Global variables used to monitor the results
-let status: number = null;
+let status: number | null = null;
 let result: any = null;
-let error: Error = null;
+let error: Error | null = null;
 
 // Mocked response and next functions
 const response = {
@@ -71,6 +71,7 @@ describe('TESTING: Controller', () => {
 
     it('it should handle errors', async () => {
       try {
+        // @ts-ignore
         await controller.query(null, null, next);
       } catch (codeError) {
         error = codeError;
@@ -113,6 +114,7 @@ describe('TESTING: Controller', () => {
 
     it('it should handle errors', async () => {
       try {
+        // @ts-ignore
         await controller.show(null, null, next);
       } catch (codeError) {
         error = codeError;
@@ -144,6 +146,7 @@ describe('TESTING: Controller', () => {
 
     it('it should handle errors', async () => {
       try {
+        // @ts-ignore
         await controller.create(null, null, next);
       } catch (codeError) {
         error = codeError;
@@ -178,6 +181,7 @@ describe('TESTING: Controller', () => {
 
     it('it should handle errors', async () => {
       try {
+        // @ts-ignore
         await controller.update(null, null, next);
       } catch (codeError) {
         error = codeError;
@@ -212,6 +216,7 @@ describe('TESTING: Controller', () => {
 
     it('it should handle errors', async () => {
       try {
+        // @ts-ignore
         await controller.patch(null, null, next);
       } catch (codeError) {
         error = codeError;
@@ -256,6 +261,7 @@ describe('TESTING: Controller', () => {
 
     it('it should handle errors', async () => {
       try {
+        // @ts-ignore
         await controller.delete(null, null, next);
       } catch (codeError) {
         error = codeError;

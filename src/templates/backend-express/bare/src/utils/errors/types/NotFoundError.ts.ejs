@@ -8,7 +8,7 @@ export default class NotFoundError extends Error {
   public message: string;
   public status: number;
   public error: object | null;
-  public stack: string;
+  public stack?: string;
 
   /**
    * @param {*} error Error description (can be any type)
@@ -20,5 +20,6 @@ export default class NotFoundError extends Error {
     this.message = 'Not found';
     this.status = 404;
     this.error = error || null;
+    this.stack = (new Error()).stack;
   }
 }

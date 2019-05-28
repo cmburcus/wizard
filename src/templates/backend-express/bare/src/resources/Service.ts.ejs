@@ -36,7 +36,10 @@ export default (model: any) => ({
     queryBuilder = objectionFiltersUtil.addSelect(queryBuilder, query.select);
     queryBuilder = objectionFiltersUtil.addFilter(queryBuilder, query.filter);
     queryBuilder = objectionFiltersUtil.addOrderBy(queryBuilder, query.order);
-    queryBuilder = objectionFiltersUtil.addPagination(queryBuilder, query.page, query.pageSize);
+
+    if (query.page && query.pageSize) {
+      queryBuilder = objectionFiltersUtil.addPagination(queryBuilder, query.page, query.pageSize);
+    }
 
     return queryBuilder;
   },

@@ -20,9 +20,9 @@ describe('TESTING: Authentication Model', () => {
     model.$beforeInsert();
 
     expect(model)
-      .to.have.property('password')
-      .not.equal(FAKE_RECORD.password);
-    expect(bcrypt.compareSync(FAKE_RECORD.password, model.password)).to.equal(true);
+      .to.have.property('password').be.a('string')
+      .and.not.equal(FAKE_RECORD.password);
+    expect(bcrypt.compareSync(FAKE_RECORD.password, <string> model.password)).to.equal(true);
   });
 
   it('it should encrypt the password before updating if it exists', async () => {
@@ -31,9 +31,9 @@ describe('TESTING: Authentication Model', () => {
     model.$beforeUpdate();
 
     expect(model)
-      .to.have.property('password')
-      .not.equal(FAKE_RECORD.password);
-    expect(bcrypt.compareSync(FAKE_RECORD.password, model.password)).to.equal(true);
+      .to.have.property('password').be.a('string')
+      .and.not.equal(FAKE_RECORD.password);
+    expect(bcrypt.compareSync(FAKE_RECORD.password, <string> model.password)).to.equal(true);
   });
 
   it('it should ignore the password encryption before updating if it does not exist', async () => {

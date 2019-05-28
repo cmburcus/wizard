@@ -8,7 +8,7 @@ export default class SystemError extends Error {
   public message: string;
   public status: number;
   public error: object | null;
-  public stack: string;
+  public stack?: string;
 
   /**
    * @param {*} error Error description (can be any type)
@@ -20,5 +20,6 @@ export default class SystemError extends Error {
     this.message = 'Internal server error';
     this.status = 500;
     this.error = error || null;
+    this.stack = (new Error()).stack;
   }
 }

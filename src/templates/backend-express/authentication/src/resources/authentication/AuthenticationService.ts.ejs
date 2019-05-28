@@ -54,7 +54,7 @@ export default {
           throw errorUtil.getAuthenticationError('no entry found');
         }
 
-        if (!bcrypt.compareSync(credentials.password, result.password)) {
+        if (!result.password || !bcrypt.compareSync(credentials.password, result.password)) {
           throw errorUtil.getAuthenticationError('invalid password');
         }
 
@@ -64,7 +64,7 @@ export default {
               authorityId: result.authority_id,
             },
           },
-          process.env.JWT_SECRET,
+          <string> process.env.JWT_SECRET,
           { expiresIn: process.env.JWT_EXPIRES_IN || '30d' }
         );
       });
@@ -82,7 +82,7 @@ export default {
     }
 
     try {
-      return jsonwebtoken.verify(token, process.env.JWT_SECRET);
+      return jsonwebtoken.verify(token, <string> process.env.JWT_SECRET);
     } catch (error) {
       throw errorUtil.getInvalidTokenError(error.name + ': ' + error.message);
     }

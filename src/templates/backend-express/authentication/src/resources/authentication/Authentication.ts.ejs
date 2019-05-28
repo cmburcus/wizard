@@ -9,21 +9,16 @@ import Model from '../Model';
  * This represents an authentication model
  */
 export default class Authentication extends Model {
-  public id: number
-  public authority_id: number
-  public email: string
-  public password: string
-  public created_at: string
-  public updated_at: string
+  public id?: number
+  public authority_id?: number | null
+  public email?: string
+  public password?: string
+  public created_at?: string
+  public updated_at?: string
 
   // Name of database table for this model
   static get tableName() {
     return 'authentications';
-  }
-
-  // If this is true only properties in jsonSchema are picked when inserting or updating a row in the database.
-  static get pickJsonSchemaProperties() {
-    return true;
   }
 
   static get joiAuthorityIdValidation() {
@@ -107,7 +102,7 @@ export default class Authentication extends Model {
       // Property validation when creating the object
       properties: {
         authority_id: {
-          type: ['number', null],
+          type: ['number', 'null'],
         },
         email: {
           type: 'string',

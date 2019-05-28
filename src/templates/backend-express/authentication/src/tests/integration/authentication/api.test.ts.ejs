@@ -36,8 +36,8 @@ const FAKE_CREDENTIALS = {
   password: FAKE_RECORDS[0].password,
 };
 
-let storedRecord: Partial<AuthenticationModel> = null;
-let jwtToken: string = null;
+let storedRecord: Partial<AuthenticationModel> | null = null;
+let jwtToken: string | null = null;
 
 describe('TESTING HTTP: /api/v1/authentication', () => {
   beforeEach(async () => {
@@ -57,7 +57,9 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
 
     it('it should handle server failure by returning an error', async () => {
       let errorReturn = null;
-      await AuthenticationController.query(null, null, function(error) {
+
+      // @ts-ignore
+      await AuthenticationController.query(null, null, function(error: Error) {
         errorReturn = error;
       });
 
@@ -101,7 +103,9 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
 
     it('it should handle server failure by returning an error', async () => {
       let errorReturn = null;
-      await AuthenticationController.show(null, null, function(error) {
+
+      // @ts-ignore
+      await AuthenticationController.show(null, null, function(error: Error) {
         errorReturn = error;
       });
 
@@ -121,11 +125,16 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     it('it should get user if found in the database', async () => {
       const response = await chai
         .request(server)
-        .get(`/api/v1/authentication/${storedRecord.id}`)
+        .get(`/api/v1/authentication/${storedRecord ? storedRecord.id : null}`)
         .set('content-type', 'application/json');
 
-      expect(response).to.have.status(200);
+      expect(storedRecord).to.be.an('object')
 
+      if (!storedRecord) {
+        return;
+      }
+
+      expect(response).to.have.status(200);
       expect(response)
         .to.have.nested.property('body.id')
         .be.a('number')
@@ -153,7 +162,9 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
   describe('POST: /', () => {
     it('it should handle server failure by returning an error', async () => {
       let errorReturn = null;
-      await AuthenticationController.create(null, null, function(error) {
+
+      // @ts-ignore
+      await AuthenticationController.create(null, null, function(error: Error) {
         errorReturn = error;
       });
 
@@ -254,7 +265,9 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
 
     it('it should handle server failure by returning an error', async () => {
       let errorReturn = null;
-      await AuthenticationController.update(null, null, function(error) {
+
+      // @ts-ignore
+      await AuthenticationController.update(null, null, function(error: Error) {
         errorReturn = error;
       });
 
@@ -270,7 +283,7 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
 
       const response = await chai
         .request(server)
-        .put(`/api/v1/authentication/${storedRecord.id}`)
+        .put(`/api/v1/authentication/${storedRecord ? storedRecord.id : null}`)
         .set('content-type', 'application/json')
         .send(record);
 
@@ -299,7 +312,7 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     it('it should fail if no data is provided', async () => {
       const response = await chai
         .request(server)
-        .put(`/api/v1/authentication/${storedRecord.id}`)
+        .put(`/api/v1/authentication/${storedRecord ? storedRecord.id : null}`)
         .set('content-type', 'application/json');
 
       expect(response).to.have.status(400);
@@ -355,7 +368,9 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
 
     it('it should handle server failure by returning an error', async () => {
       let errorReturn = null;
-      await AuthenticationController.patch(null, null, function(error) {
+
+      // @ts-ignore
+      await AuthenticationController.patch(null, null, function(error: Error) {
         errorReturn = error;
       });
 
@@ -369,9 +384,15 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
 
       const response = await chai
         .request(server)
-        .patch(`/api/v1/authentication/${storedRecord.id}`)
+        .patch(`/api/v1/authentication/${storedRecord ? storedRecord.id : null}`)
         .set('content-type', 'application/json')
         .send(record);
+
+      expect(storedRecord).to.be.an('object');
+
+      if (!storedRecord) {
+        return;
+      }
 
       expect(response).to.have.status(200);
       expect(response)
@@ -398,8 +419,14 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     it('it should succeed even if no data is provided', async () => {
       const response = await chai
         .request(server)
-        .patch(`/api/v1/authentication/${storedRecord.id}`)
+        .patch(`/api/v1/authentication/${storedRecord ? storedRecord.id : null}`)
         .set('content-type', 'application/json');
+
+      expect(storedRecord).to.be.an('object');
+
+      if (!storedRecord) {
+        return;
+      }
 
       expect(response).to.have.status(200);
       expect(response)
@@ -432,7 +459,9 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
 
     it('it should handle server failure by returning an error', async () => {
       let errorReturn = null;
-      await AuthenticationController.delete(null, null, function(error) {
+
+      // @ts-ignore
+      await AuthenticationController.delete(null, null, function(error: Error) {
         errorReturn = error;
       });
 
@@ -442,7 +471,7 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     it('it should delete record if it exists', async () => {
       const response = await chai
         .request(server)
-        .delete(`/api/v1/authentication/${storedRecord.id}`)
+        .delete(`/api/v1/authentication/${storedRecord ? storedRecord.id : null}`)
         .set('content-type', 'application/json');
 
       expect(response).to.have.status(200);
@@ -469,7 +498,9 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
   describe('POST: /register', () => {
     it('it should handle server failure by returning an error', async () => {
       let errorReturn = null;
-      await AuthenticationController.register(null, null, function(error) {
+
+      // @ts-ignore
+      await AuthenticationController.register(null, null, function(error: Error) {
         errorReturn = error;
       });
 
@@ -535,7 +566,7 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
         .to.have.nested.property('[0].password')
         .be.a('string');
 
-      const passwordMatch = await bcrypt.compare(FAKE_RECORDS[0].password, record[0].password);
+      const passwordMatch = await bcrypt.compare(FAKE_RECORDS[0].password, <string> record[0].password);
 
       expect(passwordMatch).to.be.true;
     });
@@ -580,7 +611,9 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
 
     it('it should handle server failure by returning an error', async () => {
       let errorReturn = null;
-      await AuthenticationController.authenticate(null, null, function(error) {
+
+      // @ts-ignore
+      await AuthenticationController.authenticate(null, null, function(error: Error) {
         errorReturn = error;
       });
 
@@ -614,6 +647,7 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
       let verifiedToken = null;
 
       try {
+        // @ts-ignore
         verifiedToken = jsonwebtoken.verify(response.body, process.env.JWT_SECRET);
       } catch (error) {
         verifiedToken = error;
@@ -734,7 +768,8 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
 
     it('it should handle server failure by returning an error', async () => {
       let errorReturn = null;
-      await AuthenticationController.verify(null, null, function(error) {
+      // @ts-ignore
+      await AuthenticationController.verify(null, null, function(error: Error) {
         errorReturn = error;
       });
 

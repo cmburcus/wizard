@@ -379,7 +379,8 @@ describe('TESTING UTIL: errors', () => {
     it('it should call the callback with a NotFoundError', async () => {
       let errorReturn = null;
 
-      await errorUtil.notFoundHandler(null, null, function(error) {
+      // @ts-ignore
+      await errorUtil.notFoundHandler(null, null, function(error: Error) {
         errorReturn = error;
       });
 
@@ -425,6 +426,7 @@ describe('TESTING UTIL: errors', () => {
         .to.have.property('jsonObject')
         .be.a('string');
 
+      // @ts-ignore
       const jsonObject = JSON.parse(response.jsonObject);
 
       expect(jsonObject)
@@ -468,6 +470,7 @@ describe('TESTING UTIL: errors', () => {
         .to.have.property('jsonObject')
         .be.a('string');
 
+      // @ts-ignore
       const jsonObject = JSON.parse(response.jsonObject);
 
       expect(jsonObject)
@@ -499,6 +502,7 @@ describe('TESTING UTIL: errors', () => {
         .to.have.property('jsonObject')
         .be.a('string');
 
+      // @ts-ignore
       const jsonObject = JSON.parse(response.jsonObject);
 
       expect(jsonObject)

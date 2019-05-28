@@ -34,7 +34,7 @@ const validator = {
    */
   validateSchema: (schema: Joi.Schema) => async (
     request: Request,
-    response: Response,
+    _response: Response,
     next: NextFunction
   ) => {
     try {
@@ -58,7 +58,7 @@ const validator = {
    */
   uniqueField: (field: string, uniqueCheckFunction: any, excludeCurrentKey?: string) => async (
     request: Request,
-    response: Response,
+    _response: Response,
     next: NextFunction
   ) => {
     try {

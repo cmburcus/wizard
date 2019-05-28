@@ -6,8 +6,6 @@ import Joi from 'joi';
 import validationOptions from '../../../utils/validator/config/joi.json';
 import validator from '../../../utils/validator';
 
-import Error from '../../../utils/errors';
-
 const expect = chai.expect;
 
 // Mock data
@@ -194,7 +192,8 @@ describe('TESTING UTIL: validator', () => {
       let result = null;
 
       try {
-        await validator.validateSchema(schema)(mockRequest, null, function(possibleError) {
+        // @ts-ignore
+        await validator.validateSchema(schema)(mockRequest, null, function(possibleError: Error) {
           result = possibleError;
         });
       } catch (error) {
@@ -220,7 +219,8 @@ describe('TESTING UTIL: validator', () => {
       let result = null;
 
       try {
-        await validator.validateSchema(schema)(mockRequest, null, function(possibleError) {
+        // @ts-ignore
+        await validator.validateSchema(schema)(mockRequest, null, function(possibleError: Error) {
           result = possibleError;
         });
       } catch (error) {
@@ -237,7 +237,8 @@ describe('TESTING UTIL: validator', () => {
       let result = null;
 
       try {
-        await validator.validateSchema(null)(null, null, function(possibleError) {
+        // @ts-ignore
+        await validator.validateSchema(null)(null, null, function(possibleError: Error) {
           result = possibleError;
         });
       } catch (error) {
@@ -263,8 +264,9 @@ describe('TESTING UTIL: validator', () => {
       let result = null;
 
       try {
+        // @ts-ignore
         await validator.uniqueField('field', truthyCondition)(mockRequest, null, function(
-          possibleError
+          possibleError: Error
         ) {
           result = possibleError;
         });
@@ -281,8 +283,9 @@ describe('TESTING UTIL: validator', () => {
       let result = null;
 
       try {
+        // @ts-ignore
         await validator.uniqueField('field', truthyCondition)(mockRequest, null, function(
-          possibleError
+          possibleError: Error
         ) {
           result = possibleError;
         });
@@ -297,8 +300,9 @@ describe('TESTING UTIL: validator', () => {
       let result = null;
 
       try {
+        // @ts-ignore
         await validator.uniqueField('field', truthyCondition)(mockRequest, null, function(
-          possibleError
+          possibleError: Error
         ) {
           result = possibleError;
         });
@@ -313,8 +317,9 @@ describe('TESTING UTIL: validator', () => {
       let result = null;
 
       try {
+        // @ts-ignore
         await validator.uniqueField('field', truthyCondition, 'id')(mockRequest, null, function(
-          possibleError
+          possibleError: Error
         ) {
           result = possibleError;
         });
@@ -329,8 +334,9 @@ describe('TESTING UTIL: validator', () => {
       let result = null;
 
       try {
+        // @ts-ignore
         await validator.uniqueField('field', falsyCondition)(mockRequest, null, function(
-          possibleError
+          possibleError: Error
         ) {
           result = possibleError;
         });
