@@ -1,11 +1,9 @@
 'use strict';
 
-// Defining require for local dependencies to use absolute paths
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import dotenv from 'dotenv';
-
 import Knex from 'knex';
 import { Model } from 'objection';
 
@@ -16,6 +14,7 @@ import routes from './config/routes.json';
 // Initialize dotenv
 dotenv.config();
 
+// Initialize express
 const app = express();
 
 // Initialize knex.
@@ -28,15 +27,18 @@ const knex: any = Knex(databaseConfig[app.get('env') || 'development']);
 // the Model.bindKnex method.
 Model.knex(knex);
 
+// Only use http logger in development
 /* istanbul ignore next */
 if (!app.get('env') || app.get('env') === 'development') {
   app.use(logger('dev'));
 }
 
+// Defining extra app configs
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+// Setting routes from config
 routes.forEach((route: any) => {
   app.use(`/api/${route.version}/${route.route}`, require(route.path).default);
 });

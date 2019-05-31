@@ -1,7 +1,7 @@
 'use strict';
 
-import { Request, Response, NextFunction } from 'express';
 import status from 'http-status';
+import { Request, Response, NextFunction } from 'express';
 
 /**
  * This controller handles the route request/response lifecycle. It's assumed
@@ -11,11 +11,6 @@ import status from 'http-status';
 export default (service: any) => ({
   /**
    * Fetches a list of records
-   *
-   * @param {object} request
-   * @param {object} response
-   *
-   * @returns {json} List of records or error
    */
   query: async (request: Request, response: Response, next: NextFunction) => {
     try {
@@ -29,11 +24,6 @@ export default (service: any) => ({
 
   /**
    * Fetches a record by id
-   *
-   * @param {object} request
-   * @param {object} response
-   *
-   * @returns {json} Record or error
    */
   show: async (request: Request, response: Response, next: NextFunction) => {
     try {
@@ -47,11 +37,6 @@ export default (service: any) => ({
 
   /**
    * Creates a new record
-   *
-   * @param {object} request
-   * @param {object} response
-   *
-   * @returns {json} Record or error
    */
   create: async (request: Request, response: Response, next: NextFunction) => {
     try {
@@ -65,11 +50,6 @@ export default (service: any) => ({
 
   /**
    * Updates an existing record
-   *
-   * @param {object} request
-   * @param {object} response
-   *
-   * @returns {json} Record or error
    */
   update: async (request: Request, response: Response, next: NextFunction) => {
     try {
@@ -83,11 +63,6 @@ export default (service: any) => ({
 
   /**
    * Patches an existing record
-   *
-   * @param {object} request
-   * @param {object} response
-   *
-   * @returns {json} Record or error
    */
   patch: async (request: Request, response: Response, next: NextFunction) => {
     try {
@@ -101,11 +76,6 @@ export default (service: any) => ({
 
   /**
    * Removes a record from the database
-   *
-   * @param {object} request
-   * @param {object} response
-   *
-   * @returns {number} Number of deleted records
    */
   delete: async (request: Request, response: Response, next: NextFunction) => {
     try {

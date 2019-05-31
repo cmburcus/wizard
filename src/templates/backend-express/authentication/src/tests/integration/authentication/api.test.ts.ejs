@@ -2,29 +2,26 @@
 
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import server from '../../../app';
-
 import bcrypt from 'bcrypt';
 import jsonwebtoken from 'jsonwebtoken';
+import { Request, Response } from 'express';
 
+import server from '../../../app';
 import validation from './validation';
-
 import AuthenticationModel from '../../../resources/authentication/Authentication';
 import AuthenticationController from '../../../resources/authentication/AuthenticationController';
 import AuthenticationService from '../../../resources/authentication/AuthenticationService';
 
-const expect = chai.expect;
-
-chai.use(chaiHttp);
-
 // Fake data to be used for the tests
 const FAKE_RECORDS = [
   {
+    // eslint-disable-next-line @typescript-eslint/camelcase
     authority_id: 1,
     email: 'test@example.com',
     password: 'asdfasdf',
   },
   {
+    // eslint-disable-next-line @typescript-eslint/camelcase
     authority_id: null,
     email: 'test2@example.com',
     password: 'asdfasdf',
@@ -36,8 +33,14 @@ const FAKE_CREDENTIALS = {
   password: FAKE_RECORDS[0].password,
 };
 
+let emptyRequest = {};
+let emptyResponse = {};
+
 let storedRecord: Partial<AuthenticationModel> | null = null;
 let jwtToken: string | null = null;
+
+const expect = chai.expect;
+chai.use(chaiHttp);
 
 describe('TESTING HTTP: /api/v1/authentication', () => {
   beforeEach(async () => {
@@ -58,10 +61,13 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     it('it should handle server failure by returning an error', async () => {
       let errorReturn = null;
 
-      // @ts-ignore
-      await AuthenticationController.query(null, null, function(error: Error) {
-        errorReturn = error;
-      });
+      await AuthenticationController.query(
+        emptyRequest as Request,
+        emptyResponse as Response,
+        function(error: Error) {
+          errorReturn = error;
+        }
+      );
 
       expect(errorReturn).to.be.an('error');
     });
@@ -104,10 +110,13 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     it('it should handle server failure by returning an error', async () => {
       let errorReturn = null;
 
-      // @ts-ignore
-      await AuthenticationController.show(null, null, function(error: Error) {
-        errorReturn = error;
-      });
+      await AuthenticationController.show(
+        emptyRequest as Request,
+        emptyResponse as Response,
+        function(error: Error) {
+          errorReturn = error;
+        }
+      );
 
       expect(errorReturn).to.be.an('error');
     });
@@ -128,7 +137,7 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
         .get(`/api/v1/authentication/${storedRecord ? storedRecord.id : null}`)
         .set('content-type', 'application/json');
 
-      expect(storedRecord).to.be.an('object')
+      expect(storedRecord).to.be.an('object');
 
       if (!storedRecord) {
         return;
@@ -163,16 +172,20 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     it('it should handle server failure by returning an error', async () => {
       let errorReturn = null;
 
-      // @ts-ignore
-      await AuthenticationController.create(null, null, function(error: Error) {
-        errorReturn = error;
-      });
+      await AuthenticationController.create(
+        emptyRequest as Request,
+        emptyResponse as Response,
+        function(error: Error) {
+          errorReturn = error;
+        }
+      );
 
       expect(errorReturn).to.be.an('error');
     });
 
     it('it should create a record if the data is valid', async () => {
       const record = {
+        // eslint-disable-next-line @typescript-eslint/camelcase
         authority_id: 1,
         email: 'johnsmith@example.com',
         password: 'asdfasdf',
@@ -266,16 +279,20 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     it('it should handle server failure by returning an error', async () => {
       let errorReturn = null;
 
-      // @ts-ignore
-      await AuthenticationController.update(null, null, function(error: Error) {
-        errorReturn = error;
-      });
+      await AuthenticationController.update(
+        emptyRequest as Request,
+        emptyResponse as Response,
+        function(error: Error) {
+          errorReturn = error;
+        }
+      );
 
       expect(errorReturn).to.be.an('error');
     });
 
     it('it should update the record if the data is valid', async () => {
       const record = {
+        // eslint-disable-next-line @typescript-eslint/camelcase
         authority_id: 5000,
         email: 'newjohnsmith@example.com',
         password: 'newPassword',
@@ -369,16 +386,20 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     it('it should handle server failure by returning an error', async () => {
       let errorReturn = null;
 
-      // @ts-ignore
-      await AuthenticationController.patch(null, null, function(error: Error) {
-        errorReturn = error;
-      });
+      await AuthenticationController.patch(
+        emptyRequest as Request,
+        emptyResponse as Response,
+        function(error: Error) {
+          errorReturn = error;
+        }
+      );
 
       expect(errorReturn).to.be.an('error');
     });
 
     it('it should update the record if the data is valid', async () => {
       const record = {
+        // eslint-disable-next-line @typescript-eslint/camelcase
         authority_id: 5000,
       };
 
@@ -460,10 +481,13 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     it('it should handle server failure by returning an error', async () => {
       let errorReturn = null;
 
-      // @ts-ignore
-      await AuthenticationController.delete(null, null, function(error: Error) {
-        errorReturn = error;
-      });
+      await AuthenticationController.delete(
+        emptyRequest as Request,
+        emptyResponse as Response,
+        function(error: Error) {
+          errorReturn = error;
+        }
+      );
 
       expect(errorReturn).to.be.an('error');
     });
@@ -499,10 +523,13 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     it('it should handle server failure by returning an error', async () => {
       let errorReturn = null;
 
-      // @ts-ignore
-      await AuthenticationController.register(null, null, function(error: Error) {
-        errorReturn = error;
-      });
+      await AuthenticationController.register(
+        emptyRequest as Request,
+        emptyResponse as Response,
+        function(error: Error) {
+          errorReturn = error;
+        }
+      );
 
       expect(errorReturn).to.be.an('error');
     });
@@ -538,6 +565,7 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
         .post('/api/v1/authentication/register')
         .set('content-type', 'application/json')
         .send({
+          // eslint-disable-next-line @typescript-eslint/camelcase
           authority_id: null,
           email: FAKE_RECORDS[0].email,
           password: FAKE_RECORDS[0].password,
@@ -566,7 +594,8 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
         .to.have.nested.property('[0].password')
         .be.a('string');
 
-      const passwordMatch = await bcrypt.compare(FAKE_RECORDS[0].password, <string> record[0].password);
+      const passwordMatch = await bcrypt.compare(FAKE_RECORDS[0].password, record[0]
+        .password as string);
 
       expect(passwordMatch).to.be.true;
     });
@@ -612,10 +641,13 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     it('it should handle server failure by returning an error', async () => {
       let errorReturn = null;
 
-      // @ts-ignore
-      await AuthenticationController.authenticate(null, null, function(error: Error) {
-        errorReturn = error;
-      });
+      await AuthenticationController.authenticate(
+        emptyRequest as Request,
+        emptyResponse as Response,
+        function(error: Error) {
+          errorReturn = error;
+        }
+      );
 
       expect(errorReturn).to.be.an('error');
     });
@@ -643,11 +675,17 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
       expect(response)
         .to.have.property('body')
         .be.a('string');
+      expect(process)
+        .to.have.nested.property('env.JWT_SECRET')
+        .be.a('string');
+
+      if (!process.env.JWT_SECRET) {
+        return;
+      }
 
       let verifiedToken = null;
 
       try {
-        // @ts-ignore
         verifiedToken = jsonwebtoken.verify(response.body, process.env.JWT_SECRET);
       } catch (error) {
         verifiedToken = error;
@@ -768,10 +806,14 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
 
     it('it should handle server failure by returning an error', async () => {
       let errorReturn = null;
-      // @ts-ignore
-      await AuthenticationController.verify(null, null, function(error: Error) {
-        errorReturn = error;
-      });
+
+      await AuthenticationController.verify(
+        emptyRequest as Request,
+        emptyResponse as Response,
+        function(error: Error) {
+          errorReturn = error;
+        }
+      );
 
       expect(errorReturn).to.be.an('error');
     });

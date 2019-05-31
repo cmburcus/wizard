@@ -1,9 +1,9 @@
 'use strict';
 
-import { Request, Response, NextFunction } from 'express';
 import Joi from 'joi';
-import validationOptions from './config/joi.json';
+import { Request, Response, NextFunction } from 'express';
 
+import validationOptions from './config/joi.json';
 import errorUtil from '../errors';
 
 interface KeyValueCondition {

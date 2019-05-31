@@ -6,8 +6,6 @@ import Joi from 'joi';
 import validationOptions from '../../../utils/validator/config/joi.json';
 import validator from '../../../utils/validator';
 
-const expect = chai.expect;
-
 // Mock data
 let mockRequest: any = null;
 
@@ -17,6 +15,8 @@ function truthyCondition() {
 function falsyCondition() {
   return [{ count: 1 }];
 }
+
+const expect = chai.expect;
 
 describe('TESTING UTIL: validator', () => {
   beforeEach(() => {

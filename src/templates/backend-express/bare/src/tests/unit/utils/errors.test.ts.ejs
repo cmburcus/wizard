@@ -1,6 +1,7 @@
 'use strict';
 
 import chai from 'chai';
+import { Request, Response } from 'express';
 
 import errorUtil from '../../../utils/errors';
 import AuthenticationError from '../../../utils/errors/types/AuthenticationError';
@@ -10,16 +11,12 @@ import ValidationError from '../../../utils/errors/types/ValidationError';
 import SystemError from '../../../utils/errors/types/SystemError';
 import NotFoundError from '../../../utils/errors/types/NotFoundError';
 
-const expect = chai.expect;
-
-// Mock request and response
 interface MockResponse {
   statusCode?: number;
   jsonObject?: string;
   status(code: number): MockResponse;
   json(object: object): MockResponse;
 }
-
 interface IndexableInterface {
   [index: string]: any;
 }
@@ -31,6 +28,7 @@ const request: IndexableInterface = {
   },
 };
 
+// Mock request and response
 const response: MockResponse = {
   statusCode: undefined,
   jsonObject: undefined,
@@ -45,6 +43,8 @@ const response: MockResponse = {
     return response;
   },
 };
+
+const expect = chai.expect;
 
 describe('TESTING UTIL: errors', () => {
   describe('AuthenticationError', () => {
@@ -379,8 +379,12 @@ describe('TESTING UTIL: errors', () => {
     it('it should call the callback with a NotFoundError', async () => {
       let errorReturn = null;
 
-      // @ts-ignore
-      await errorUtil.notFoundHandler(null, null, function(error: Error) {
+      const request = {};
+      const response = {};
+
+      await errorUtil.notFoundHandler(request as Request, response as Response, function(
+        error: Error
+      ) {
         errorReturn = error;
       });
 
@@ -415,8 +419,7 @@ describe('TESTING UTIL: errors', () => {
         systemError = error;
       }
 
-      // @ts-ignore
-      await errorUtil.errorHandler(systemError, request, response, null);
+      await errorUtil.errorHandler(systemError, request as Request, response as Response, () => {});
 
       expect(response)
         .to.have.property('statusCode')
@@ -426,7 +429,10 @@ describe('TESTING UTIL: errors', () => {
         .to.have.property('jsonObject')
         .be.a('string');
 
-      // @ts-ignore
+      if (!response.jsonObject) {
+        return;
+      }
+
       const jsonObject = JSON.parse(response.jsonObject);
 
       expect(jsonObject)
@@ -459,8 +465,7 @@ describe('TESTING UTIL: errors', () => {
         systemError = error;
       }
 
-      // @ts-ignore
-      await errorUtil.errorHandler(systemError, request, response, null);
+      await errorUtil.errorHandler(systemError, request as Request, response as Response, () => {});
 
       expect(response)
         .to.have.property('statusCode')
@@ -470,7 +475,10 @@ describe('TESTING UTIL: errors', () => {
         .to.have.property('jsonObject')
         .be.a('string');
 
-      // @ts-ignore
+      if (!response.jsonObject) {
+        return;
+      }
+
       const jsonObject = JSON.parse(response.jsonObject);
 
       expect(jsonObject)
@@ -491,8 +499,7 @@ describe('TESTING UTIL: errors', () => {
     it('it should handle errors thrown on purpose', async () => {
       let error = new InvalidArgumentError();
 
-      // @ts-ignore
-      await errorUtil.errorHandler(error, request, response, null);
+      await errorUtil.errorHandler(error, request as Request, response as Response, () => {});
 
       expect(response)
         .to.have.property('statusCode')
@@ -502,7 +509,10 @@ describe('TESTING UTIL: errors', () => {
         .to.have.property('jsonObject')
         .be.a('string');
 
-      // @ts-ignore
+      if (!response.jsonObject) {
+        return;
+      }
+
       const jsonObject = JSON.parse(response.jsonObject);
 
       expect(jsonObject)

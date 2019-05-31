@@ -1,6 +1,7 @@
 'use strict';
 
 import chai from 'chai';
+
 import AbstractModel from '../../../resources/Model';
 
 const expect = chai.expect;
@@ -45,8 +46,10 @@ describe('TESTING: Model', () => {
   it('it should delete created_at and update updated_at before a model update if created_at exists', () => {
     const model = new AbstractModel();
 
+    /* eslint-disable @typescript-eslint/camelcase */
     model.created_at = 'created at';
     model.updated_at = 'updated at';
+    /* eslint-enable @typescript-eslint/camelcase */
 
     model.$beforeUpdate();
 

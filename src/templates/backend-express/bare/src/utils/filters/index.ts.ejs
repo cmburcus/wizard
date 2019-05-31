@@ -1,15 +1,9 @@
 'use strict';
 
-import filterConstants from './constants/filters.json';
-
-import errorUtil from '../errors';
-
 import { raw, QueryBuilder as ObjectionQueryBuilder } from 'objection';
 
-const operators: Operators = filterConstants.operators;
-const conditions: Conditions = filterConstants.conditions;
-const rangeConditions: RangeConditions = filterConstants.rangeConditions;
-const order: Order = filterConstants.order;
+import filterConstants from './constants/filters.json';
+import errorUtil from '../errors';
 
 interface IndexableInterface {
   [index: string]: any;
@@ -46,6 +40,11 @@ interface Order extends IndexableInterface {
   default: string;
 }
 
+const operators: Operators = filterConstants.operators;
+const conditions: Conditions = filterConstants.conditions;
+const rangeConditions: RangeConditions = filterConstants.rangeConditions;
+const order: Order = filterConstants.order;
+
 /**
  * It will sanitize the column and return the proper values to be used in a where clause
  *
@@ -73,8 +72,6 @@ function getSanitizedCondtion(
 /**
  * Given the different url parameters that can be passed as filters, this function
  * will determine if the combination used is valid.
- *
- * @returns {string|null} String if an invalid filter is found or null if everything is valid
  */
 function getInvalidFilterString(
   column: string,

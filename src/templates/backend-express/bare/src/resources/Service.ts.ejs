@@ -22,8 +22,6 @@ interface Query {
 export default (model: any) => ({
   /**
    * Fetches a list of records from the database
-   *
-   * @returns {Promise} Promise
    */
   query: (query?: Query) => {
     let queryBuilder = model.query();
@@ -46,10 +44,6 @@ export default (model: any) => ({
 
   /**
    * Fetches one record from the database
-   *
-   * @param {number} id
-   *
-   * @returns {Promise} Promise
    */
   show: (id: number) => {
     if (!id) {
@@ -61,10 +55,6 @@ export default (model: any) => ({
 
   /**
    * Creates a new record
-   *
-   * @param {object} record
-   *
-   * @returns {Promise} Promise
    */
   create: (record: object) => {
     if (!record) {
@@ -76,11 +66,6 @@ export default (model: any) => ({
 
   /**
    * Updates a record
-   *
-   * @param {number} id
-   * @param {object} record
-   *
-   * @returns {Promise} Promise
    */
   update: (id: number, record: object) => {
     if (!id || !record) {
@@ -92,11 +77,6 @@ export default (model: any) => ({
 
   /**
    * Patches a record
-   *
-   * @param {number} id
-   * @param {object} record
-   *
-   * @returns {Promise} Promise
    */
   patch: (id: number, record: object) => {
     if (!id || !record) {
@@ -108,10 +88,6 @@ export default (model: any) => ({
 
   /**
    * Deletes a record from the database
-   *
-   * @param {number} id
-   *
-   * @returns {Promise} Promise
    */
   delete: (id: number) => {
     if (!id) {
@@ -128,8 +104,6 @@ export default (model: any) => ({
    * needs to be '!=' and it will exclude this value from the search. Example use
    * would be if checking for unique email on update but we want to ignore the check
    * if the user never changed their email
-   *
-   * @returns {Promise} Promise
    */
   countBy: (keyValueList: any) => {
     if (typeof keyValueList === 'undefined') {

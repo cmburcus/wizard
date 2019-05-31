@@ -1,12 +1,13 @@
 'use strict';
 
 import chai from 'chai';
+
 import AbstractService from '../../../resources/Service';
 import AbstractModel from '../../../resources/Model';
 
-const expect = chai.expect;
-
 const service = AbstractService(AbstractModel);
+
+const expect = chai.expect;
 
 describe('TESTING: Service', () => {
   describe('query', () => {

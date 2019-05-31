@@ -1,21 +1,17 @@
 'use strict';
 
-import { Request, Response, NextFunction } from 'express';
 import status from 'http-status';
+import { Request, Response, NextFunction } from 'express';
 
 import Controller from '../Controller';
 import AuthenticationService from './AuthenticationService';
-
-import jwtUtil from '../../utils/jwt'
+import jwtUtil from '../../utils/jwt';
 
 export default {
   ...Controller(AuthenticationService),
 
   /**
    * Registers a new authority
-   *
-   * @param {object} request
-   * @param {object} response
    */
   register: async (request: Request, response: Response, next: NextFunction) => {
     try {
@@ -29,9 +25,6 @@ export default {
 
   /**
    * Authenticates an authority and returns a JWT token if successful
-   *
-   * @param {object} request
-   * @param {object} response
    */
   authenticate: async (request: Request, response: Response, next: NextFunction) => {
     try {
@@ -45,9 +38,6 @@ export default {
 
   /**
    * Given a token, returns the associated authority
-   *
-   * @param {object} request
-   * @param {object} response
    */
   verify: async (request: Request, response: Response, next: NextFunction) => {
     try {

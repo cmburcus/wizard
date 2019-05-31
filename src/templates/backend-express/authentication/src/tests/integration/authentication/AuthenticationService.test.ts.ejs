@@ -6,43 +6,38 @@ import jsonwebtoken from 'jsonwebtoken';
 import AuthenticationModel from '../../../resources/authentication/Authentication';
 import AuthenticationService from '../../../resources/authentication/AuthenticationService';
 
-const expect = chai.expect;
-
-const POSTGRESS_UNIQUE_FIELD_VIOLATION_CODE: string = '23505';
+const POSTGRESS_UNIQUE_FIELD_VIOLATION_CODE = '23505';
 
 // Fake data to be used for the tests
-interface FakeRecord {
-  id?: any
-  authority_id?: any
-  email: any
-  password: any
-}
-
-const FAKE_RECORDS: FakeRecord[] = [
+const FAKE_RECORDS = [
   {
+    // eslint-disable-next-line @typescript-eslint/camelcase
     authority_id: 1,
     email: 'test@example.com',
     password: 'asdfasdf',
   },
   {
+    // eslint-disable-next-line @typescript-eslint/camelcase
     authority_id: null,
     email: 'test2@example.com',
     password: 'asdfasdf',
   },
 ];
 
-const FAKE_CREDENTIALS: FakeRecord = {
+const FAKE_CREDENTIALS = {
   email: FAKE_RECORDS[0].email,
   password: FAKE_RECORDS[0].password,
 };
 
-const FAKE_AUTHORITY_ID: number = 1;
-const FAKE_EMAIL: string = 'johnsmith@example.com';
-const FAKE_PASSWORD: string = 'testPassword';
+const FAKE_AUTHORITY_ID = 1;
+const FAKE_EMAIL = 'johnsmith@example.com';
+const FAKE_PASSWORD = 'testPassword';
 
 let recordId: number | null | undefined = null;
-let storedRecord: FakeRecord | null = null;
+let storedRecord: AuthenticationModel | null = null;
 let token: string | null = null;
+
+const expect = chai.expect;
 
 describe('TESTING: AuthenticationService', () => {
   beforeEach(async () => {
@@ -102,7 +97,7 @@ describe('TESTING: AuthenticationService', () => {
       let result = null;
 
       try {
-        result = await AuthenticationService.show(<number> recordId);
+        result = await AuthenticationService.show(recordId as number);
       } catch (error) {
         result = error;
       }
@@ -166,6 +161,7 @@ describe('TESTING: AuthenticationService', () => {
   describe('create', () => {
     it('it should create a record if the data is valid', async () => {
       const record = {
+        // eslint-disable-next-line @typescript-eslint/camelcase
         authority_id: FAKE_AUTHORITY_ID,
         email: FAKE_EMAIL,
         password: FAKE_PASSWORD,
@@ -250,17 +246,21 @@ describe('TESTING: AuthenticationService', () => {
   describe('update', () => {
     beforeEach(async () => {
       const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
-      storedRecord = <FakeRecord> records[0];
+      storedRecord = records[0];
     });
 
     it('it should update the record if the data is valid', async () => {
-      expect(storedRecord).to.be.an('object');
+      expect(storedRecord)
+        .to.be.an('object')
+        .and.have.property('id')
+        .be.a('number');
 
-      if (!storedRecord) {
+      if (!storedRecord || !storedRecord.id) {
         return;
       }
 
       const record = {
+        // eslint-disable-next-line @typescript-eslint/camelcase
         authority_id: 2,
         email: 'newtest@example.com',
         password: 'asdfasdf2',
@@ -296,9 +296,12 @@ describe('TESTING: AuthenticationService', () => {
     });
 
     it('it should fail if required fields are not defined', async () => {
-      expect(storedRecord).to.be.an('object');
+      expect(storedRecord)
+        .to.be.an('object')
+        .and.have.property('id')
+        .be.a('number');
 
-      if (!storedRecord) {
+      if (!storedRecord || !storedRecord.id) {
         return;
       }
 
@@ -351,13 +354,16 @@ describe('TESTING: AuthenticationService', () => {
   describe('patch', () => {
     beforeEach(async () => {
       const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
-      storedRecord = <FakeRecord> records[0];
+      storedRecord = records[0];
     });
 
     it('it should update the record if the data is valid', async () => {
-      expect(storedRecord).to.be.an('object');
+      expect(storedRecord)
+        .to.be.an('object')
+        .and.have.property('id')
+        .be.a('number');
 
-      if (!storedRecord) {
+      if (!storedRecord || !storedRecord.id) {
         return;
       }
 
@@ -427,7 +433,7 @@ describe('TESTING: AuthenticationService', () => {
       let result = null;
 
       try {
-        result = await AuthenticationService.delete(<number> recordId);
+        result = await AuthenticationService.delete(recordId as number);
       } catch (error) {
         result = error;
       }
@@ -523,15 +529,15 @@ describe('TESTING: AuthenticationService', () => {
     it('it should create an authentication record if the data is valid', async () => {
       let result = null;
 
-      const record: FakeRecord = {
+      const record = {
+        // eslint-disable-next-line @typescript-eslint/camelcase
         authority_id: FAKE_AUTHORITY_ID,
         email: FAKE_EMAIL,
         password: FAKE_PASSWORD,
       };
 
       try {
-        // @ts-ignore
-        result = await AuthenticationService.register(record);
+        result = await AuthenticationService.register(record as AuthenticationModel);
       } catch (error) {
         result = error;
       }
@@ -581,15 +587,15 @@ describe('TESTING: AuthenticationService', () => {
     it('it should create an authentication record if authority_id is null', async () => {
       let result = null;
 
-      const record: FakeRecord = {
+      const record = {
+        // eslint-disable-next-line @typescript-eslint/camelcase
         authority_id: null,
         email: FAKE_EMAIL,
         password: FAKE_PASSWORD,
       };
 
       try {
-        // @ts-ignore
-        result = await AuthenticationService.register(record);
+        result = await AuthenticationService.register(record as AuthenticationModel);
       } catch (error) {
         result = error;
       }
@@ -615,7 +621,8 @@ describe('TESTING: AuthenticationService', () => {
     it('it should fail if authority_id is not a number', async () => {
       let result = null;
 
-      const record: FakeRecord = {
+      const record = {
+        // eslint-disable-next-line @typescript-eslint/camelcase
         authority_id: '1',
         email: FAKE_EMAIL,
         password: FAKE_PASSWORD,
@@ -649,15 +656,15 @@ describe('TESTING: AuthenticationService', () => {
     it('it should fail if authority_id is a negative number', async () => {
       let result = null;
 
-      const record: FakeRecord = {
+      const record = {
+        // eslint-disable-next-line @typescript-eslint/camelcase
         authority_id: -1,
         email: FAKE_EMAIL,
         password: FAKE_PASSWORD,
       };
 
       try {
-        // @ts-ignore
-        result = await AuthenticationService.register(record);
+        result = await AuthenticationService.register(record as AuthenticationModel);
       } catch (error) {
         result = error;
       }
@@ -676,12 +683,14 @@ describe('TESTING: AuthenticationService', () => {
     it('it should fail if authority_id is not unique', async () => {
       let result = null;
 
-      const recordOne: FakeRecord = {
+      const recordOne = {
+        // eslint-disable-next-line @typescript-eslint/camelcase
         authority_id: FAKE_AUTHORITY_ID,
         email: FAKE_EMAIL,
         password: FAKE_PASSWORD,
       };
-      const recordTwo: FakeRecord = {
+      const recordTwo = {
+        // eslint-disable-next-line @typescript-eslint/camelcase
         authority_id: FAKE_AUTHORITY_ID,
         email: `2${FAKE_EMAIL}`,
         password: FAKE_PASSWORD,
@@ -690,8 +699,7 @@ describe('TESTING: AuthenticationService', () => {
       try {
         await AuthenticationModel.query().insert(recordOne);
 
-        // @ts-ignore
-        result = await AuthenticationService.register(recordTwo);
+        result = await AuthenticationService.register(recordTwo as AuthenticationModel);
       } catch (error) {
         result = error;
       }
@@ -713,7 +721,8 @@ describe('TESTING: AuthenticationService', () => {
     it('it should fail if email is null', async () => {
       let result = null;
 
-      const record: FakeRecord = {
+      const record = {
+        // eslint-disable-next-line @typescript-eslint/camelcase
         authority_id: FAKE_AUTHORITY_ID,
         email: null,
         password: FAKE_PASSWORD,
@@ -742,6 +751,7 @@ describe('TESTING: AuthenticationService', () => {
       let result = null;
 
       const record = {
+        // eslint-disable-next-line @typescript-eslint/camelcase
         authority_id: FAKE_AUTHORITY_ID,
         email: 12345,
         password: FAKE_PASSWORD,
@@ -776,6 +786,7 @@ describe('TESTING: AuthenticationService', () => {
       let result = null;
 
       const record = {
+        // eslint-disable-next-line @typescript-eslint/camelcase
         authority_id: FAKE_AUTHORITY_ID,
         email:
           'abcdefghijklmnopqrstuvwzabcdefghijklmnopqrstuvwzababcdefghijklmnopqrstuvwzabcdefghijklmnopqrstuvwzababcdefghijklmnopqrstuvwzabcdefghijklmnopqrstuvwzababcdefghijklmnopqrstuvwzabcdefghijklmnopqrstuvwzababcdefghijklmnopqrstuvwzabcdefghijklmnopqrstu@w.com',
@@ -783,8 +794,7 @@ describe('TESTING: AuthenticationService', () => {
       };
 
       try {
-        // @ts-ignore
-        result = await AuthenticationService.register(record);
+        result = await AuthenticationService.register(record as AuthenticationModel);
       } catch (error) {
         result = error;
       }
@@ -810,12 +820,14 @@ describe('TESTING: AuthenticationService', () => {
     it('it should fail if email is not unique', async () => {
       let result = null;
 
-      const recordOne: FakeRecord = {
+      const recordOne = {
+        // eslint-disable-next-line @typescript-eslint/camelcase
         authority_id: FAKE_AUTHORITY_ID,
         email: FAKE_EMAIL,
         password: FAKE_PASSWORD,
       };
-      const recordTwo: FakeRecord = {
+      const recordTwo = {
+        // eslint-disable-next-line @typescript-eslint/camelcase
         authority_id: FAKE_AUTHORITY_ID + 1,
         email: FAKE_EMAIL,
         password: FAKE_PASSWORD,
@@ -824,8 +836,7 @@ describe('TESTING: AuthenticationService', () => {
       try {
         await AuthenticationModel.query().insert(recordOne);
 
-        // @ts-ignore
-        result = await AuthenticationService.register(recordTwo);
+        result = await AuthenticationService.register(recordTwo as AuthenticationModel);
       } catch (error) {
         result = error;
       }
@@ -847,7 +858,8 @@ describe('TESTING: AuthenticationService', () => {
     it('it should fail if password is null', async () => {
       let result = null;
 
-      const record: FakeRecord = {
+      const record = {
+        // eslint-disable-next-line @typescript-eslint/camelcase
         authority_id: FAKE_AUTHORITY_ID,
         email: FAKE_EMAIL,
         password: null,
@@ -876,6 +888,7 @@ describe('TESTING: AuthenticationService', () => {
       let result = null;
 
       const record = {
+        // eslint-disable-next-line @typescript-eslint/camelcase
         authority_id: FAKE_AUTHORITY_ID,
         email: FAKE_EMAIL,
         password: 123,
@@ -907,7 +920,7 @@ describe('TESTING: AuthenticationService', () => {
   describe('authenticate', () => {
     beforeEach(async () => {
       const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
-      storedRecord = <FakeRecord> records[0];
+      storedRecord = records[0];
     });
 
     it('it should authenticate if the credentials are valid', async () => {
@@ -949,11 +962,17 @@ describe('TESTING: AuthenticationService', () => {
       }
 
       expect(result).to.be.a('string');
+      expect(process)
+        .to.have.nested.property('env.JWT_SECRET')
+        .be.a('string');
+
+      if (!process.env.JWT_SECRET) {
+        return;
+      }
 
       let verifiedToken = null;
 
       try {
-        // @ts-ignore
         verifiedToken = await jsonwebtoken.verify(result, process.env.JWT_SECRET);
       } catch (error) {
         verifiedToken = error;
@@ -999,15 +1018,17 @@ describe('TESTING: AuthenticationService', () => {
 
       expect(result).to.be.a('string');
       expect(storedRecord).to.be.an('object');
+      expect(process)
+        .to.have.nested.property('env.JWT_SECRET')
+        .be.a('string');
 
-      if (!storedRecord) {
+      if (!storedRecord || !process.env.JWT_SECRET) {
         return;
       }
 
       let verifiedToken = null;
 
       try {
-        // @ts-ignore
         verifiedToken = await jsonwebtoken.verify(result, process.env.JWT_SECRET);
       } catch (error) {
         verifiedToken = error;
@@ -1107,7 +1128,7 @@ describe('TESTING: AuthenticationService', () => {
   describe('verify', () => {
     beforeEach(async () => {
       const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
-      storedRecord = <FakeRecord> records[0];
+      storedRecord = records[0];
       token = await AuthenticationService.authenticate(FAKE_CREDENTIALS);
     });
 
@@ -1115,7 +1136,7 @@ describe('TESTING: AuthenticationService', () => {
       let result = null;
 
       try {
-        result = await AuthenticationService.verify(<string> token);
+        result = await AuthenticationService.verify(token as string);
       } catch (error) {
         result = error;
       }
@@ -1196,7 +1217,7 @@ describe('TESTING: AuthenticationService', () => {
       let result = null;
 
       try {
-        result = await AuthenticationService.deleteByAuthorityId(<number> recordId);
+        result = await AuthenticationService.deleteByAuthorityId(recordId as number);
       } catch (error) {
         result = error;
       }

@@ -7,19 +7,16 @@ export default class AuthenticationError extends Error {
   public type: string;
   public message: string;
   public status: number;
-  public error: object | null;
+  public error: string | object | null;
   public stack?: string;
 
-  /**
-   * @param {*} error Error description (can be any type)
-   */
-  public constructor(error?: any) {
+  public constructor(error?: string | object | null) {
     super('AuthenticationError');
 
     this.type = this.constructor.name;
     this.message = 'Authentication failed';
     this.status = 401;
     this.error = error || null;
-    this.stack = (new Error()).stack;
+    this.stack = new Error().stack;
   }
 }

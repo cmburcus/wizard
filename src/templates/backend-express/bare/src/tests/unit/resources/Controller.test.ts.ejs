@@ -1,10 +1,10 @@
 'use strict';
 
 import chai from 'chai';
+import { Request, Response } from 'express';
+
 import AbstractController from '../../../resources/Controller';
 import { Error } from '../../../utils/errors';
-
-const expect = chai.expect;
 
 // Mocking service so that we don't touch the database
 const service = {
@@ -23,6 +23,8 @@ let result: any = null;
 let error: Error | null = null;
 
 // Mocked response and next functions
+const emptyRequest = {};
+const emptyResponse = {};
 const response = {
   status: (returnedStatus: number) => {
     status = returnedStatus;
@@ -39,6 +41,8 @@ const next = (returnedError: Error) => {
   status = returnedError.status || 500;
 };
 
+const expect = chai.expect;
+
 describe('TESTING: Controller', () => {
   beforeEach(() => {
     status = null;
@@ -48,11 +52,8 @@ describe('TESTING: Controller', () => {
 
   describe('Controller.query', () => {
     it('it should be able to perform a query operation', async () => {
-      const request = {};
-
       try {
-        // @ts-ignore
-        await controller.query(request, response, next);
+        await controller.query(emptyRequest as Request, response as Response, next);
       } catch (codeError) {
         error = codeError;
       }
@@ -71,8 +72,7 @@ describe('TESTING: Controller', () => {
 
     it('it should handle errors', async () => {
       try {
-        // @ts-ignore
-        await controller.query(null, null, next);
+        await controller.query(emptyRequest as Request, emptyResponse as Response, next);
       } catch (codeError) {
         error = codeError;
       }
@@ -88,8 +88,7 @@ describe('TESTING: Controller', () => {
       const request = { params: { id: 1 } };
 
       try {
-        // @ts-ignore
-        await controller.show(request, response, next);
+        await controller.show(request as Request, response as Response, next);
       } catch (codeError) {
         error = codeError;
       }
@@ -102,8 +101,7 @@ describe('TESTING: Controller', () => {
       const request = { params: {} };
 
       try {
-        // @ts-ignore
-        await controller.show(request, response, next);
+        await controller.show(request as Request, response as Response, next);
       } catch (codeError) {
         error = codeError;
       }
@@ -114,8 +112,7 @@ describe('TESTING: Controller', () => {
 
     it('it should handle errors', async () => {
       try {
-        // @ts-ignore
-        await controller.show(null, null, next);
+        await controller.show(emptyRequest as Request, emptyResponse as Response, next);
       } catch (codeError) {
         error = codeError;
       }
@@ -131,8 +128,7 @@ describe('TESTING: Controller', () => {
       const request = { body: { col: 'value' } };
 
       try {
-        // @ts-ignore
-        await controller.create(request, response, next);
+        await controller.create(request as Request, response as Response, next);
       } catch (codeError) {
         error = codeError;
       }
@@ -146,8 +142,7 @@ describe('TESTING: Controller', () => {
 
     it('it should handle errors', async () => {
       try {
-        // @ts-ignore
-        await controller.create(null, null, next);
+        await controller.create(emptyRequest as Request, emptyResponse as Response, next);
       } catch (codeError) {
         error = codeError;
       }
@@ -166,8 +161,7 @@ describe('TESTING: Controller', () => {
       };
 
       try {
-        // @ts-ignore
-        await controller.update(request, response, next);
+        await controller.update(request as Request, response as Response, next);
       } catch (codeError) {
         error = codeError;
       }
@@ -181,8 +175,7 @@ describe('TESTING: Controller', () => {
 
     it('it should handle errors', async () => {
       try {
-        // @ts-ignore
-        await controller.update(null, null, next);
+        await controller.update(emptyRequest as Request, emptyResponse as Response, next);
       } catch (codeError) {
         error = codeError;
       }
@@ -201,8 +194,7 @@ describe('TESTING: Controller', () => {
       };
 
       try {
-        // @ts-ignore
-        await controller.patch(request, response, next);
+        await controller.patch(request as Request, response as Response, next);
       } catch (codeError) {
         error = codeError;
       }
@@ -216,8 +208,7 @@ describe('TESTING: Controller', () => {
 
     it('it should handle errors', async () => {
       try {
-        // @ts-ignore
-        await controller.patch(null, null, next);
+        await controller.patch(emptyRequest as Request, emptyResponse as Response, next);
       } catch (codeError) {
         error = codeError;
       }
@@ -233,8 +224,7 @@ describe('TESTING: Controller', () => {
       const request = { params: { id: 1 } };
 
       try {
-        // @ts-ignore
-        await controller.delete(request, response, next);
+        await controller.delete(request as Request, response as Response, next);
       } catch (codeError) {
         error = codeError;
       }
@@ -249,8 +239,7 @@ describe('TESTING: Controller', () => {
       const request = { params: {} };
 
       try {
-        // @ts-ignore
-        await controller.delete(request, response, next);
+        await controller.delete(request as Request, response as Response, next);
       } catch (codeError) {
         error = codeError;
       }
@@ -261,8 +250,7 @@ describe('TESTING: Controller', () => {
 
     it('it should handle errors', async () => {
       try {
-        // @ts-ignore
-        await controller.delete(null, null, next);
+        await controller.delete(emptyRequest as Request, emptyResponse as Response, next);
       } catch (codeError) {
         error = codeError;
       }

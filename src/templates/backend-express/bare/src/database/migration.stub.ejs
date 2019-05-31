@@ -1,10 +1,12 @@
 'use strict';
 
+import Knex from 'knex';
+
 const TABLE_NAME = 'table_name';
 
 module.exports = {
-  up: (knex) =>
-    knex.schema.createTable(TABLE_NAME, (table) => {
+  up: (knex: Knex) =>
+    knex.schema.createTable(TABLE_NAME, (table: any) => {
       table
         .increments('id')
         .unsigned()
@@ -14,5 +16,5 @@ module.exports = {
       table.timestamps();
     }),
 
-  down: (knex) => knex.schema.dropTable(TABLE_NAME),
+  down: (knex: Knex) => knex.schema.dropTable(TABLE_NAME),
 };

@@ -21,32 +21,32 @@ export default {
   /**
    * Returns an authentication error
    */
-  getAuthenticationError: (error?: any) => new AuthenticationError(error),
+  getAuthenticationError: (error?: string | object | null) => new AuthenticationError(error),
 
   /**
    * Returns an invalid token error
    */
-  getInvalidTokenError: (error?: any) => new InvalidTokenError(error),
+  getInvalidTokenError: (error?: string | object | null) => new InvalidTokenError(error),
 
   /**
    * Returns an invalid argument error
    */
-  getInvalidArgumentError: (error?: any) => new InvalidArgumentError(error),
+  getInvalidArgumentError: (error?: string | object | null) => new InvalidArgumentError(error),
 
   /**
    * Returns a validation error
    */
-  getValidationError: (error?: any) => new ValidationError(error),
+  getValidationError: (error?: string | object | null) => new ValidationError(error),
 
   /**
    * Returns a system error
    */
-  getSystemError: (error?: any) => new SystemError(error),
+  getSystemError: (error?: string | object | null) => new SystemError(error),
 
   /**
    * Returns a not found error
    */
-  getNotFoundError: (error?: any) => new NotFoundError(error),
+  getNotFoundError: (error?: string | object | null) => new NotFoundError(error),
 
   /**
    * Error handler middleware for routes that do not exist
@@ -57,7 +57,6 @@ export default {
 
   /**
    * Error handler middleware that can be used to handle all route errors
-   * TODO Check if we need _next
    */
   errorHandler: (error: Error, request: Request, response: Response, _next: NextFunction) => {
     let errorObject: Error = error;
