@@ -8,7 +8,7 @@
   },
   "scripts": {
     "ts:build": "tsc",
-    "node:dev": "NODE_ENV=development && DEBUG=app:* && nodemon ./bin/www",
+    "node:dev": "NODE_ENV=development && DEBUG=app:* && nodemon",
     "node:prod": "NODE_ENV=production && DEBUG=app:* && node ./bin/www",
     "node:test": "NODE_ENV=testing && DEBUG=app:* && nyc mocha dist/tests/**/*.js --file dist/app.js -t 10000 --recursive --exit",
     "format": "eslint --quiet --report-unused-disable-directives --fix '**/*.ts' || true"
@@ -47,6 +47,7 @@
     "nodemon": "1.18.9",
     "nyc": "13.2.0",
     "prettier": "1.16.4",
+    "ts-node": "8.2.0",
     "typescript": "3.4.3"
   }
 }

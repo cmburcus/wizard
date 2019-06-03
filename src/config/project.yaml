@@ -63,6 +63,11 @@ environment:
         params:
           - yarn
           - node:test
+      runApp:
+        comment: Running app in docker container
+        params:
+          - yarn
+          - node:dev
       ssh:
         comment: Attempting environment SSH
         params:

@@ -16,7 +16,6 @@ const routes = require.main.yaml('config/generation/express/routes.yaml')
 const environment = require.main.yaml('config/generation/express/environment.yaml')
 
 const { print } = require('gluegun/print')
-const description = 'Generates authentication components'
 
 const command = {
   name: 'generate:auth',

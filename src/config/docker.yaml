@@ -41,6 +41,8 @@ commands:
   execute:
     - exec
     - -it
+  logs:
+    - logs
   stop:
     - stop
   remove:

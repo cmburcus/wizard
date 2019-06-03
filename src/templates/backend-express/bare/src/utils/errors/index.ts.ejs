@@ -75,6 +75,7 @@ export default {
       status: errorObject.status,
       message: errorObject.message,
       error: errorObject.error,
+      stack: request.app.get('env') !== 'production' ? errorObject.stack : null,
     };
 
     response.status(errorResponse.status).json(errorResponse);

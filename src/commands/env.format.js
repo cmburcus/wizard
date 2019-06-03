@@ -1,9 +1,5 @@
 const { print } = require('gluegun/print')
-const { bins } = require('../config/environment')
-const childProcess = require('child_process')
 const project = require.main.yaml('config/project.yaml')
-
-const description = 'Formats the code using eslint and prettier'
 
 const command = {
   name: 'env:format',

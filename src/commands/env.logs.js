@@ -1,17 +1,14 @@
 const { print } = require('gluegun/print')
-const { bins } = require('../config/environment')
-const childProcess = require('child_process')
 const project = require.main.yaml('config/project.yaml')
 
-const description = 'Display docker container logs'
-
-module.exports = {
+const command = {
   name: 'env:logs',
-  description: description,
+  description: 'Display docker container logs',
+  types: [project.types.backend.express],
   run: async context => {
     const { parameters } = context
 
-    if (!context.canRunCommand(project.types.backend.express)) {
+    if (!context.canRunCommand(command)) {
       return
     }
 
@@ -25,16 +22,12 @@ module.exports = {
     /// ////////////////////////////////
     // RUNNING COMMANDS
     /// ////////////////////////////////
-    try {
-      print.warning('Displaying docker container logs')
-      print.info(
-        'Command: '.yellow +
-          `docker logs ${parameters.options.f ? '-f ' : ''}${parameters.options.t ? '-t ' : ''}${
-            !parameters.options.db ? bins.node : bins.postgres
-          }`.muted
-      )
-      print.info('')
+    const projectEnvironment = context.getProjectEnvironment()
 
+    try {
+      const container = !parameters.options.db
+        ? projectEnvironment.bins.app
+        : projectEnvironment.bins.database
       const options = []
 
       if (parameters.options.f) {
@@ -45,17 +38,14 @@ module.exports = {
         options.push('-t')
       }
 
-      await childProcess.execFileSync(
-        'docker',
-        ['logs', ...options, !parameters.options.db ? bins.node : bins.postgres],
-        { stdio: 'inherit' }
-      )
-      print.info('')
+      context.displayContainerLogs(container, options)
     } catch (error) {
       print.error(error.stack)
     }
   }
 }
+
+module.exports = command
 
 /**
  * Prints the help message of this command
@@ -82,5 +72,5 @@ function printHelp (context) {
 
   // Help title
   context.helpTitle()
-  print.info(`  ${description}`)
+  print.info(`  ${command.description}`)
 }

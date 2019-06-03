@@ -1,6 +1,4 @@
 const { print } = require('gluegun/print')
-const { bins, knex } = require('../config/environment')
-const childProcess = require('child_process')
 const project = require.main.yaml('config/project.yaml')
 
 const command = {
@@ -8,7 +6,7 @@ const command = {
   description: 'Run all migrations that have not yet been run',
   types: [project.types.backend.express],
   run: async context => {
-    const { parameters, system, filesystem } = context
+    const { parameters, system } = context
 
     if (!context.canRunCommand(command)) {
       return

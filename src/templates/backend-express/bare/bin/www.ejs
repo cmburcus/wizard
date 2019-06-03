@@ -9,8 +9,9 @@
 /**
  * Module dependencies.
  */
+var source = process.env.NODE_ENV === 'development' ? '../src/app' : '../dist/app';
 
-var app = require('../dist/app');
+var app = require(source).default;
 var debug = require('debug')('backend:server');
 var http = require('http');
 

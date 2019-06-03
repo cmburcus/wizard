@@ -93,22 +93,50 @@ module.exports = context => {
    *
    * @param container Should be the container name as defined in docker.yaml
    * @param command Array of strings defining the command to run
+   * @param detach Boolean to indicate whether to run in detached mode
    */
-  context.executeCommandInsideContainer = (container, command) => {
+  context.executeCommandInsideContainer = (container, command, detach) => {
     if (!projectConfig) {
       return
     }
 
     print.warning(command.comment)
 
-    let runAsUser = []
+    let options = []
 
+    // Run command as user if defined in the runtime
     if (typeof docker.runtime[container].user !== 'undefined') {
-      runAsUser.push(docker.commands.options.runAsUser)
-      runAsUser.push(docker.runtime[container].user)
+      options.push(docker.commands.options.runAsUser)
+      options.push(docker.runtime[container].user)
     }
 
-    const params = [...docker.commands.execute, ...runAsUser, container, ...command.params]
+    // Run as detached mode if defined and true
+    if (detach) {
+      options.push(docker.commands.options.detach)
+    }
+
+    const params = [...docker.commands.execute, ...options, container, ...command.params]
+
+    printCommand(docker.commands.command, params)
+    childProcess.execFileSync(docker.commands.command, params, stdio)
+    print.info('')
+  }
+
+  /**
+   * Fetch the logs of a container. Options are assumed to be the correct ones.
+   * the docker command will throw an error if an option is invalid
+   *
+   * @param container Should be the container name as defined in docker.yaml
+   * @param options Array of options available from the docker logs command
+   */
+  context.displayContainerLogs = (container, options) => {
+    if (!projectConfig) {
+      return
+    }
+
+    print.warning('Displaying docker container logs')
+
+    const params = [...docker.commands.logs, container, ...options]
 
     printCommand(docker.commands.command, params)
     childProcess.execFileSync(docker.commands.command, params, stdio)
