@@ -1,17 +1,14 @@
 const { print } = require('gluegun/print')
-const { bins } = require('../config/environment')
-const childProcess = require('child_process')
-const projectTypes = require('../config/project-types')
+const project = require.main.yaml('config/project.yaml')
 
-const description = 'Runs the tests in the docker container'
-
-module.exports = {
+const command = {
   name: 'env:test',
-  description: description,
-  run: async (context) => {
+  description: 'Runs the tests in the docker container',
+  types: [project.types.backend.express, project.types.frontend.react],
+  run: async context => {
     const { parameters, system } = context
 
-    if (!context.canRunCommand(projectTypes.backendExpress)) {
+    if (!context.canRunCommand(command)) {
       return
     }
 
@@ -25,20 +22,15 @@ module.exports = {
     /// ////////////////////////////////
     // RUNNING COMMANDS
     /// ////////////////////////////////
+    const projectEnvironment = context.getProjectEnvironment()
+
     const timer = system.startTimer()
 
     try {
-      print.warning('Running tests inside docker container')
-      print.info('Command: '.yellow + `docker exec -it ${bins.node} yarn node:test`.muted)
-      print.info('')
-      await childProcess.execFileSync('docker', [
-        'exec',
-        '-it',
-        bins.node,
-        'yarn',
-        'node:test'
-      ], {stdio: 'inherit'})
-      print.info('')
+      context.executeCommandInsideContainer(
+        projectEnvironment.bins.app,
+        projectEnvironment.commands.runTests
+      )
 
       print.info(`Executed in ${timer() * 0.001} s`)
     } catch (error) {
@@ -46,6 +38,8 @@ module.exports = {
     }
   }
 }
+
+module.exports = command
 
 /**
  * Prints the help message of this command
@@ -67,5 +61,5 @@ function printHelp (context) {
 
   // Help title
   context.helpTitle()
-  print.info(`  ${description}`)
+  print.info(`  ${command.description}`)
 }

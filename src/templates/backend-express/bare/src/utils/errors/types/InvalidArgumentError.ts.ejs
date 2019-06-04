@@ -1,0 +1,22 @@
+'use strict';
+
+/**
+ * This class can be used to throw when an argument is invalid
+ */
+export default class InvalidArgumentError extends Error {
+  public type: string;
+  public message: string;
+  public status: number;
+  public error: string | object | null;
+  public stack?: string;
+
+  public constructor(error?: string | object | null) {
+    super('InvalidArgumentError');
+
+    this.type = this.constructor.name;
+    this.message = 'Invalid argument';
+    this.status = 400;
+    this.error = error || null;
+    this.stack = new Error().stack;
+  }
+}

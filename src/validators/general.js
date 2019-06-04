@@ -1,5 +1,5 @@
 module.exports = {
-  isRequired: (value) => {
+  isRequired: value => {
     if (!value) {
       return 'Field required'
     }

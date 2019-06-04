@@ -1,0 +1,53 @@
+'use strict';
+
+import status from 'http-status';
+import { Request, Response, NextFunction } from 'express';
+
+import Controller from '../Controller';
+import AuthenticationService from './AuthenticationService';
+import jwtUtil from '../../utils/jwt';
+
+export default {
+  ...Controller(AuthenticationService),
+
+  /**
+   * Registers a new authority
+   */
+  register: async (request: Request, response: Response, next: NextFunction) => {
+    try {
+      await AuthenticationService.register(request.body);
+
+      response.status(status.CREATED).json();
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  /**
+   * Authenticates an authority and returns a JWT token if successful
+   */
+  authenticate: async (request: Request, response: Response, next: NextFunction) => {
+    try {
+      const token = await AuthenticationService.authenticate(request.body);
+
+      response.status(status.OK).json(token);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  /**
+   * Given a token, returns the associated authority
+   */
+  verify: async (request: Request, response: Response, next: NextFunction) => {
+    try {
+      const jwtToken = jwtUtil.getTokenFromHeader(request);
+
+      const authority = await AuthenticationService.verify(jwtToken);
+
+      response.status(status.OK).json(authority);
+    } catch (error) {
+      next(error);
+    }
+  },
+};

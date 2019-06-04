@@ -1,18 +1,16 @@
 const { print } = require('gluegun/print')
-const { bins } = require('../config/environment')
-const childProcess = require('child_process')
-const projectTypes = require('../config/project-types')
+const project = require.main.yaml('config/project.yaml')
+const structure = require.main.yaml('config/generation/express/structure.yaml')
 const promptValidator = require('../validators/general')
 
-const description = 'Create a named seed file'
-
-module.exports = {
+const command = {
   name: 'seed:make',
-  description: description,
-  run: async (context) => {
+  description: 'Create a named seed file',
+  types: [project.types.backend.express],
+  run: async context => {
     const { parameters, system, prompt } = context
 
-    if (!context.canRunCommand(projectTypes.backendExpress)) {
+    if (!context.canRunCommand(command)) {
       return
     }
 
@@ -31,7 +29,7 @@ module.exports = {
     let name = parameters.first
 
     if (typeof name === 'undefined') {
-      ({ name } = await prompt.ask({
+      ;({ name } = await prompt.ask({
         type: 'input',
         name: 'name',
         message: 'Name :',
@@ -43,21 +41,7 @@ module.exports = {
     name = name.toLowerCase().replace(' ', '_')
 
     try {
-      print.warning('Creating seed file')
-      print.info('Command: '.yellow + `docker exec -it ${bins.node} ${bins.knex} --knexfile ${bins.knexfile} seed:make ${name}`.muted)
-      print.info('')
-
-      await childProcess.execFileSync('docker', [
-        'exec',
-        '-it',
-        bins.node,
-        bins.knex,
-        '--knexfile',
-        bins.knexfile,
-        'seed:make',
-        name
-      ], {stdio: 'inherit'})
-      print.info('')
+      await context.generateDatabaseFile(structure.core.src.database, project.migrations.seed, name)
 
       print.info(`Executed in ${timer() * 0.001} s`)
     } catch (error) {
@@ -65,6 +49,8 @@ module.exports = {
     }
   }
 }
+
+module.exports = command
 
 /**
  * Prints the help message of this command
@@ -76,8 +62,6 @@ function printHelp (context) {
   context.helpUsageTitle()
   print.info('  seed:make <name>')
   print.info('')
-  print.info('  Docker container must already be running')
-  print.info('')
 
   // Options
   context.helpOptionsTitle()
@@ -86,5 +70,5 @@ function printHelp (context) {
 
   // Help title
   context.helpTitle()
-  print.info(`  ${description}`)
+  print.info(`  ${command.description}`)
 }

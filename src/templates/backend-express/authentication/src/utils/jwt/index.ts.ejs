@@ -1,0 +1,24 @@
+'use strict';
+
+import { Request } from 'express';
+
+import errorUtil from '../errors';
+
+export default {
+  /**
+   * Gets the token from the authorization header or throws invalid token
+   */
+  getTokenFromHeader: (request: Request) => {
+    if (!request.headers || !request.headers.authorization) {
+      throw errorUtil.getInvalidTokenError('No authorization header found');
+    }
+
+    const parts = request.headers.authorization.split(' ');
+
+    if (parts.length !== 2 || parts[0] !== 'Bearer') {
+      throw errorUtil.getInvalidTokenError('The authorization header is malformed');
+    }
+
+    return parts[1];
+  },
+};

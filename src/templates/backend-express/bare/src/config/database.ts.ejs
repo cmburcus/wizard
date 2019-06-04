@@ -1,0 +1,46 @@
+'use strict';
+
+/**
+ * Configuration file to be used for database
+ * This file is also used by knex for migrations and seeds
+ */
+
+const envConnection = {
+  client: 'pg',
+  connection: {
+    host: process.env.DB_HOST,
+    user: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+  },
+};
+
+export default {
+  development: {
+    client: 'pg',
+    connection: {
+      host: 'postgres',
+      user: 'postgres',
+      password: 'password',
+      database: 'postgres',
+    },
+    migrations: {
+      tableName: 'migrations',
+      stub: 'migration.stub',
+    },
+  },
+  testing: {
+    client: 'pg',
+    connection: {
+      host: 'postgres',
+      user: 'postgres',
+      password: 'password',
+      database: 'postgres',
+    },
+    migrations: {
+      tableName: 'migrations',
+    },
+  },
+  staging: envConnection,
+  production: envConnection,
+};

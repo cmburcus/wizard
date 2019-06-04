@@ -1,0 +1,36 @@
+---
+################################################################################
+#
+# This file defines the dependencies to be added to the project
+#
+# Each parent should follow the following structure
+#
+# [file : the relative path from the root of the project to the file]
+#
+# [parent : name to be referenced by]
+#   [dependencies]
+#     - [name : name of the dependency]
+#       [version : the version of the dependency]
+#   [devDependencies : same as dependencies if any]
+#
+################################################################################
+
+################################################################################
+#
+# FILE
+#
+# The file where the dependencies are stored
+################################################################################
+file: package.json
+
+################################################################################
+#
+# AUTHENTICATION
+#
+################################################################################
+authentication:
+  dependencies:
+    - name: bcrypt
+      version: 3.0.4
+    - name: jsonwebtoken
+      version: 8.4.0

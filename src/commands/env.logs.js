@@ -1,17 +1,14 @@
 const { print } = require('gluegun/print')
-const { bins } = require('../config/environment')
-const childProcess = require('child_process')
-const projectTypes = require('../config/project-types')
+const project = require.main.yaml('config/project.yaml')
 
-const description = 'Display docker container logs'
-
-module.exports = {
+const command = {
   name: 'env:logs',
-  description: description,
-  run: async (context) => {
+  description: 'Display docker container logs',
+  types: [project.types.backend.express],
+  run: async context => {
     const { parameters } = context
 
-    if (!context.canRunCommand(projectTypes.backendExpress)) {
+    if (!context.canRunCommand(command)) {
       return
     }
 
@@ -25,10 +22,12 @@ module.exports = {
     /// ////////////////////////////////
     // RUNNING COMMANDS
     /// ////////////////////////////////
+    const projectEnvironment = context.getProjectEnvironment()
+
     try {
-      print.warning('Displaying docker container logs')
-      print.info('Command: '.yellow + `docker logs ${parameters.options.f ? '-f ' : ''}${parameters.options.t ? '-t ' : ''}${!parameters.options.db ? bins.node : bins.postgres}`.muted)
-      print.info('')
+      const container = !parameters.options.db
+        ? projectEnvironment.bins.app
+        : projectEnvironment.bins.database
 
       const options = []
 
@@ -40,17 +39,14 @@ module.exports = {
         options.push('-t')
       }
 
-      await childProcess.execFileSync('docker', [
-        'logs',
-        ...options,
-        !parameters.options.db ? bins.node : bins.postgres
-      ], {stdio: 'inherit'})
-      print.info('')
+      context.displayContainerLogs(container, options)
     } catch (error) {
       print.error(error.stack)
     }
   }
 }
+
+module.exports = command
 
 /**
  * Prints the help message of this command
@@ -63,7 +59,7 @@ function printHelp (context) {
   print.info('  env:logs [options]')
   print.info('')
   print.info('  Docker container must already be running')
-  print.info('    By default, the node container logs are displayed')
+  print.info('  By default, the node container logs are displayed')
   print.info('')
 
   // Options
@@ -77,5 +73,5 @@ function printHelp (context) {
 
   // Help title
   context.helpTitle()
-  print.info(`  ${description}`)
+  print.info(`  ${command.description}`)
 }

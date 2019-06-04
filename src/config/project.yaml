@@ -1,0 +1,114 @@
+---
+################################################################################
+#
+# This file defines configs for the different types of projects available
+#
+################################################################################
+
+################################################################################
+#
+# NODE VERSIONS
+#
+# The node versions available (and supported)
+################################################################################
+node:
+  - 9.11.1
+
+################################################################################
+#
+# PROJECT TYPES
+#
+# The different types of projects Wizard supports
+################################################################################
+types:
+  backend:
+    express: express
+  frontend:
+    react: react
+
+################################################################################
+#
+# MIGRATION TYPES
+#
+# The different types of migration generation (typically migration and seed)
+################################################################################
+migrations:
+  migration: migration
+  seed: seed
+
+################################################################################
+#
+# ENVIRONMENT SPECIFICATIONS
+#
+# Different environment specifications used by projects
+#
+# - bins: key/value list of docker bins
+# - commands: list of commands that can run inside containers
+# - folders: list of required folders that must always be present
+################################################################################
+environment:
+  express:
+    bins:
+      app: node
+      database: postgres
+    commands:
+      formatCode:
+        comment: Formatting code
+        params:
+          - yarn
+          - format
+      installDependencies:
+        comment: Installing project dependencies
+        params:
+          - yarn
+      migrateLatest:
+        comment: Running latest migrations
+        params:
+          - node_modules/.bin/knex
+          - --knexfile
+          - dist/database/knexfile.js
+          - migrate:latest
+      migrateRollback:
+        comment: Rollback of last migration
+        params:
+          - node_modules/.bin/knex
+          - --knexfile
+          - dist/database/knexfile.js
+          - migrate:rollback
+      migrateVersion:
+        comment: Checking current migration version
+        params:
+          - node_modules/.bin/knex
+          - --knexfile
+          - dist/database/knexfile.js
+          - migrate:currentVersion
+      runTests:
+        comment: Running tests inside docker container
+        params:
+          - yarn
+          - node:test
+      runApp:
+        comment: Running app in docker container
+        params:
+          - yarn
+          - node:dev
+      seedRun:
+        comment: Running seed files
+        params:
+          - node_modules/.bin/knex
+          - --knexfile
+          - dist/database/knexfile.js
+          - seed:run
+      ssh:
+        comment: Attempting environment SSH
+        params:
+          - bash
+      typescriptBuild:
+        comment: Compiling typescript
+        params:
+          - yarn
+          - ts:build
+    folders:
+      - node_modules
+      - dist/database/migrations
+      - dist/database/seeds

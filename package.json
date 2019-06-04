@@ -22,14 +22,15 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "gluegun": "next"
+    "gluegun": "next",
+    "js-yaml": "^3.13.1"
   },
   "devDependencies": {
-    "standard": "^10.0.0",
-    "babel-eslint": "^8.0.1",
-    "prettier": "^1.7.4",
     "ava": "^0.22.0",
-    "nyc": "^11.2.1"
+    "babel-eslint": "^8.0.1",
+    "nyc": "^11.2.1",
+    "prettier": "^1.7.4",
+    "standard": "^10.0.0"
   },
   "standard": {
     "parser": "babel-eslint"

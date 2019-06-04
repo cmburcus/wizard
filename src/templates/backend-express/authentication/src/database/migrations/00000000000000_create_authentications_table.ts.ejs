@@ -1,0 +1,34 @@
+'use strict';
+
+import * as Knex from 'knex';
+
+const TABLE_NAME = 'authentications';
+
+module.exports = {
+  up: (knex: Knex): Promise<any> =>
+    knex.schema.createTable(TABLE_NAME, (table: any) => {
+      table
+        .increments('id')
+        .unsigned()
+        .primary()
+        .notNull();
+
+      // Note, unsigned doesn't work with postgres
+      table
+        .integer('authority_id')
+        .unsigned()
+        .nullable()
+        .unique();
+
+      table
+        .string('email', 250)
+        .unique()
+        .notNull();
+
+      table.string('password', 60).notNull();
+
+      table.timestamps();
+    }),
+
+  down: (knex: Knex): Promise<any> => knex.schema.dropTable(TABLE_NAME),
+};

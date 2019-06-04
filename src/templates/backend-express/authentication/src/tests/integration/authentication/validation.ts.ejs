@@ -1,0 +1,219 @@
+'use strict';
+
+import AuthenticationModel from '../../../resources/authentication/Authentication';
+
+const FAKE_AUTHORITY_ID = 1;
+const FAKE_EMAIL = 'test@example.com';
+const FAKE_PASSWORD = 'asdfasdf';
+
+export default {
+  register: [
+    {
+      message: 'it should fail if authority_id is empty',
+      record: {
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        authority_id: '',
+        email: FAKE_EMAIL,
+        password: FAKE_PASSWORD,
+      },
+    },
+    {
+      message: 'it should fail if authority_id is not a number',
+      record: {
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        authority_id: '1a',
+        email: FAKE_EMAIL,
+        password: FAKE_PASSWORD,
+      },
+    },
+    {
+      message: 'it should fail if authority_id is not a negative number',
+      record: {
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        authority_id: -1,
+        email: FAKE_EMAIL,
+        password: FAKE_PASSWORD,
+      },
+    },
+    {
+      message: 'it should fail if authority_id is not unique',
+      record: {
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        authority_id: FAKE_AUTHORITY_ID,
+        email: `2${FAKE_EMAIL}`,
+        password: FAKE_PASSWORD,
+      },
+      prerequesite: async () => {
+        await AuthenticationModel.query().insert({
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          authority_id: FAKE_AUTHORITY_ID,
+          email: FAKE_EMAIL,
+          password: FAKE_PASSWORD,
+        });
+      },
+    },
+    {
+      message: 'it should fail if no data is provided',
+    },
+    {
+      message: 'it should fail if email is not provided',
+      record: {
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        authority_id: FAKE_AUTHORITY_ID,
+        password: FAKE_PASSWORD,
+      },
+    },
+    {
+      message: 'it should fail if email is null',
+      record: {
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        authority_id: FAKE_AUTHORITY_ID,
+        email: null,
+        password: FAKE_PASSWORD,
+      },
+    },
+    {
+      message: 'it should fail if email is empty',
+      record: {
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        authority_id: FAKE_AUTHORITY_ID,
+        email: '',
+        password: FAKE_PASSWORD,
+      },
+    },
+    {
+      message: 'it should fail if email is not a string',
+      record: {
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        authority_id: FAKE_AUTHORITY_ID,
+        email: 12345,
+        password: FAKE_PASSWORD,
+      },
+    },
+    {
+      message: 'it should fail if email is less than 5 characters',
+      record: {
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        authority_id: FAKE_AUTHORITY_ID,
+        email: 'a@b.',
+        password: FAKE_PASSWORD,
+      },
+    },
+    {
+      message: 'it should fail if email is longer than 250 characters',
+      record: {
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        authority_id: FAKE_AUTHORITY_ID,
+        email:
+          'abcdefghijklmnopqrstuvwzabcdefghijklmnopqrstuvwzababcdefghijklmnopqrstuvwzabcdefghijklmnopqrstuvwzababcdefghijklmnopqrstuvwzabcdefghijklmnopqrstuvwzababcdefghijklmnopqrstuvwzabcdefghijklmnopqrstuvwzababcdefghijklmnopqrstuvwzabcdefghijklmnopqrstu@w.com',
+        password: FAKE_PASSWORD,
+      },
+    },
+    {
+      message: 'it should fail if email does not have the @ sign',
+      record: {
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        authority_id: FAKE_AUTHORITY_ID,
+        email: 'johnsmith.com',
+        password: FAKE_PASSWORD,
+      },
+    },
+    {
+      message: 'it should fail if email does not have the .domain',
+      record: {
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        authority_id: FAKE_AUTHORITY_ID,
+        email: 'johnsmith@example.',
+        password: FAKE_PASSWORD,
+      },
+    },
+    {
+      message: 'it should fail if email is not an email format',
+      record: {
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        authority_id: FAKE_AUTHORITY_ID,
+        email: 'johnsmith',
+        password: FAKE_PASSWORD,
+      },
+    },
+    {
+      message: 'it should fail if email is not unique',
+      record: {
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        authority_id: FAKE_AUTHORITY_ID,
+        email: FAKE_EMAIL,
+        password: FAKE_PASSWORD,
+      },
+      prerequesite: async () => {
+        await AuthenticationModel.query().insert({
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          authority_id: FAKE_AUTHORITY_ID + 1,
+          email: FAKE_EMAIL,
+          password: FAKE_PASSWORD,
+        });
+      },
+    },
+    {
+      message: 'it should fail if password is not provided',
+      record: {
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        authority_id: FAKE_AUTHORITY_ID,
+        email: FAKE_EMAIL,
+      },
+    },
+    {
+      message: 'it should fail if password is null',
+      record: {
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        authority_id: FAKE_AUTHORITY_ID,
+        email: FAKE_EMAIL,
+        password: null,
+      },
+    },
+    {
+      message: 'it should fail if password is empty',
+      record: {
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        authority_id: FAKE_AUTHORITY_ID,
+        email: FAKE_EMAIL,
+        password: '',
+      },
+    },
+    {
+      message: 'it should fail if password is not a string',
+      record: {
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        authority_id: FAKE_AUTHORITY_ID,
+        email: FAKE_EMAIL,
+        password: 1234567890,
+      },
+    },
+    {
+      message: 'it should fail if password is less than 8 characters',
+      record: {
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        authority_id: FAKE_AUTHORITY_ID,
+        email: FAKE_EMAIL,
+        password: '1234567',
+      },
+    },
+  ],
+
+  authenticate: [
+    {
+      message: 'it should fail if no data is provided',
+    },
+    {
+      message: 'it should fail if email is not provided',
+      record: {
+        password: FAKE_PASSWORD,
+      },
+    },
+    {
+      message: 'it should fail if password is not provided',
+      record: {
+        email: FAKE_EMAIL,
+      },
+    },
+  ],
+};

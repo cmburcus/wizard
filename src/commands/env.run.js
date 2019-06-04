@@ -1,17 +1,14 @@
 const { print } = require('gluegun/print')
-const { bins } = require('../config/environment')
-const childProcess = require('child_process')
-const projectTypes = require('../config/project-types')
+const project = require.main.yaml('config/project.yaml')
 
-const description = 'Runs the app in the docker container'
-
-module.exports = {
+const command = {
   name: 'env:run',
-  description: description,
-  run: async (context) => {
+  description: 'Runs the app in the docker container',
+  types: [project.types.backend.express, project.types.frontend.react],
+  run: async context => {
     const { parameters, system } = context
 
-    if (!context.canRunCommand(projectTypes.backendExpress)) {
+    if (!context.canRunCommand(command)) {
       return
     }
 
@@ -25,28 +22,17 @@ module.exports = {
     /// ////////////////////////////////
     // RUNNING COMMANDS
     /// ////////////////////////////////
+    const projectEnvironment = context.getProjectEnvironment()
+
     const timer = system.startTimer()
 
     try {
-      print.warning('Running app in docker container')
-      print.info('Command: '.yellow + `docker exec -it ${parameters.options.d ? '-d ' : ''}${bins.node} yarn node:dev`.muted)
-      print.info('')
-
-      const options = []
-
-      if (parameters.options.d) {
-        options.push('-d')
-      }
-
-      await childProcess.execFileSync('docker', [
-        'exec',
-        '-it',
-        ...options,
-        bins.node,
-        'yarn',
-        'node:dev'
-      ], {stdio: 'inherit'})
-      print.info('')
+      // Run the app
+      context.executeCommandInsideContainer(
+        projectEnvironment.bins.app,
+        projectEnvironment.commands.runApp,
+        typeof parameters.options.d !== 'undefined'
+      )
 
       if (parameters.options.d) {
         print.info(`Executed in ${timer() * 0.001} s`)
@@ -58,6 +44,8 @@ module.exports = {
     }
   }
 }
+
+module.exports = command
 
 /**
  * Prints the help message of this command
@@ -80,5 +68,5 @@ function printHelp (context) {
 
   // Help title
   context.helpTitle()
-  print.info(`  ${description}`)
+  print.info(`  ${command.description}`)
 }

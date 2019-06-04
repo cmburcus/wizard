@@ -1,0 +1,58 @@
+'use strict';
+
+import express from 'express';
+
+import validator from '../../utils/validator';
+import AuthenticationController from './AuthenticationController';
+import AuthenticationService from './AuthenticationService';
+import AuthenticationModel from './Authentication';
+
+const router = express.Router();
+
+/**
+ * Authentication router
+ */
+
+router
+  // Authentication specific routes
+  .post(
+    '/register',
+    validator.validateSchema(AuthenticationModel.joiSchema),
+    validator.uniqueField('authority_id', AuthenticationService.countBy),
+    validator.uniqueField('email', AuthenticationService.countBy),
+    AuthenticationController.register
+  )
+  .post(
+    '/authenticate',
+    validator.validateSchema(AuthenticationModel.joiAuthenticateSchema),
+    AuthenticationController.authenticate
+  )
+  .get('/verify', AuthenticationController.verify)
+
+  // Basic routes
+  .get('/', AuthenticationController.query)
+  .get('/:id', AuthenticationController.show)
+  .post(
+    '/',
+    validator.validateSchema(AuthenticationModel.joiSchema),
+    validator.uniqueField('authority_id', AuthenticationService.countBy),
+    validator.uniqueField('email', AuthenticationService.countBy),
+    AuthenticationController.create
+  )
+  .put(
+    '/:id',
+    validator.validateSchema(AuthenticationModel.joiSchema),
+    validator.uniqueField('authority_id', AuthenticationService.countBy, 'id'),
+    validator.uniqueField('email', AuthenticationService.countBy, 'id'),
+    AuthenticationController.update
+  )
+  .patch(
+    '/:id',
+    validator.validateSchema(AuthenticationModel.joiPatchSchema),
+    validator.uniqueField('authority_id', AuthenticationService.countBy, 'id'),
+    validator.uniqueField('email', AuthenticationService.countBy, 'id'),
+    AuthenticationController.patch
+  )
+  .delete('/:id', AuthenticationController.delete);
+
+export default router;

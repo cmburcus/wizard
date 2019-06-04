@@ -1,0 +1,130 @@
+'use strict';
+
+import Joi from 'joi';
+import bcrypt from 'bcrypt';
+
+import Model from '../Model';
+
+/**
+ * This represents an authentication model
+ */
+export default class Authentication extends Model {
+  public id?: number;
+  public authority_id?: number | null;
+  public email?: string;
+  public password?: string;
+
+  // Name of database table for this model
+  public static get tableName() {
+    return 'authentications';
+  }
+
+  public static get joiAuthorityIdValidation() {
+    return Joi.number()
+      .integer()
+      .positive()
+      .allow(null);
+  }
+
+  public static get joiEmailValidation() {
+    return Joi.string()
+      .min(5)
+      .max(250)
+      .email();
+  }
+
+  public static get joiPasswordValidation() {
+    return Joi.string()
+      .min(8)
+      .max(60);
+  }
+
+  // Encrypt password before storing record
+  public $beforeInsert() {
+    super.$beforeInsert();
+
+    this.password = bcrypt.hashSync(this.password, 10);
+  }
+
+  // Encrypt password before updating it
+  public $beforeUpdate() {
+    super.$beforeUpdate();
+
+    if (typeof this.password !== 'undefined') {
+      this.password = bcrypt.hashSync(this.password, 10);
+    }
+  }
+
+  public $formatJson(json: any) {
+    delete json.password;
+
+    json = super.$formatJson(json);
+
+    return json;
+  }
+
+  // Gets the joi schema for registration and create route validation
+  public static get joiSchema() {
+    return Joi.object().keys({
+      /* eslint-disable @typescript-eslint/camelcase */
+      authority_id: this.joiAuthorityIdValidation.optional(),
+      email: this.joiEmailValidation.required(),
+      password: this.joiPasswordValidation.required(),
+      /* eslint-enable @typescript-eslint/camelcase */
+    });
+  }
+
+  // Gets the joi schema for update route validation
+  public static get joiPatchSchema() {
+    return Joi.object().keys({
+      /* eslint-disable @typescript-eslint/camelcase */
+      authority_id: this.joiAuthorityIdValidation.optional(),
+      email: this.joiEmailValidation.optional(),
+      password: this.joiPasswordValidation.optional(),
+      /* eslint-enable @typescript-eslint/camelcase */
+    });
+  }
+
+  // Gets the joi schema for authenticate route validation
+  public static get joiAuthenticateSchema() {
+    return Joi.object().keys({
+      email: Joi.string().required(),
+      password: Joi.string().required(),
+    });
+  }
+
+  // Optional schema against which the JSON is validated
+  public static get jsonSchema() {
+    return {
+      // Type for this model
+      type: 'object',
+
+      // Required fields
+      required: ['email', 'password'],
+
+      // Property validation when creating the object
+      properties: {
+        /* eslint-disable @typescript-eslint/camelcase */
+        authority_id: {
+          type: ['number', 'null'],
+        },
+        email: {
+          type: 'string',
+          minLength: 5,
+          maxLength: 250,
+        },
+        password: {
+          type: 'string',
+          minLenth: 8,
+        },
+        created_at: {
+          type: 'string',
+        },
+        updated_at: {
+          type: 'string',
+        },
+        /* eslint-enable @typescript-eslint/camelcase */
+      },
+    };
+  }
+}

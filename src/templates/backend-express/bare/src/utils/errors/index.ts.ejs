@@ -1,0 +1,83 @@
+'use strict';
+
+import { Request, Response, NextFunction } from 'express';
+
+import AuthenticationError from './types/AuthenticationError';
+import InvalidTokenError from './types/InvalidTokenError';
+import InvalidArgumentError from './types/InvalidArgumentError';
+import ValidationError from './types/ValidationError';
+import SystemError from './types/SystemError';
+import NotFoundError from './types/NotFoundError';
+
+export interface Error
+  extends AuthenticationError,
+    InvalidTokenError,
+    InvalidArgumentError,
+    ValidationError,
+    SystemError,
+    NotFoundError {}
+
+export default {
+  /**
+   * Returns an authentication error
+   */
+  getAuthenticationError: (error?: string | object | null) => new AuthenticationError(error),
+
+  /**
+   * Returns an invalid token error
+   */
+  getInvalidTokenError: (error?: string | object | null) => new InvalidTokenError(error),
+
+  /**
+   * Returns an invalid argument error
+   */
+  getInvalidArgumentError: (error?: string | object | null) => new InvalidArgumentError(error),
+
+  /**
+   * Returns a validation error
+   */
+  getValidationError: (error?: string | object | null) => new ValidationError(error),
+
+  /**
+   * Returns a system error
+   */
+  getSystemError: (error?: string | object | null) => new SystemError(error),
+
+  /**
+   * Returns a not found error
+   */
+  getNotFoundError: (error?: string | object | null) => new NotFoundError(error),
+
+  /**
+   * Error handler middleware for routes that do not exist
+   */
+  notFoundHandler: (_request: Request, _response: Response, next: NextFunction) => {
+    next(new NotFoundError());
+  },
+
+  /**
+   * Error handler middleware that can be used to handle all route errors
+   */
+  errorHandler: (error: Error, request: Request, response: Response, _next: NextFunction) => {
+    let errorObject: Error = error;
+    let errorResponse = null;
+
+    if (typeof error.type === 'undefined' && request.app.get('env') === 'production') {
+      // System error details will not be sent in production
+      errorObject = new SystemError();
+    } else if (typeof error.type === 'undefined') {
+      // App errors are typed. If an error is not typed, it has to be a system error
+      errorObject = new SystemError(error.stack);
+    }
+
+    errorResponse = {
+      type: errorObject.type,
+      status: errorObject.status,
+      message: errorObject.message,
+      error: errorObject.error,
+      stack: request.app.get('env') !== 'production' ? errorObject.stack : null,
+    };
+
+    response.status(errorResponse.status).json(errorResponse);
+  },
+};

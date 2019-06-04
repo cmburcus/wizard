@@ -1,0 +1,16 @@
+'use strict';
+
+import * as Knex from "knex";
+
+const TABLE_NAME = 'table_name';
+
+exports.seed = function (knex: Knex): Promise<any> {
+  return knex(TABLE_NAME).del()
+    .then(function () {
+      return knex(TABLE_NAME).insert([
+          { id: 1, colName: "rowValue1" },
+          { id: 2, colName: "rowValue2" },
+          { id: 3, colName: "rowValue3" }
+      ]);
+    });
+};

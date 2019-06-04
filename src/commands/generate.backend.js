@@ -1,22 +1,27 @@
 // Prompts
 const newProjectPrompts = require('../config/prompts/new-project')
 
-// Map for the types of projects
-const backendExpressMap = require('../config/maps/backend-express')
-
 // Project types
-const projectTypes = require('../config/project-types')
+const project = require.main.yaml('config/project.yaml')
 
+// Project paths
+const paths = require.main.yaml('config/generation/express/structure.yaml')
+const template = paths.templates.express
+const globals = paths.globals
+const core = paths.core
+const utils = paths.core_utils
+
+// Others
 const { print } = require('gluegun/print')
-const description = 'Generate an express application'
 
-module.exports = {
+const command = {
   name: 'generate:backend',
-  description: description,
-  run: async (context) => {
-    const { parameters, prompt, filesystem } = context
+  description: 'Generate an express application',
+  types: [],
+  run: async context => {
+    const { parameters, prompt } = context
 
-    if (!context.canRunCommand()) {
+    if (!context.canRunCommand(command)) {
       return
     }
 
@@ -27,25 +32,44 @@ module.exports = {
       return
     }
 
-    print.info(`Generating ${projectTypes.backendExpress}...`.yellow)
+    print.info(`Generating ${project.types.backend.express}...`.yellow)
 
-    const questions = newProjectPrompts.filter((question) => (
-      typeof question.projectType === 'undefined' || question.projectType === projectTypes.backendExpress
-    ))
+    // Gathering project information
+    const questions = newProjectPrompts.filter(
+      question =>
+        typeof question.projectType === 'undefined' ||
+        question.projectType === project.types.backend.express
+    )
 
-    const answers = await prompt.ask(questions)
+    let answers = await prompt.ask(questions)
 
+    // Project name cannot have spaces so we'll convert them to underscores
     answers.projectNameAlias = answers.projectName.toLowerCase().replace(' ', '_')
 
-    // Create migrations & seeds folder
-    filesystem.dir(`${answers.folderName}/database/migrations`)
-    filesystem.dir(`${answers.folderName}/database/seeds`)
-    filesystem.dir(`${answers.folderName}/test/integration`)
-    filesystem.dir(`${answers.folderName}/test/unit`)
+    // For now the project type is always express so we'll hardcode it
+    answers = {
+      ...answers,
+      projectType: project.types.backend.express
+    }
 
-    context.generateProject(answers.folderName, backendExpressMap(answers))
+    // Folders to be generated
+    const foldersMap = [
+      ...context.createFolderMap(answers.folderName, core),
+      ...context.createFolderMap(answers.folderName, utils)
+    ]
+
+    // Files to be generated
+    const filesMap = [
+      ...context.createFileMap(null, answers.folderName, globals, answers),
+      ...context.createFileMap(template, answers.folderName, core, answers),
+      ...context.createFileMap(template, answers.folderName, utils, answers)
+    ]
+
+    context.generateProject(answers.folderName, foldersMap, filesMap)
   }
 }
+
+module.exports = command
 
 /**
  * Prints the help message of this command
@@ -65,5 +89,5 @@ function printHelp (context) {
 
   // Help title
   context.helpTitle()
-  print.info(`  ${description}`)
+  print.info(`  ${command.description}`)
 }

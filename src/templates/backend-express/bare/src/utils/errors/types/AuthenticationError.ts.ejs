@@ -1,0 +1,22 @@
+'use strict';
+
+/**
+ * This class can be used to throw when an authentication error occured
+ */
+export default class AuthenticationError extends Error {
+  public type: string;
+  public message: string;
+  public status: number;
+  public error: string | object | null;
+  public stack?: string;
+
+  public constructor(error?: string | object | null) {
+    super('AuthenticationError');
+
+    this.type = this.constructor.name;
+    this.message = 'Authentication failed';
+    this.status = 401;
+    this.error = error || null;
+    this.stack = new Error().stack;
+  }
+}

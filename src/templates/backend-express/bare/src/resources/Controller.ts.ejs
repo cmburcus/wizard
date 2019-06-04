@@ -1,0 +1,89 @@
+'use strict';
+
+import status from 'http-status';
+import { Request, Response, NextFunction } from 'express';
+
+/**
+ * This controller handles the route request/response lifecycle. It's assumed
+ * the data passed to this controller has already passed through route validation
+ * using middlewares
+ */
+export default (service: any) => ({
+  /**
+   * Fetches a list of records
+   */
+  query: async (request: Request, response: Response, next: NextFunction) => {
+    try {
+      const records = await service.query(request.query);
+
+      response.status(status.OK).json(records);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  /**
+   * Fetches a record by id
+   */
+  show: async (request: Request, response: Response, next: NextFunction) => {
+    try {
+      const record = await service.show(request.params.id);
+
+      response.status(record ? status.OK : status.NOT_FOUND).json(record);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  /**
+   * Creates a new record
+   */
+  create: async (request: Request, response: Response, next: NextFunction) => {
+    try {
+      const record = await service.create(request.body);
+
+      response.status(status.CREATED).json(record);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  /**
+   * Updates an existing record
+   */
+  update: async (request: Request, response: Response, next: NextFunction) => {
+    try {
+      const record = await service.update(request.params.id, request.body);
+
+      response.status(status.OK).json(record);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  /**
+   * Patches an existing record
+   */
+  patch: async (request: Request, response: Response, next: NextFunction) => {
+    try {
+      const record = await service.patch(request.params.id, request.body);
+
+      response.status(status.OK).json(record);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  /**
+   * Removes a record from the database
+   */
+  delete: async (request: Request, response: Response, next: NextFunction) => {
+    try {
+      const numberOfRecords = await service.delete(request.params.id);
+
+      response.status(numberOfRecords > 0 ? status.OK : status.NOT_FOUND).json(numberOfRecords);
+    } catch (error) {
+      next(error);
+    }
+  },
+});

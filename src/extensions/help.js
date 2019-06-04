@@ -1,13 +1,12 @@
-const { print, filesystem } = require('gluegun')
+const { print } = require('gluegun')
 const { version } = require('../../package')
 
-const commandTypes = require('../config/command-types')
-const projectTypes = require('../config/project-types')
+const commands = require.main.yaml('config/commands.yaml')
 
 /**
  * Displays help message
  */
-module.exports = (context) => {
+module.exports = context => {
   /**
    * Prints the help header
    */
@@ -68,48 +67,50 @@ module.exports = (context) => {
     print.info('Available commands:'.yellow)
 
     // Global commands
-    printCommandsByType(context.plugin.commands, commandTypes.global)
+    printCommandsByType(context.plugin.commands, commands.global)
 
     // Generator commands
     if (!context.isProject()) {
       print.info('generate'.yellow)
-      printCommandsByType(context.plugin.commands, commandTypes.generateBare)
-    } else if (context.isBackendExpressProject()) {
+      printCommandsByType(context.plugin.commands, commands.generate.bare)
+    } else if (context.isBackendProject()) {
       print.info('generate'.yellow)
-      printCommandsByType(context.plugin.commands, commandTypes.generateExpress)
+      printCommandsByType(context.plugin.commands, commands.generate.express)
     }
 
     // Environment commands
-    if (context.isBackendExpressProject()) {
+    if (context.isBackendProject()) {
       print.info('environment'.yellow)
-      printCommandsByType(context.plugin.commands, commandTypes.environment)
+      printCommandsByType(context.plugin.commands, commands.environment)
     }
 
     // Migration commands
-    if (context.isBackendExpressProject()) {
+    if (context.isBackendProject()) {
       print.info('migrate'.yellow)
-      printCommandsByType(context.plugin.commands, commandTypes.migrate)
+      printCommandsByType(context.plugin.commands, commands.database.migrate)
     }
 
     // Seed commands
-    if (context.isBackendExpressProject()) {
+    if (context.isBackendProject()) {
       print.info('seed'.yellow)
-      printCommandsByType(context.plugin.commands, commandTypes.seed)
+      printCommandsByType(context.plugin.commands, commands.database.seed)
     }
   }
 }
 
-function printCommandsByType (commands, type) {
-  commands.filter(command => type.indexOf(command.name) >= 0).forEach(command => {
-    const commandLength = command.name.length
-    let tabs = '\t\t\t'
+function printCommandsByType (commandList, type) {
+  commandList
+    .filter(command => type.indexOf(command.name) >= 0)
+    .forEach(command => {
+      const commandLength = command.name.length
+      let tabs = '\t\t\t'
 
-    if (commandLength >= 14) {
-      tabs = '\t'
-    } else if (commandLength >= 7) {
-      tabs = '\t\t'
-    }
+      if (commandLength >= 14) {
+        tabs = '\t'
+      } else if (commandLength >= 7) {
+        tabs = '\t\t'
+      }
 
-    print.info(`  ${command.name}`.green + `${tabs}${command.description}`)
-  })
+      print.info(`  ${command.name}`.green + `${tabs}${command.description}`)
+    })
 }

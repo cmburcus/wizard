@@ -1,16 +1,14 @@
 const { print } = require('gluegun/print')
-const childProcess = require('child_process')
-const projectTypes = require('../config/project-types')
+const project = require.main.yaml('config/project.yaml')
 
-const description = 'Stops the docker containers if they are running (dev by default)'
-
-module.exports = {
+const command = {
   name: 'env:stop',
-  description: description,
-  run: async (context) => {
-    const { parameters, filesystem, system } = context
+  description: 'Stops the docker containers if they are running (dev by default)',
+  types: [project.types.backend.express, project.types.frontend.react],
+  run: async context => {
+    const { parameters, system } = context
 
-    if (!context.canRunCommand(projectTypes.backendExpress)) {
+    if (!context.canRunCommand(command)) {
       return
     }
 
@@ -24,28 +22,11 @@ module.exports = {
     /// ////////////////////////////////
     // RUNNING COMMANDS
     /// ////////////////////////////////
-    const projectConfig = JSON.parse(filesystem.read('.wizard'));
-
     const timer = system.startTimer()
 
     try {
-      print.warning('Stopping docker containers')
-      print.info('Command: '.yellow + 'docker stop node postgres')
-      await childProcess.execFileSync('docker', [
-        'stop',
-        'node',
-        'postgres'
-      ], { stdio: 'inherit' })
-      print.info('')
-
-      print.warning('Removing docker network')
-      print.info('Command: '.yellow + `docker network create ${projectConfig.projectName}`.muted)
-      await childProcess.execFileSync('docker', [
-        'network',
-        'remove',
-        projectConfig.projectName,
-      ], { stdio: 'inherit' })
-      print.info('')
+      await context.stopDockerContainers()
+      await context.removeDockerNetwork()
 
       print.info(`Executed in ${timer() * 0.001} s`)
     } catch (error) {
@@ -53,6 +34,8 @@ module.exports = {
     }
   }
 }
+
+module.exports = command
 
 /**
  * Prints the help message of this command
@@ -72,5 +55,5 @@ function printHelp (context) {
 
   // Help title
   context.helpTitle()
-  print.info(`  ${description}`)
+  print.info(`  ${command.description}`)
 }

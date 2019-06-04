@@ -1,0 +1,22 @@
+'use strict';
+
+/**
+ * This class can be used to throw when a route is not found
+ */
+export default class NotFoundError extends Error {
+  public type: string;
+  public message: string;
+  public status: number;
+  public error: string | object | null;
+  public stack?: string;
+
+  public constructor(error?: string | object | null) {
+    super('NotFoundError');
+
+    this.type = this.constructor.name;
+    this.message = 'Not found';
+    this.status = 404;
+    this.error = error || null;
+    this.stack = new Error().stack;
+  }
+}
