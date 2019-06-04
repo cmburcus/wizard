@@ -28,6 +28,16 @@ types:
 
 ################################################################################
 #
+# MIGRATION TYPES
+#
+# The different types of migration generation (typically migration and seed)
+################################################################################
+migrations:
+  migration: migration
+  seed: seed
+
+################################################################################
+#
 # ENVIRONMENT SPECIFICATIONS
 #
 # Different environment specifications used by projects
@@ -58,6 +68,20 @@ environment:
           - --knexfile
           - dist/database/knexfile.js
           - migrate:latest
+      migrateRollback:
+        comment: Rollback of last migration
+        params:
+          - node_modules/.bin/knex
+          - --knexfile
+          - dist/database/knexfile.js
+          - migrate:rollback
+      migrateVersion:
+        comment: Checking current migration version
+        params:
+          - node_modules/.bin/knex
+          - --knexfile
+          - dist/database/knexfile.js
+          - migrate:currentVersion
       runTests:
         comment: Running tests inside docker container
         params:
@@ -68,6 +92,13 @@ environment:
         params:
           - yarn
           - node:dev
+      seedRun:
+        comment: Running seed files
+        params:
+          - node_modules/.bin/knex
+          - --knexfile
+          - dist/database/knexfile.js
+          - seed:run
       ssh:
         comment: Attempting environment SSH
         params:

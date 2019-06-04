@@ -102,13 +102,8 @@ module.exports = context => {
 
     print.warning(command.comment)
 
-    let options = []
-
     // Run command as user if defined in the runtime
-    if (typeof docker.runtime[container].user !== 'undefined') {
-      options.push(docker.commands.options.runAsUser)
-      options.push(docker.runtime[container].user)
-    }
+    let options = [...getUser(container)]
 
     // Run as detached mode if defined and true
     if (detach) {

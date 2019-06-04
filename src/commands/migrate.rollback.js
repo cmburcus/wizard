@@ -1,17 +1,14 @@
 const { print } = require('gluegun/print')
-const { bins, knex } = require('../config/environment')
-const childProcess = require('child_process')
 const project = require.main.yaml('config/project.yaml')
 
-const description = 'Rollback the last set of migrations performed'
-
-module.exports = {
+const command = {
   name: 'migrate:rollback',
-  description: description,
+  description: 'Rollback the last set of migrations performed',
+  types: [project.types.backend.express],
   run: async context => {
     const { parameters, system } = context
 
-    if (!context.canRunCommand(project.types.backend.express)) {
+    if (!context.canRunCommand(command)) {
       return
     }
 
@@ -25,23 +22,16 @@ module.exports = {
     /// ////////////////////////////////
     // RUNNING COMMANDS
     /// ////////////////////////////////
+    const projectEnvironment = context.getProjectEnvironment()
+
     const timer = system.startTimer()
 
     try {
-      print.warning('Rollback of last migration')
-      print.info(
-        'Command: '.yellow +
-          `docker exec -it ${bins.node} ${bins.knex} --knexfile ${knex.knexfile} migrate:rollback`
-            .muted
+      // Rollback latest migration
+      await context.executeCommandInsideContainer(
+        projectEnvironment.bins.app,
+        projectEnvironment.commands.migrateRollback
       )
-      print.info('')
-
-      await childProcess.execFileSync(
-        'docker',
-        ['exec', '-it', bins.node, bins.knex, '--knexfile', knex.knexfile, 'migrate:rollback'],
-        { stdio: 'inherit' }
-      )
-      print.info('')
 
       print.info(`Executed in ${timer() * 0.001} s`)
     } catch (error) {
@@ -49,6 +39,8 @@ module.exports = {
     }
   }
 }
+
+module.exports = command
 
 /**
  * Prints the help message of this command
@@ -70,5 +62,5 @@ function printHelp (context) {
 
   // Help title
   context.helpTitle()
-  print.info(`  ${description}`)
+  print.info(`  ${command.description}`)
 }

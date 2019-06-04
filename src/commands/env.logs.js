@@ -28,6 +28,7 @@ const command = {
       const container = !parameters.options.db
         ? projectEnvironment.bins.app
         : projectEnvironment.bins.database
+
       const options = []
 
       if (parameters.options.f) {
@@ -58,7 +59,7 @@ function printHelp (context) {
   print.info('  env:logs [options]')
   print.info('')
   print.info('  Docker container must already be running')
-  print.info('    By default, the node container logs are displayed')
+  print.info('  By default, the node container logs are displayed')
   print.info('')
 
   // Options

@@ -25,6 +25,7 @@ const command = {
     const projectEnvironment = context.getProjectEnvironment()
 
     try {
+      // SSH inside the docker container for the app
       context.executeCommandInsideContainer(
         projectEnvironment.bins.app,
         projectEnvironment.commands.ssh

@@ -31,25 +31,16 @@ const command = {
     try {
       print.success(`Creating environment for ${buildType}\n`)
 
-      // Creating docker network
       await context.createDockerNetwork()
-
-      // Building docker containers
       await context.createDockerContainers(buildType)
-
-      // Installing project dependencies
       await context.executeCommandInsideContainer(
         projectEnvironment.bins.app,
         projectEnvironment.commands.installDependencies
       )
-
-      // Compiling typescript
       await context.executeCommandInsideContainer(
         projectEnvironment.bins.app,
         projectEnvironment.commands.typescriptBuild
       )
-
-      // Migrating database
       await context.executeCommandInsideContainer(
         projectEnvironment.bins.app,
         projectEnvironment.commands.migrateLatest

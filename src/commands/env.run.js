@@ -27,6 +27,7 @@ const command = {
     const timer = system.startTimer()
 
     try {
+      // Run the app
       context.executeCommandInsideContainer(
         projectEnvironment.bins.app,
         projectEnvironment.commands.runApp,

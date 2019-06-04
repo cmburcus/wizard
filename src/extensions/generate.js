@@ -1,8 +1,17 @@
+const project = require.main.yaml('config/project.yaml')
+
 /**
  * Functions used when generating new content
  */
 module.exports = context => {
   const { print, prompt, filesystem } = context
+
+  let projectConfig = null
+  const wizard = filesystem.read('.wizard')
+
+  if (wizard) {
+    projectConfig = JSON.parse(wizard)
+  }
 
   /**
    * Attempts to add dependencies to the file provided. If the
@@ -204,6 +213,46 @@ module.exports = context => {
   }
 
   /**
+   * Can run migrate:make or seed:make commands inside the container
+   *
+   * @param structure Structure object for database folder as specified in structure.yaml
+   * @param type Types as
+   * @param name String to define the filename
+   */
+  context.generateDatabaseFile = (structure, type, name) => {
+    if (!projectConfig) {
+      return
+    }
+
+    print.warning(`Creating ${type} file`)
+
+    const template = `${structure.path}/${type}.stub`
+
+    // Make it all lowercase and replace spaces with underscores
+    let filename = name.toLowerCase().replace(' ', '_')
+
+    let filepath = null
+
+    if (type === project.migrations.migration) {
+      filepath = structure.migrations.path
+      filename = `${getDateTimeString()}_${filename}`
+    } else if (type === project.migrations.seed) {
+      filepath = structure.seeds.path
+    }
+
+    if (!filepath) {
+      throw new Error(`No path found for ${type}`)
+    }
+
+    const file = `${filepath}/${filename}.ts`
+
+    filesystem.copy(template, file)
+    print.info('New file: '.green + file)
+
+    print.info('')
+  }
+
+  /**
    * Adds routes to the config routes file for the backend
    */
   context.generateKey = length => {
@@ -237,4 +286,21 @@ module.exports = context => {
 
     print.info(`Exiting...`.yellow)
   }
+}
+
+/**
+ * Returns a string representing the current date and time.
+ *
+ * Example of ISO string date: 2019-06-04T16:33:35.147Z
+ * We'll just remove all the characters in between the numbers and take
+ * the first 14 characters which represent the date and time including the
+ * seconds
+ *
+ * Typically used to prefix files like migrations
+ */
+function getDateTimeString () {
+  return new Date()
+    .toISOString()
+    .replace(/[-:.T]/g, '')
+    .substr(0, 14)
 }

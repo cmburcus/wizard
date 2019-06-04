@@ -1,5 +1,5 @@
 const project = require.main.yaml('config/project.yaml')
-const { builds } = require('../config/environment')
+const docker = require.main.yaml('config/docker.yaml')
 
 /**
  * Functions used to get information about the project in the current directory
@@ -79,15 +79,15 @@ module.exports = context => {
    * @param { option: boolean } options
    */
   context.getBuildType = options => {
-    if (typeof options[builds.prod] !== 'undefined') {
-      return builds.prod
+    if (typeof options[docker.builds.production] !== 'undefined') {
+      return docker.builds.production
     }
 
-    if (typeof options[builds.test] !== 'undefined') {
-      return builds.test
+    if (typeof options[docker.builds.testing] !== 'undefined') {
+      return docker.builds.testing
     }
 
-    return builds.dev
+    return docker.builds.development
   }
 
   /**

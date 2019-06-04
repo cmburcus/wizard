@@ -1,11 +1,11 @@
 'use strict';
 
-import Knex from 'knex';
+import * as Knex from 'knex';
 
 const TABLE_NAME = 'authentications';
 
 module.exports = {
-  up: (knex: Knex) =>
+  up: (knex: Knex): Promise<any> =>
     knex.schema.createTable(TABLE_NAME, (table: any) => {
       table
         .increments('id')
@@ -30,5 +30,5 @@ module.exports = {
       table.timestamps();
     }),
 
-  down: (knex: Knex) => knex.schema.dropTable(TABLE_NAME),
+  down: (knex: Knex): Promise<any> => knex.schema.dropTable(TABLE_NAME),
 };

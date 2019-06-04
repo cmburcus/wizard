@@ -5,15 +5,15 @@ const newProjectPrompts = require('../config/prompts/new-project')
 const project = require.main.yaml('config/project.yaml')
 
 const { print } = require('gluegun/print')
-const description = 'Generate an express application'
 
-module.exports = {
+const command = {
   name: 'generate:frontend',
-  description: description,
+  description: 'Generate an express application',
+  types: [],
   run: async context => {
     const { parameters, prompt } = context
 
-    if (!context.canRunCommand()) {
+    if (!context.canRunCommand(command)) {
       return
     }
 
@@ -46,6 +46,8 @@ module.exports = {
   }
 }
 
+module.exports = command
+
 /**
  * Prints the help message of this command
  */
@@ -64,5 +66,5 @@ function printHelp (context) {
 
   // Help title
   context.helpTitle()
-  print.info(`  ${description}`)
+  print.info(`  ${command.description}`)
 }

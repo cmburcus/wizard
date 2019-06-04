@@ -73,6 +73,7 @@ core:
       files:
         - src/database/knexfile.ts
         - src/database/migration.stub
+        - src/database/seed.stub
       migrations:
         path: src/database/migrations
       seeds:
