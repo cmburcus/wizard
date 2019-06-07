@@ -18,7 +18,7 @@ module.exports = context => {
    * dependency already exists, it will be ignored even if the version
    * is different.
    */
-  context.addDependencies = async (file, dependenciesMap) => {
+  context.addDependencies = async (file, dependenciesMap, silent) => {
     const dependenciesFile = await filesystem.read(file, 'json')
 
     const processed = {
@@ -57,6 +57,11 @@ module.exports = context => {
     // Save the file if there are new dependencies
     if (processed.dependencies.added.length > 0 || processed.devDependencies.added.length > 0) {
       await filesystem.write(file, dependenciesFile)
+    }
+
+    // We won't print the changes if silent mode is active
+    if (silent) {
+      return
     }
 
     // Print the changes

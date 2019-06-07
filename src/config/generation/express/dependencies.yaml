@@ -25,12 +25,92 @@ file: package.json
 
 ################################################################################
 #
+# CORE
+#
+################################################################################
+core:
+  dependencies:
+    - name: '@hapi/joi'
+      version: 15.0.3
+    - name: cookie-parser
+      version: 1.4.4
+    - name: debug
+      version: 4.1.1
+    - name: dotenv
+      version: 8.0.0
+    - name: express
+      version: 4.17.1
+    - name: http-errors
+      version: 1.7.2
+    - name: http-status
+      version: 1.3.2
+    - name: knex
+      version: 0.17.3
+    - name: morgan
+      version: 1.9.1
+    - name: objection
+      version: 1.6.9
+    - name: pg
+      version: 7.11.0
+    - name: pg-hstore
+      version: 2.3.3
+  devDependencies:
+    - name: '@istanbuljs/nyc-config-typescript'
+      version: 0.1.3
+    - name: '@types/cookie-parser'
+      version: 1.4.1
+    - name: '@types/dotenv'
+      version: 6.1.1
+    - name: '@types/express'
+      version: 4.17.0
+    - name: '@types/hapi__joi'
+      version: 15.0.1
+    - name: '@types/mocha'
+      version: 5.2.7
+    - name: '@types/morgan'
+      version: 1.7.35
+    - name: '@typescript-eslint/eslint-plugin'
+      version: 1.9.0
+    - name: '@typescript-eslint/parser'
+      version: 1.9.0
+    - name: chai
+      version: 4.2.0
+    - name: chai-http
+      version: 4.3.0
+    - name: eslint
+      version: 5.16.0
+    - name: eslint-config-prettier
+      version: 4.3.0
+    - name: eslint-plugin-prettier
+      version: 3.1.0
+    - name: mocha
+      version: 6.1.4
+    - name: nodemon
+      version: 1.19.1
+    - name: nyc
+      version: 14.1.1
+    - name: prettier
+      version: 1.18.1
+    - name: source-map-support
+      version: 0.5.12
+    - name: ts-node
+      version: 8.2.0
+    - name: typescript
+      version: 3.5.1
+
+################################################################################
+#
 # AUTHENTICATION
 #
 ################################################################################
 authentication:
   dependencies:
     - name: bcrypt
-      version: 3.0.4
+      version: 3.0.6
     - name: jsonwebtoken
-      version: 8.4.0
+      version: 8.5.1
+  devDependencies:
+    - name: '@types/bcrypt'
+      version: 3.0.0
+    - name: '@types/jsonwebtoken'
+      version: 8.3.2
