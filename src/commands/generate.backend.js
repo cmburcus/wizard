@@ -11,6 +11,9 @@ const globals = paths.globals
 const core = paths.core
 const utils = paths.core_utils
 
+// Dependencies
+const dependencies = require.main.yaml('config/generation/express/dependencies.yaml')
+
 // Others
 const { print } = require('gluegun/print')
 
@@ -19,7 +22,7 @@ const command = {
   description: 'Generate an express application',
   types: [],
   run: async context => {
-    const { parameters, prompt } = context
+    const { parameters, prompt, system } = context
 
     if (!context.canRunCommand(command)) {
       return
@@ -65,7 +68,10 @@ const command = {
       ...context.createFileMap(template, answers.folderName, utils, answers)
     ]
 
-    context.generateProject(answers.folderName, foldersMap, filesMap)
+    await context.generateProject(answers.folderName, foldersMap, filesMap)
+
+    // Adding required dependencies
+    await context.addDependencies(`${answers.folderName}/${dependencies.file}`, dependencies.core, true)
   }
 }
 

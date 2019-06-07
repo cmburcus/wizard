@@ -88,7 +88,7 @@ containers:
         - removeOnStop
 
     - name: node
-      image: node:9.11.1
+      image: node:10.16.0
       workDir: /app
       options:
         - detach
