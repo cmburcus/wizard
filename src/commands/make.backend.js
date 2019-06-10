@@ -18,7 +18,7 @@ const dependencies = require.main.yaml('config/generation/express/dependencies.y
 const { print } = require('gluegun/print')
 
 const command = {
-  name: 'generate:backend',
+  name: 'make:backend',
   description: 'Generate an express application',
   types: [],
   run: async context => {
@@ -89,7 +89,7 @@ function printHelp (context) {
 
   // Usage
   context.helpUsageTitle()
-  print.info('  generate:backend [options]')
+  print.info('  make:backend [options]')
   print.info('')
 
   // Options

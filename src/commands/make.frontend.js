@@ -7,7 +7,7 @@ const project = require.main.yaml('config/project.yaml')
 const { print } = require('gluegun/print')
 
 const command = {
-  name: 'generate:frontend',
+  name: 'make:frontend',
   description: 'Generate an express application',
   types: [],
   run: async context => {
@@ -56,7 +56,7 @@ function printHelp (context) {
 
   // Usage
   context.helpUsageTitle()
-  print.info('  generate:frontend [options]')
+  print.info('  make:frontend [options]')
   print.info('')
 
   // Options

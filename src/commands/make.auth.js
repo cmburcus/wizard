@@ -18,7 +18,7 @@ const environment = require.main.yaml('config/generation/express/environment.yam
 const { print } = require('gluegun/print')
 
 const command = {
-  name: 'generate:auth',
+  name: 'make:auth',
   description: 'Generates authentication components',
   types: [project.types.backend.express],
   run: async context => {
@@ -74,7 +74,7 @@ function printHelp (context) {
 
   // Usage
   context.helpUsageTitle()
-  print.info('  generate:auth [options]')
+  print.info('  make:auth [options]')
   print.info('')
 
   // Options

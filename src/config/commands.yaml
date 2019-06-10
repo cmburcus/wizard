@@ -24,10 +24,10 @@ global:
 ################################################################################
 generate:
   bare:
-    - generate:backend
-    - generate:frontend
+    - make:backend
+    - make:frontend
   express:
-    - generate:auth
+    - make:auth
 
 ################################################################################
 #
