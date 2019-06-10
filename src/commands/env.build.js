@@ -7,7 +7,7 @@ const command = {
   description: 'Builds the docker containers (dev by default)',
   types: [project.types.backend.express, project.types.frontend.react],
   run: async context => {
-    const { parameters, system } = context
+    const { parameters } = context
 
     if (!context.canRunCommand(command)) {
       return
@@ -26,7 +26,7 @@ const command = {
     const buildType = context.getBuildType(parameters.options)
     const projectEnvironment = context.getProjectEnvironment()
 
-    const timer = system.startTimer()
+    const timer = context.startTimer()
 
     try {
       print.success(`Creating environment for ${buildType}\n`)
@@ -46,7 +46,7 @@ const command = {
         projectEnvironment.commands.migrateLatest
       )
 
-      print.info(`Executed in ${timer() * 0.001} s`)
+      context.printExecutionTime(timer)
     } catch (error) {
       print.error(error.stack)
     }

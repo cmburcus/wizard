@@ -6,7 +6,7 @@ const command = {
   description: 'Stops the docker containers if they are running (dev by default)',
   types: [project.types.backend.express, project.types.frontend.react],
   run: async context => {
-    const { parameters, system } = context
+    const { parameters } = context
 
     if (!context.canRunCommand(command)) {
       return
@@ -22,13 +22,13 @@ const command = {
     /// ////////////////////////////////
     // RUNNING COMMANDS
     /// ////////////////////////////////
-    const timer = system.startTimer()
+    const timer = context.startTimer()
 
     try {
       await context.stopDockerContainers()
       await context.removeDockerNetwork()
 
-      print.info(`Executed in ${timer() * 0.001} s`)
+      context.printExecutionTime(timer)
     } catch (error) {
       print.error(error.stack)
     }

@@ -22,7 +22,7 @@ const command = {
   description: 'Generate an express application',
   types: [],
   run: async context => {
-    const { parameters, prompt, system } = context
+    const { parameters, prompt } = context
 
     if (!context.canRunCommand(command)) {
       return
@@ -71,7 +71,11 @@ const command = {
     await context.generateProject(answers.folderName, foldersMap, filesMap)
 
     // Adding required dependencies
-    await context.addDependencies(`${answers.folderName}/${dependencies.file}`, dependencies.core, true)
+    await context.addDependencies(
+      `${answers.folderName}/${dependencies.file}`,
+      dependencies.core,
+      true
+    )
   }
 }
 

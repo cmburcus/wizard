@@ -6,7 +6,7 @@ const command = {
   description: 'Rollback the last set of migrations performed',
   types: [project.types.backend.express],
   run: async context => {
-    const { parameters, system } = context
+    const { parameters } = context
 
     if (!context.canRunCommand(command)) {
       return
@@ -24,7 +24,7 @@ const command = {
     /// ////////////////////////////////
     const projectEnvironment = context.getProjectEnvironment()
 
-    const timer = system.startTimer()
+    const timer = context.startTimer()
 
     try {
       // Rollback latest migration
@@ -33,7 +33,7 @@ const command = {
         projectEnvironment.commands.migrateRollback
       )
 
-      print.info(`Executed in ${timer() * 0.001} s`)
+      context.printExecutionTime(timer)
     } catch (error) {
       print.error(error.stack)
     }
