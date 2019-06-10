@@ -33,7 +33,7 @@ globals:
 # The base template directories where the template files are found
 ################################################################################
 templates:
-  express: express/bare
+  express: express/core
   expressAuth: express/authentication
 
 ################################################################################
