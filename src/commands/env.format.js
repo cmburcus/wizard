@@ -6,7 +6,7 @@ const command = {
   description: 'Formats the code using eslint and prettier',
   types: [project.types.backend.express, project.types.frontend.react],
   run: async context => {
-    const { parameters, system } = context
+    const { parameters } = context
 
     if (!context.canRunCommand(command)) {
       return
@@ -24,7 +24,7 @@ const command = {
     /// ////////////////////////////////
     const projectEnvironment = context.getProjectEnvironment()
 
-    const timer = system.startTimer()
+    const timer = context.startTimer()
 
     try {
       // Format the project
@@ -34,7 +34,7 @@ const command = {
       )
 
       if (parameters.options.d) {
-        print.info(`Executed in ${timer() * 0.001} s`)
+        context.printExecutionTime(timer)
       }
     } catch (error) {
       if (error.status !== 130) {

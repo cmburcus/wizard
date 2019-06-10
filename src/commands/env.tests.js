@@ -6,7 +6,7 @@ const command = {
   description: 'Runs the tests in the docker container',
   types: [project.types.backend.express, project.types.frontend.react],
   run: async context => {
-    const { parameters, system } = context
+    const { parameters } = context
 
     if (!context.canRunCommand(command)) {
       return
@@ -24,7 +24,7 @@ const command = {
     /// ////////////////////////////////
     const projectEnvironment = context.getProjectEnvironment()
 
-    const timer = system.startTimer()
+    const timer = context.startTimer()
 
     try {
       context.executeCommandInsideContainer(
@@ -32,7 +32,7 @@ const command = {
         projectEnvironment.commands.runTests
       )
 
-      print.info(`Executed in ${timer() * 0.001} s`)
+      context.printExecutionTime(timer)
     } catch (error) {
       // If the tests fail there will be an error thrown but we don't want to display it
     }

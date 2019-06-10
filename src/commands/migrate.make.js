@@ -8,7 +8,7 @@ const command = {
   description: 'Create a named migration file',
   types: [project.types.backend.express],
   run: async context => {
-    const { parameters, system, prompt } = context
+    const { parameters, prompt } = context
 
     if (!context.canRunCommand(command)) {
       return
@@ -24,7 +24,7 @@ const command = {
     /// ////////////////////////////////
     // RUNNING COMMANDS
     /// ////////////////////////////////
-    const timer = system.startTimer()
+    const timer = context.startTimer()
 
     let name = parameters.first
 
@@ -45,7 +45,7 @@ const command = {
         name
       )
 
-      print.info(`Executed in ${timer() * 0.001} s`)
+      context.printExecutionTime(timer)
     } catch (error) {
       print.error(error.stack)
     }
