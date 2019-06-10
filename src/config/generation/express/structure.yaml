@@ -33,8 +33,8 @@ globals:
 # The base template directories where the template files are found
 ################################################################################
 templates:
-  express: backend-express/bare
-  expressAuth: backend-express/authentication
+  express: express/bare
+  expressAuth: express/authentication
 
 ################################################################################
 #
