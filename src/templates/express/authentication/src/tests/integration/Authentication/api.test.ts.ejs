@@ -8,9 +8,9 @@ import { Request, Response } from 'express';
 
 import server from '../../../app';
 import validation from './validation';
-import AuthenticationModel from '../../../resources/authentication/Authentication';
-import AuthenticationController from '../../../resources/authentication/AuthenticationController';
-import AuthenticationService from '../../../resources/authentication/AuthenticationService';
+import AuthenticationModel from '../../../resources/Authentication/Model';
+import AuthenticationController from '../../../resources/Authentication/Controller';
+import AuthenticationService from '../../../resources/Authentication/Service';
 
 // Fake data to be used for the tests
 const FAKE_RECORDS = [

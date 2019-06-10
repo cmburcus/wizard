@@ -118,30 +118,30 @@ authentication:
     resources:
       path: src/resources
       authentication:
-        path: src/resources/authentication
+        path: src/resources/Authentication
         files:
-          - src/resources/authentication/Authentication.ts
-          - src/resources/authentication/AuthenticationController.ts
-          - src/resources/authentication/AuthenticationService.ts
-          - src/resources/authentication/routes.ts
+          - src/resources/Authentication/Model.ts
+          - src/resources/Authentication/Controller.ts
+          - src/resources/Authentication/Service.ts
+          - src/resources/Authentication/routes.ts
     tests:
       path: src/tests
       integration:
         path: src/tests/integration
         authentication:
-          path: src/tests/integration/authentication
+          path: src/tests/integration/Authentication
           files:
-            - src/tests/integration/authentication/api.test.ts
-            - src/tests/integration/authentication/AuthenticationService.test.ts
-            - src/tests/integration/authentication/validation.ts
+            - src/tests/integration/Authentication/api.test.ts
+            - src/tests/integration/Authentication/Service.test.ts
+            - src/tests/integration/Authentication/validation.ts
       unit:
         path: src/tests/unit
         resources:
           path: src/tests/unit/resources
           authentication:
-            path: src/tests/unit/resources/authentication
+            path: src/tests/unit/resources/Authentication
             files:
-              - src/tests/unit/resources/authentication/Authentication.test.ts
+              - src/tests/unit/resources/Authentication/Model.test.ts
 
 ################################################################################
 #
