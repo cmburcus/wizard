@@ -1,0 +1,42 @@
+'use strict';
+
+import express from 'express';
+
+import validator from '../../utils/validator';
+import PasswordResetController from './Controller';
+import PasswordResetService from './Service';
+import PasswordResetModel from './Model';
+
+const router = express.Router();
+
+/**
+ * PasswordReset router
+ */
+
+router
+  // PasswordReset specific routes
+
+  // Basic routes
+  .get('/', PasswordResetController.query)
+  .get('/:id', PasswordResetController.show)
+  .post(
+    '/',
+    validator.validateSchema(PasswordResetModel.joiSchema),
+    validator.uniqueField('email', PasswordResetService.countBy),
+    PasswordResetController.create
+  )
+  .put(
+    '/:id',
+    validator.validateSchema(PasswordResetModel.joiSchema),
+    validator.uniqueField('email', PasswordResetService.countBy, 'id'),
+    PasswordResetController.update
+  )
+  .patch(
+    '/:id',
+    validator.validateSchema(PasswordResetModel.joiSchema),
+    validator.uniqueField('email', PasswordResetService.countBy, 'id'),
+    PasswordResetController.patch
+  )
+  .delete('/:id', PasswordResetController.delete);
+
+export default router;

@@ -1,0 +1,608 @@
+'use strict';
+
+import { knex } from '../../../app';
+import chai from 'chai';
+
+import AuthenticationModel from '../../../resources/Authentication/Model';
+import PasswordResetModel from '../../../resources/PasswordReset/Model';
+import PasswordResetService from '../../../resources/PasswordReset/Service';
+
+const expect = chai.expect;
+
+describe('INTEGRATION: Password Reset Service', () => {
+  beforeEach(async () => {
+    await knex.migrate.rollback({ directory: 'dist/database/migrations' });
+    await knex.migrate.latest({ directory: 'dist/database/migrations' });
+  });
+
+  after(async () => {
+    await knex.migrate.rollback({ directory: 'dist/database/migrations' });
+  });
+
+  describe('query', () => {
+    it('it should get an empty array if there are no records', async () => {
+      let result = null;
+
+      try {
+        result = await PasswordResetService.query();
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result)
+        .to.be.an('array')
+        .and.have.lengthOf(0);
+    });
+
+    it('it should get all records in the database', async () => {
+      await AuthenticationModel.query().insert([
+        {
+          email: 'test1@testing.com',
+          password: 'password',
+        },
+        {
+          email: 'test2@testing.com',
+          password: 'password',
+        },
+      ]);
+      await PasswordResetModel.query().insert([
+        { email: 'test1@testing.com' },
+        { email: 'test2@testing.com' },
+      ]);
+
+      let result = null;
+
+      try {
+        result = await PasswordResetService.query();
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result)
+        .to.be.an('array')
+        .and.have.lengthOf(2);
+    });
+  });
+
+  describe('show', () => {
+    it('it should get record if found in the database', async () => {
+      await AuthenticationModel.query().insert({
+        email: 'test@testing.com',
+        password: 'password',
+      });
+      await PasswordResetModel.query().insert({
+        email: 'test@testing.com',
+      });
+
+      let result = null;
+
+      try {
+        result = await PasswordResetService.show(1);
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('object');
+      expect(result)
+        .to.have.property('id')
+        .be.a('number');
+      expect(result)
+        .to.have.property('email')
+        .be.a('string');
+      expect(result)
+        .to.have.property('token')
+        .be.a('string');
+      expect(result)
+        .to.have.property('created_at')
+        .be.a('date');
+      expect(result)
+        .to.have.property('updated_at')
+        .be.a('date');
+    });
+
+    it('it should return undefined if a record does not exist', async () => {
+      let result = null;
+
+      try {
+        result = await PasswordResetService.show(9999999);
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.undefined;
+    });
+
+    it('it should fail if id is not defined', async () => {
+      let result = null;
+
+      try {
+        // @ts-ignore
+        result = await PasswordResetService.show();
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('error');
+      expect(result)
+        .to.have.property('type')
+        .equal('InvalidArgumentError');
+      expect(result)
+        .to.have.property('status')
+        .equal(400);
+      expect(result)
+        .to.have.property('error')
+        .equal('show');
+    });
+  });
+
+  describe('create', () => {
+    it('it should create a record if the data is valid', async () => {
+      await AuthenticationModel.query().insert({
+        email: 'test@testing.com',
+        password: 'password',
+      });
+
+      let result = null;
+
+      try {
+        result = await PasswordResetService.create({
+          email: 'test@testing.com',
+        });
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('object');
+      expect(result);
+      expect(result)
+        .to.have.property('email')
+        .equal('test@testing.com');
+      expect(result)
+        .to.have.property('token')
+        .be.a('string');
+      expect(result)
+        .to.have.property('id')
+        .be.a('number');
+      expect(result)
+        .to.have.property('created_at')
+        .be.a('date');
+      expect(result)
+        .to.have.property('updated_at')
+        .be.a('date');
+    });
+
+    it('it should fail if required fields are not defined', async () => {
+      let result = null;
+
+      try {
+        result = await PasswordResetService.create({});
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('error');
+      expect(result)
+        .to.have.property('name')
+        .equal('ValidationError');
+      expect(result)
+        .to.have.property('type')
+        .equal('ModelValidation');
+      expect(result)
+        .to.have.property('statusCode')
+        .equal(400);
+      expect(result).to.have.property('name');
+      expect(result).to.have.property('type');
+      expect(result).to.have.property('statusCode');
+    });
+
+    it('it should fail if no data is provided', async () => {
+      let result = null;
+
+      try {
+        // @ts-ignore
+        result = await PasswordResetService.create();
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('error');
+      expect(result)
+        .to.have.property('type')
+        .equal('InvalidArgumentError');
+      expect(result)
+        .to.have.property('status')
+        .equal(400);
+      expect(result)
+        .to.have.property('error')
+        .equal('create');
+    });
+
+    it('it should fail if an authority does not exist with the email provided', async () => {
+      // let result = null;
+      //
+      // try {
+      //   result = await PasswordResetService.create({
+      //     email: 'doesnotexist@testing.com'
+      //   });
+      // } catch (error) {
+      //   result = error;
+      // }
+      //
+      // console.log(result);
+      // expect(result).to.be.an('error');
+    });
+
+    it('it should recreate the record if another one exists with the same email', async () => {});
+  });
+
+  describe('update', () => {
+    it('it should update the record if the data is valid', async () => {
+      await AuthenticationModel.query().insert([
+        {
+          email: 'test@testing.com',
+          password: 'password',
+        },
+        {
+          email: 'test1@testing.com',
+          password: 'password',
+        },
+      ]);
+      const record = await PasswordResetModel.query().insert({
+        email: 'test@testing.com',
+      });
+
+      let result = null;
+
+      try {
+        // @ts-ignore
+        result = await PasswordResetService.update(1, {
+          email: 'test1@testing.com',
+        });
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('object');
+      expect(result)
+        .to.have.property('email')
+        .equal('test1@testing.com');
+      expect(result)
+        .to.have.property('token')
+        .be.a('string');
+      expect(result)
+        .to.have.property('id')
+        .be.a('number');
+      expect(result)
+        .to.have.property('created_at')
+        .be.a('date');
+      expect(result)
+        .to.have.property('updated_at')
+        .be.a('date')
+        .and.not.equal(record.updated_at);
+    });
+
+    it('it should fail if required fields are not defined', async () => {
+      await AuthenticationModel.query().insert({
+        email: 'test@testing.com',
+        password: 'password',
+      });
+      await PasswordResetModel.query().insert({
+        email: 'test@testing.com',
+      });
+
+      let result = null;
+
+      try {
+        result = await PasswordResetService.update(1, {});
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('error');
+      expect(result)
+        .to.have.property('name')
+        .equal('ValidationError');
+      expect(result)
+        .to.have.property('type')
+        .equal('ModelValidation');
+      expect(result)
+        .to.have.property('statusCode')
+        .equal(400);
+      expect(result).to.have.property('name');
+      expect(result).to.have.property('type');
+      expect(result).to.have.property('statusCode');
+    });
+
+    it('it should fail if no data is provided', async () => {
+      await AuthenticationModel.query().insert({
+        email: 'test@testing.com',
+        password: 'password',
+      });
+      await PasswordResetModel.query().insert({
+        email: 'test@testing.com',
+      });
+
+      let result = null;
+
+      try {
+        // @ts-ignore
+        result = await PasswordResetService.update(1);
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('error');
+      expect(result)
+        .to.have.property('type')
+        .equal('InvalidArgumentError');
+      expect(result)
+        .to.have.property('status')
+        .equal(400);
+      expect(result)
+        .to.have.property('error')
+        .equal('update');
+    });
+
+    it('it should fail if required fields are not defined', async () => {
+      await AuthenticationModel.query().insert({
+        email: 'test@testing.com',
+        password: 'password',
+      });
+      await PasswordResetModel.query().insert({
+        email: 'test@testing.com',
+      });
+
+      let result = null;
+
+      try {
+        result = await PasswordResetService.update(1, {});
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('error');
+      expect(result)
+        .to.have.property('name')
+        .equal('ValidationError');
+      expect(result)
+        .to.have.property('type')
+        .equal('ModelValidation');
+      expect(result)
+        .to.have.property('statusCode')
+        .equal(400);
+      expect(result).to.have.property('name');
+      expect(result).to.have.property('type');
+      expect(result).to.have.property('statusCode');
+    });
+
+    it('it should fail if no data is provided', async () => {
+      await AuthenticationModel.query().insert({
+        email: 'test@testing.com',
+        password: 'password',
+      });
+      await PasswordResetModel.query().insert({
+        email: 'test@testing.com',
+      });
+
+      let result = null;
+
+      try {
+        // @ts-ignore
+        result = await PasswordResetService.update(1);
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('error');
+      expect(result)
+        .to.have.property('type')
+        .equal('InvalidArgumentError');
+      expect(result)
+        .to.have.property('status')
+        .equal(400);
+      expect(result)
+        .to.have.property('error')
+        .equal('update');
+    });
+
+    it('it should fail if an authority does not exist with the email provided', async () => {});
+
+    it('it should recreate the record if another one exists with the same email', async () => {});
+  });
+
+  describe('patch', () => {
+    it('it should update the record if the data is valid', async () => {
+      await AuthenticationModel.query().insert([
+        {
+          email: 'test@testing.com',
+          password: 'password',
+        },
+        {
+          email: 'test1@testing.com',
+          password: 'password',
+        },
+      ]);
+      const record = await PasswordResetModel.query().insert({
+        email: 'test@testing.com',
+      });
+
+      let result = null;
+
+      try {
+        result = await PasswordResetService.patch(1, {
+          email: 'test1@testing.com',
+        });
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('object');
+      expect(result)
+        .to.have.property('email')
+        .equal('test1@testing.com');
+      expect(result)
+        .to.have.property('token')
+        .be.a('string');
+      expect(result)
+        .to.have.property('id')
+        .be.a('number');
+      expect(result)
+        .to.have.property('created_at')
+        .be.a('date');
+      expect(result)
+        .to.have.property('updated_at')
+        .be.a('date')
+        .and.not.equal(record.updated_at);
+    });
+
+    it('it should fail if no data is provided', async () => {
+      await AuthenticationModel.query().insert({
+        email: 'test@testing.com',
+        password: 'password',
+      });
+      await PasswordResetModel.query().insert({
+        email: 'test@testing.com',
+      });
+
+      let result = null;
+
+      try {
+        // @ts-ignore
+        result = await PasswordResetService.patch(1);
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('error');
+      expect(result)
+        .to.have.property('type')
+        .equal('InvalidArgumentError');
+      expect(result)
+        .to.have.property('status')
+        .equal(400);
+      expect(result)
+        .to.have.property('error')
+        .equal('patch');
+    });
+
+    it('it should fail if an authority does not exist with the email provided', async () => {});
+
+    it('it should recreate the record if another one exists with the same email', async () => {});
+  });
+
+  describe('delete', () => {
+    it('it should delete record if it exists', async () => {
+      await AuthenticationModel.query().insert({
+        email: 'test@testing.com',
+        password: 'password',
+      });
+      await PasswordResetModel.query().insert({
+        email: 'test@testing.com',
+      });
+
+      let result = null;
+
+      try {
+        result = await PasswordResetService.delete(1);
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.a('number');
+      expect(result).to.equal(1);
+    });
+
+    it('it should return 0 if the record does not exist', async () => {
+      let result = null;
+
+      try {
+        result = await PasswordResetService.delete(1);
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.a('number');
+      expect(result).to.equal(0);
+    });
+
+    it('it should fail if id is not defined', async () => {
+      let result = null;
+
+      try {
+        // @ts-ignore
+        result = await PasswordResetService.delete();
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('error');
+      expect(result)
+        .to.have.property('type')
+        .equal('InvalidArgumentError');
+      expect(result)
+        .to.have.property('status')
+        .equal(400);
+      expect(result)
+        .to.have.property('error')
+        .equal('delete');
+    });
+  });
+
+  describe('countBy', () => {
+    it('it should be able to perform a count operation', async () => {
+      await AuthenticationModel.query().insert({
+        email: 'test@testing.com',
+        password: 'password',
+      });
+      await PasswordResetModel.query().insert({
+        email: 'test@testing.com',
+      });
+
+      let result = null;
+
+      try {
+        result = await PasswordResetService.countBy([{ key: 'email', value: 'test@testing.com' }]);
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('array');
+      expect(result[0])
+        .to.have.property('count')
+        .be.equal('1');
+    });
+
+    it('it should be able to perform a count operation excluding an id', async () => {
+      await AuthenticationModel.query().insert({
+        email: 'test@testing.com',
+        password: 'password',
+      });
+      await PasswordResetModel.query().insert({
+        email: 'test@testing.com',
+      });
+
+      let result = null;
+
+      try {
+        result = await PasswordResetService.countBy([
+          {
+            key: 'email',
+            value: 'test@testing.com',
+          },
+          {
+            key: 'id',
+            value: 1,
+            condition: '!=',
+          },
+        ]);
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('array');
+      expect(result[0])
+        .to.have.property('count')
+        .be.equal('0');
+    });
+  });
+});

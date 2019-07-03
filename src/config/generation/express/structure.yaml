@@ -88,13 +88,14 @@ core:
       path: src/tests
       integration:
         path: src/tests/integration
+        files:
+          - src/tests/integration/Service.test.ts
       unit:
         path: src/tests/unit
         resources:
           path: src/tests/unit/resources
           files:
             - src/tests/unit/resources/Model.test.ts
-            - src/tests/unit/resources/Service.test.ts
             - src/tests/unit/resources/Controller.test.ts
 
 ################################################################################
@@ -115,25 +116,42 @@ authentication:
         path: src/database/migrations
         files:
           - src/database/migrations/00000000000000_create_authentications_table.ts
+          - src/database/migrations/00000000000000_create_password_resets_table.ts
     resources:
       path: src/resources
       authentication:
         path: src/resources/Authentication
         files:
           - src/resources/Authentication/Model.ts
-          - src/resources/Authentication/Controller.ts
           - src/resources/Authentication/Service.ts
+          - src/resources/Authentication/Controller.ts
           - src/resources/Authentication/routes.ts
+      passwordReset:
+        path: src/resources/PasswordReset
+        files:
+          - src/resources/PasswordReset/Model.ts
+          - src/resources/PasswordReset/Service.ts
+          - src/resources/PasswordReset/Controller.ts
+          - src/resources/PasswordReset/routes.ts
     tests:
       path: src/tests
+      e2e:
+        path: src/tests/e2e
+        authentication:
+          path: src/tests/e2e/Authentication
+          files:
+            - src/tests/e2e/Authentication/api.test.ts
+            - src/tests/e2e/Authentication/validation.ts
       integration:
         path: src/tests/integration
         authentication:
           path: src/tests/integration/Authentication
           files:
-            - src/tests/integration/Authentication/api.test.ts
             - src/tests/integration/Authentication/Service.test.ts
-            - src/tests/integration/Authentication/validation.ts
+        passwordReset:
+          path: src/tests/integration/PasswordReset
+          files:
+            - src/tests/integration/PasswordReset/Service.test.ts
       unit:
         path: src/tests/unit
         resources:
@@ -142,6 +160,10 @@ authentication:
             path: src/tests/unit/resources/Authentication
             files:
               - src/tests/unit/resources/Authentication/Model.test.ts
+          passwordReset:
+            path: src/tests/unit/resources/PasswordReset
+            files:
+              - src/tests/unit/resources/PasswordReset/Model.test.ts
 
 ################################################################################
 #

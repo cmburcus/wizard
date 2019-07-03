@@ -2,14 +2,14 @@
 
 import chai from 'chai';
 
-import AbstractService from '../../../resources/Service';
-import AbstractModel from '../../../resources/Model';
+import AbstractService from '../../resources/Service';
+import AbstractModel from '../../resources/Model';
 
 const service = AbstractService(AbstractModel);
 
 const expect = chai.expect;
 
-describe('TESTING: Service', () => {
+describe('INTEGRATION: Abstract Service', () => {
   describe('query', () => {
     it('it should be able to perform a query operation without a query', () => {
       expect(service.query(undefined)).to.be.an('object');
@@ -112,13 +112,16 @@ describe('TESTING: Service', () => {
         .and.have.lengthOf(1);
       expect(result)
         .to.have.nested.property('_operations[0].name')
-        .equal('insert');
+        .equal('insertAndFetch');
       expect(result)
-        .to.have.nested.property('_operations[0].models')
+        .to.have.nested.property('_operations[0].delegate')
+        .be.an('object');
+      expect(result)
+        .to.have.nested.property('_operations[0].delegate.models')
         .be.an('array')
         .and.have.lengthOf(1);
       expect(result)
-        .to.have.nested.property('_operations[0].models[0]')
+        .to.have.nested.property('_operations[0].delegate.models[0]')
         .be.an('object')
         .and.deep.equal(record);
     });

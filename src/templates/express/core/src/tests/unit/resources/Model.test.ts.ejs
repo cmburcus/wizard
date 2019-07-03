@@ -6,7 +6,7 @@ import AbstractModel from '../../../resources/Model';
 
 const expect = chai.expect;
 
-describe('TESTING: Model', () => {
+describe('UNIT: Abstract Model', () => {
   it('it should create a new instance of Model', () => {
     const model = new AbstractModel();
 
@@ -32,18 +32,7 @@ describe('TESTING: Model', () => {
       .be.a('string');
   });
 
-  it('it should update updated_at before a model update if created_at does not exist', () => {
-    const model = new AbstractModel();
-
-    model.$beforeUpdate();
-
-    expect(model).to.not.have.property('created_at');
-    expect(model)
-      .to.have.property('updated_at')
-      .be.a('string');
-  });
-
-  it('it should delete created_at and update updated_at before a model update if created_at exists', () => {
+  it('it should delete created_at and update updated_at before a model update', () => {
     const model = new AbstractModel();
 
     /* eslint-disable @typescript-eslint/camelcase */

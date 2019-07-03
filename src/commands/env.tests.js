@@ -23,13 +23,22 @@ const command = {
     // RUNNING COMMANDS
     /// ////////////////////////////////
     const projectEnvironment = context.getProjectEnvironment()
+    const runTestsCommand = !parameters.options.c ? projectEnvironment.commands.runTests : projectEnvironment.commands.runTestsWithCoverage
+
+    if (parameters.options.file) {
+      runTestsCommand.params.push(`dist/tests/**/${parameters.options.file}.test.js`)
+    } else if (parameters.options.path) {
+      runTestsCommand.params.push(`dist/tests/${parameters.options.path}/**/*.test.js`)
+    } else {
+      runTestsCommand.params.push(`dist/tests/**/*.test.js`)
+    }
 
     const timer = context.startTimer()
 
     try {
       context.executeCommandInsideContainer(
         projectEnvironment.bins.app,
-        projectEnvironment.commands.runTests
+        runTestsCommand
       )
 
       context.printExecutionTime(timer)
@@ -57,6 +66,9 @@ function printHelp (context) {
   // Options
   context.helpOptionsTitle()
   print.info('  -h, --help'.green + '\t\tDisplay help message')
+  print.info('  -c'.green + '\t\tDisplay test coverage')
+  print.info('  --path <name>'.green + '\t\tPath from /dist/tests')
+  print.info('  --file <name>'.green + '\t\tFile inside /dist/tests without .test.js')
   print.info('')
 
   // Help title

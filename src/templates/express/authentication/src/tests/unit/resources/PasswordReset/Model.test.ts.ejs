@@ -1,0 +1,38 @@
+'use strict';
+
+import chai from 'chai';
+
+import PasswordResetModel from '../../../../resources/PasswordReset/Model';
+
+const expect = chai.expect;
+
+describe('UNIT: Authentication Model', () => {
+  it('it should generate token before inserting', async () => {
+    const model = await PasswordResetModel.fromJson({
+      email: 'test@example.com',
+    });
+
+    model.$beforeInsert();
+
+    expect(model)
+      .to.have.property('token')
+      .be.a('string')
+      .and.have.length(30);
+  });
+
+  it('it should override an existing token before inserting', async () => {
+    const fakeToken = '123';
+    const model = await PasswordResetModel.fromJson({
+      email: 'test@example.com',
+    });
+
+    model.token = fakeToken;
+    model.$beforeInsert();
+
+    expect(model)
+      .to.have.property('token')
+      .be.a('string')
+      .and.have.length(30)
+      .and.not.equal(fakeToken);
+  });
+});
