@@ -22,7 +22,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "gluegun": "next",
+    "gluegun": "2.0.0",
     "js-yaml": "^3.13.1"
   },
   "devDependencies": {
