@@ -15,6 +15,11 @@ const router = express.Router();
 
 router
   // PasswordReset specific routes
+  .patch(
+    '/reset',
+    validator.validateSchema(PasswordResetModel.joiResetSchema),
+    PasswordResetController.reset
+  )
 
   // Basic routes
   .get('/', PasswordResetController.query)
@@ -33,7 +38,7 @@ router
   )
   .patch(
     '/:id',
-    validator.validateSchema(PasswordResetModel.joiSchema),
+    validator.validateSchema(PasswordResetModel.joiPatchSchema),
     validator.uniqueField('email', PasswordResetService.countBy, 'id'),
     PasswordResetController.patch
   )

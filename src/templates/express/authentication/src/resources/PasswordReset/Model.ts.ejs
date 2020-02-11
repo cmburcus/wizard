@@ -12,6 +12,7 @@ export default class PasswordReset extends Model {
   public id?: number;
   public email?: string;
   public token?: string;
+  public password?: string;
 
   // Name of database table for this model
   public static get tableName() {
@@ -43,12 +44,19 @@ export default class PasswordReset extends Model {
     });
   }
 
+  // Gets the joi schema for update route validation
+  public static get joiPatchSchema() {
+    return Joi.object().keys({
+      email: this.joiEmailValidation.optional(),
+    });
+  }
+
   // Gets the joi schema for resetting password
   public static get joiResetSchema() {
     return Joi.object().keys({
       email: this.joiEmailValidation.required(),
       token: this.joiTokenValidation.required(),
-      password: AuthenticationModel.joiPasswordValidation.required,
+      password: AuthenticationModel.joiPasswordValidation.required(),
     });
   }
 

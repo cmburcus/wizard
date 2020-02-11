@@ -1,0 +1,602 @@
+'use strict';
+
+import { knex } from '../../../app';
+import chai from 'chai';
+import chaiHttp from 'chai-http';
+import { Request, Response } from 'express';
+
+import server from '../../../app';
+import AuthenticationModel from '../../../resources/Authentication/Model';
+import PasswordResetModel from '../../../resources/PasswordReset/Model';
+import PasswordResetController from '../../../resources/PasswordReset/Controller';
+// import PasswordResetService from '../../../resources/PasswordReset/Service';
+
+// Fake data to be used for the tests
+const FAKE_AUTHENTICATION_RECORDS = [
+  {
+    authority_id: 1, // eslint-disable-line @typescript-eslint/camelcase
+    email: 'test@testing.com',
+    password: 'password',
+  },
+  {
+    authority_id: null, // eslint-disable-line @typescript-eslint/camelcase
+    email: 'test2@testing.com',
+    password: 'password',
+  },
+];
+const FAKE_RECORDS = [
+  {
+    email: 'test@testing.com',
+  },
+  {
+    email: 'test2@testing.com',
+  },
+];
+
+const emptyRequest = {};
+const emptyResponse = {};
+
+const expect = chai.expect;
+chai.use(chaiHttp);
+
+describe('e2e: /api/v1/password', () => {
+  beforeEach(async () => {
+    await knex.migrate.rollback({ directory: 'dist/database/migrations' });
+    await knex.migrate.latest({ directory: 'dist/database/migrations' });
+  });
+
+  after(async () => {
+    await knex.migrate.rollback({ directory: 'dist/database/migrations' });
+  });
+
+  describe('GET: /', () => {
+    it('it should handle server failure by returning an error', async () => {
+      let errorReturn = null;
+
+      await PasswordResetController.query(
+        emptyRequest as Request,
+        emptyResponse as Response,
+        function(error: Error) {
+          errorReturn = error;
+        }
+      );
+
+      expect(errorReturn).to.be.an('error');
+    });
+
+    it('it should get an empty array if there are no records', async () => {
+      const response = await chai
+        .request(server)
+        .get('/api/v1/password')
+        .set('content-type', 'application/json');
+
+      expect(response).to.have.status(200);
+      expect(response)
+        .to.have.property('body')
+        .be.an('array')
+        .and.have.lengthOf(0);
+    });
+
+    it('it should get all records in the database', async () => {
+      await AuthenticationModel.query().insert(FAKE_AUTHENTICATION_RECORDS);
+      await PasswordResetModel.query().insert(FAKE_RECORDS);
+
+      const response = await chai
+        .request(server)
+        .get('/api/v1/password')
+        .set('content-type', 'application/json');
+
+      expect(response).to.have.status(200);
+      expect(response)
+        .to.have.property('body')
+        .be.an('array')
+        .and.have.lengthOf(2);
+    });
+  });
+
+  describe('GET: /:id', () => {
+    it('it should handle server failure by returning an error', async () => {
+      let errorReturn = null;
+
+      await PasswordResetController.show(
+        emptyRequest as Request,
+        emptyResponse as Response,
+        function(error: Error) {
+          errorReturn = error;
+        }
+      );
+
+      expect(errorReturn).to.be.an('error');
+    });
+
+    it('it should return NOT FOUND if a record is does not exist', async () => {
+      await AuthenticationModel.query().insert(FAKE_AUTHENTICATION_RECORDS);
+      await PasswordResetModel.query().insert(FAKE_RECORDS);
+
+      const response = await chai
+        .request(server)
+        .get('/api/v1/password/0')
+        .set('content-type', 'application/json');
+
+      expect(response).to.have.status(404);
+      expect(response).to.have.property('body').be.empty;
+    });
+
+    it('it should get record if found in the database', async () => {
+      await AuthenticationModel.query().insert(FAKE_AUTHENTICATION_RECORDS);
+      await PasswordResetModel.query().insert(FAKE_RECORDS);
+
+      const response = await chai
+        .request(server)
+        .get('/api/v1/password/1')
+        .set('content-type', 'application/json');
+
+      expect(response).to.have.status(200);
+      expect(response)
+        .to.have.nested.property('body.id')
+        .be.a('number')
+        .and.equal(1);
+      expect(response)
+        .to.have.nested.property('body.email')
+        .be.a('string')
+        .and.equal('test@testing.com');
+      expect(response)
+        .to.have.nested.property('body.created_at')
+        .be.a('string');
+      expect(response)
+        .to.have.nested.property('body.updated_at')
+        .be.a('string');
+    });
+  });
+
+  describe('POST: /', () => {
+    it('it should handle server failure by returning an error', async () => {
+      let errorReturn = null;
+
+      await PasswordResetController.create(
+        emptyRequest as Request,
+        emptyResponse as Response,
+        function(error: Error) {
+          errorReturn = error;
+        }
+      );
+
+      expect(errorReturn).to.be.an('error');
+    });
+
+    it('it should create a record if the data is valid', async () => {
+      await AuthenticationModel.query().insert(FAKE_AUTHENTICATION_RECORDS);
+
+      const response = await chai
+        .request(server)
+        .post('/api/v1/password')
+        .set('content-type', 'application/json')
+        .send(FAKE_RECORDS[0]);
+
+      expect(response).to.have.status(201);
+      expect(response)
+        .to.have.property('body')
+        .be.an('object');
+      expect(response)
+        .to.have.nested.property('body.email')
+        .be.a('string')
+        .and.equal('test@testing.com');
+      expect(response)
+        .to.have.nested.property('body.id')
+        .be.a('number')
+        .and.equal(1);
+      expect(response)
+        .to.have.nested.property('body.created_at')
+        .be.a('string');
+      expect(response)
+        .to.have.nested.property('body.updated_at')
+        .be.a('string');
+    });
+
+    it('it should fail if email provided is not valid', async () => {
+      await AuthenticationModel.query().insert(FAKE_AUTHENTICATION_RECORDS);
+
+      const response = await chai
+        .request(server)
+        .post('/api/v1/password')
+        .set('content-type', 'application/json')
+        .send({
+          email: 'notanemail',
+        });
+
+      expect(response).to.have.status(400);
+      expect(response)
+        .to.have.nested.property('body.type')
+        .equal('ValidationError');
+      expect(response)
+        .to.have.nested.property('body.status')
+        .equal(400);
+      expect(response)
+        .to.have.nested.property('body.message')
+        .equal('Validation failed');
+      expect(response)
+        .to.have.nested.property('body.error')
+        .be.an('object');
+      expect(response)
+        .to.have.nested.property('body.error.original')
+        .be.an('object')
+        .and.deep.equal({
+          email: 'notanemail',
+        });
+      expect(response)
+        .to.have.nested.property('body.error.errors')
+        .be.an('object');
+      expect(response)
+        .to.have.nested.property('body.error.errors.email')
+        .be.an('array')
+        .and.be.lengthOf(1);
+      expect(response)
+        .to.have.nested.property('body.error.errors.email[0]')
+        .be.an('object')
+        .and.deep.equal({
+          type: 'string.email',
+          message: 'email must be a valid email',
+        });
+    });
+
+    it('it should fail if no data is provided', async () => {
+      await AuthenticationModel.query().insert(FAKE_AUTHENTICATION_RECORDS);
+
+      const response = await chai
+        .request(server)
+        .post('/api/v1/password')
+        .set('content-type', 'application/json');
+
+      expect(response).to.have.status(400);
+      expect(response)
+        .to.have.nested.property('body.type')
+        .equal('ValidationError');
+      expect(response)
+        .to.have.nested.property('body.status')
+        .equal(400);
+      expect(response)
+        .to.have.nested.property('body.message')
+        .equal('Validation failed');
+      expect(response)
+        .to.have.nested.property('body.error')
+        .be.an('object');
+      expect(response)
+        .to.have.nested.property('body.error.original')
+        .be.an('object')
+        .and.deep.equal({});
+      expect(response)
+        .to.have.nested.property('body.error.errors')
+        .be.an('object');
+      expect(response)
+        .to.have.nested.property('body.error.errors.email')
+        .be.an('array')
+        .and.be.lengthOf(1);
+      expect(response)
+        .to.have.nested.property('body.error.errors.email[0]')
+        .be.an('object')
+        .and.deep.equal({
+          type: 'any.required',
+          message: 'email is required',
+        });
+    });
+  });
+
+  describe('PATCH: /:id', () => {
+    it('it should handle server failure by returning an error', async () => {
+      let errorReturn = null;
+
+      await PasswordResetController.patch(
+        emptyRequest as Request,
+        emptyResponse as Response,
+        function(error: Error) {
+          errorReturn = error;
+        }
+      );
+
+      expect(errorReturn).to.be.an('error');
+    });
+
+    it('it should update the record if the data is valid', async () => {
+      await AuthenticationModel.query().insert(FAKE_AUTHENTICATION_RECORDS);
+      await PasswordResetModel.query().insert(FAKE_RECORDS[0]);
+
+      const response = await chai
+        .request(server)
+        .patch('/api/v1/password/1')
+        .set('content-type', 'application/json')
+        .send({
+          email: 'test2@testing.com',
+        });
+
+      expect(response).to.have.status(200);
+      expect(response)
+        .to.have.property('body')
+        .be.an('object');
+      expect(response)
+        .to.have.nested.property('body.email')
+        .be.a('string')
+        .and.equal('test2@testing.com');
+      expect(response)
+        .to.have.nested.property('body.id')
+        .be.a('number')
+        .and.equal(1);
+      expect(response)
+        .to.have.nested.property('body.created_at')
+        .be.a('string');
+      expect(response)
+        .to.have.nested.property('body.updated_at')
+        .be.a('string');
+    });
+
+    it('it should succeed even if no data is provided', async () => {
+      await AuthenticationModel.query().insert(FAKE_AUTHENTICATION_RECORDS);
+      await PasswordResetModel.query().insert(FAKE_RECORDS);
+
+      const response = await chai
+        .request(server)
+        .patch('/api/v1/password/1')
+        .set('content-type', 'application/json');
+
+      expect(response).to.have.status(200);
+      expect(response)
+        .to.have.property('body')
+        .be.an('object');
+      expect(response)
+        .to.have.nested.property('body.email')
+        .be.a('string')
+        .and.equal('test@testing.com');
+      expect(response)
+        .to.have.nested.property('body.id')
+        .be.a('number')
+        .and.equal(1);
+      expect(response)
+        .to.have.nested.property('body.created_at')
+        .be.a('string');
+      expect(response)
+        .to.have.nested.property('body.updated_at')
+        .be.a('string');
+    });
+
+    it('it should fail if email provided is not valid', async () => {
+      await AuthenticationModel.query().insert(FAKE_AUTHENTICATION_RECORDS);
+
+      const response = await chai
+        .request(server)
+        .patch('/api/v1/password/1')
+        .set('content-type', 'application/json')
+        .send({
+          email: 'notanemail',
+        });
+
+      expect(response).to.have.status(400);
+      expect(response)
+        .to.have.nested.property('body.type')
+        .equal('ValidationError');
+      expect(response)
+        .to.have.nested.property('body.status')
+        .equal(400);
+      expect(response)
+        .to.have.nested.property('body.message')
+        .equal('Validation failed');
+      expect(response)
+        .to.have.nested.property('body.error')
+        .be.an('object');
+      expect(response)
+        .to.have.nested.property('body.error.original')
+        .be.an('object')
+        .and.deep.equal({
+          email: 'notanemail',
+        });
+      expect(response)
+        .to.have.nested.property('body.error.errors')
+        .be.an('object');
+      expect(response)
+        .to.have.nested.property('body.error.errors.email')
+        .be.an('array')
+        .and.be.lengthOf(1);
+      expect(response)
+        .to.have.nested.property('body.error.errors.email[0]')
+        .be.an('object')
+        .and.deep.equal({
+          type: 'string.email',
+          message: 'email must be a valid email',
+        });
+    });
+  });
+
+  describe('DELETE: /:id', () => {
+    it('it should handle server failure by returning an error', async () => {
+      let errorReturn = null;
+
+      await PasswordResetController.delete(
+        emptyRequest as Request,
+        emptyResponse as Response,
+        function(error: Error) {
+          errorReturn = error;
+        }
+      );
+
+      expect(errorReturn).to.be.an('error');
+    });
+
+    it('it should delete record if it exists', async () => {
+      await AuthenticationModel.query().insert(FAKE_AUTHENTICATION_RECORDS);
+      await PasswordResetModel.query().insert(FAKE_RECORDS);
+
+      const response = await chai
+        .request(server)
+        .delete('/api/v1/password/1')
+        .set('content-type', 'application/json');
+
+      expect(response).to.have.status(200);
+      expect(response)
+        .to.have.property('body')
+        .be.a('number')
+        .and.equal(1);
+    });
+
+    it('it should return NOT FOUND if the record does not exists', async () => {
+      await AuthenticationModel.query().insert(FAKE_AUTHENTICATION_RECORDS);
+      await PasswordResetModel.query().insert(FAKE_RECORDS);
+
+      const response = await chai
+        .request(server)
+        .delete('/api/v1/password/3')
+        .set('content-type', 'application/json');
+
+      expect(response).to.have.status(404);
+      expect(response)
+        .to.have.property('body')
+        .be.a('number')
+        .and.equal(0);
+    });
+  });
+
+  describe('PATCH: /reset', () => {
+    it('it should handle server failure by returning an error', async () => {
+      let errorReturn = null;
+
+      await PasswordResetController.reset(
+        emptyRequest as Request,
+        emptyResponse as Response,
+        function(error: Error) {
+          errorReturn = error;
+        }
+      );
+
+      expect(errorReturn).to.be.an('error');
+    });
+
+    it('it should fail if to password reset request exists', async () => {
+      await AuthenticationModel.query().insert(FAKE_AUTHENTICATION_RECORDS);
+
+      const response = await chai
+        .request(server)
+        .patch('/api/v1/password/reset')
+        .set('content-type', 'application/json')
+        .send({
+          email: 'test@testing.com',
+          token: 'a123456789a123456789a123456789',
+          password: 'updatedPassword',
+        });
+
+      expect(response).to.have.status(401);
+      expect(response)
+        .to.have.nested.property('body.type')
+        .equal('InvalidTokenError');
+      expect(response)
+        .to.have.nested.property('body.status')
+        .equal(401);
+      expect(response)
+        .to.have.nested.property('body.error')
+        .equal('Password reset request not found');
+    });
+
+    it('it should fail if the user no longer exists', async () => {
+      await AuthenticationModel.query().insert(FAKE_AUTHENTICATION_RECORDS);
+      await PasswordResetModel.query().insert(FAKE_RECORDS);
+      await AuthenticationModel.query().deleteById(1);
+
+      const response = await chai
+        .request(server)
+        .patch('/api/v1/password/reset')
+        .set('content-type', 'application/json')
+        .send({
+          email: 'test@testing.com',
+          token: 'a123456789a123456789a123456789',
+          password: 'updatedPassword',
+        });
+
+      expect(response).to.have.status(401);
+      expect(response)
+        .to.have.nested.property('body.type')
+        .equal('InvalidTokenError');
+      expect(response)
+        .to.have.nested.property('body.status')
+        .equal(401);
+      expect(response)
+        .to.have.nested.property('body.error')
+        .equal('Password reset request not found');
+    });
+
+    it('it should update the authority password if data is valid', async () => {
+      await AuthenticationModel.query().insert(FAKE_AUTHENTICATION_RECORDS);
+      await PasswordResetModel.query().insert(FAKE_RECORDS);
+
+      const record = await AuthenticationModel.query().findById(1);
+
+      const response = await chai
+        .request(server)
+        .patch('/api/v1/password/reset')
+        .set('content-type', 'application/json')
+        .send({
+          email: 'test@testing.com',
+          token: 'a123456789a123456789a123456789',
+          password: 'updatedPassword',
+        });
+
+      expect(response).to.have.status(200);
+      expect(response).to.have.property('body').be.empty;
+
+      const updatedRecord = await AuthenticationModel.query().findById(1);
+
+      expect(record).to.be.an('object');
+      expect(record).to.have.property('password');
+      expect(updatedRecord)
+        .to.have.property('password')
+        .not.equal(record ? record.password : null);
+    });
+
+    it('it should update the authority password even if the email changed', async () => {
+      await AuthenticationModel.query().insert(FAKE_AUTHENTICATION_RECORDS);
+      await PasswordResetModel.query().insert(FAKE_RECORDS);
+
+      const record = await AuthenticationModel.query().patchAndFetchById(1, {
+        email: 'newtest@testing.com',
+      });
+
+      const response = await chai
+        .request(server)
+        .patch('/api/v1/password/reset')
+        .set('content-type', 'application/json')
+        .send({
+          email: 'newtest@testing.com',
+          token: 'a123456789a123456789a123456789',
+          password: 'updatedPassword',
+        });
+
+      expect(response).to.have.status(200);
+      expect(response).to.have.property('body').be.empty;
+
+      const updatedRecord = await AuthenticationModel.query().findById(1);
+
+      expect(record).to.be.an('object');
+      expect(record).to.have.property('password');
+      expect(updatedRecord)
+        .to.have.property('password')
+        .not.equal(record ? record.password : null);
+    });
+
+    it('it should delete the password reset request once the password is updated', async () => {
+      await AuthenticationModel.query().insert(FAKE_AUTHENTICATION_RECORDS);
+      await PasswordResetModel.query().insert(FAKE_RECORDS);
+
+      const response = await chai
+        .request(server)
+        .patch('/api/v1/password/reset')
+        .set('content-type', 'application/json')
+        .send({
+          email: 'test@testing.com',
+          token: 'a123456789a123456789a123456789',
+          password: 'updatedPassword',
+        });
+
+      const passwordResetRequests = await PasswordResetModel.query();
+
+      expect(response).to.have.status(200);
+      expect(passwordResetRequests)
+        .to.be.an('array')
+        .and.have.lengthOf(1);
+    });
+  });
+});

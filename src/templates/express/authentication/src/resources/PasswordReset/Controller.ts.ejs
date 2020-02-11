@@ -1,8 +1,24 @@
 'use strict';
 
+import status from 'http-status';
+import { Request, Response, NextFunction } from 'express';
+
 import Controller from '../Controller';
 import PasswordResetService from './Service';
 
 export default {
   ...Controller(PasswordResetService),
+
+  /**
+   * Resets authority password
+   */
+  reset: async (request: Request, response: Response, next: NextFunction) => {
+    try {
+      await PasswordResetService.reset(request.body);
+
+      response.status(status.OK).json();
+    } catch (error) {
+      next(error);
+    }
+  },
 };

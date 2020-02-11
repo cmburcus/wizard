@@ -6,9 +6,9 @@ import PasswordResetModel from '../../../../resources/PasswordReset/Model';
 
 const expect = chai.expect;
 
-describe('UNIT: Authentication Model', () => {
-  it('it should generate token before inserting', async () => {
-    const model = await PasswordResetModel.fromJson({
+describe('UNIT: Password Reset Model', () => {
+  it('it should generate token before inserting', () => {
+    const model = PasswordResetModel.fromJson({
       email: 'test@example.com',
     });
 
@@ -20,9 +20,9 @@ describe('UNIT: Authentication Model', () => {
       .and.have.length(30);
   });
 
-  it('it should override an existing token before inserting', async () => {
+  it('it should override an existing token before inserting', () => {
     const fakeToken = '123';
-    const model = await PasswordResetModel.fromJson({
+    const model = PasswordResetModel.fromJson({
       email: 'test@example.com',
     });
 

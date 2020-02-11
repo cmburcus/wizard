@@ -39,3 +39,5 @@ authentication:
       generate: 16
     - key: JWT_EXPIRES_IN
       value: 30d
+    - key: JWT_PWD_EXPIRES_IN
+      value: 1h

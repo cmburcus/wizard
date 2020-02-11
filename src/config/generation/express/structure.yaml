@@ -142,6 +142,10 @@ authentication:
           files:
             - src/tests/e2e/Authentication/api.test.ts
             - src/tests/e2e/Authentication/validation.ts
+        passwordReset:
+          path: src/tests/e2e/PasswordReset
+          files:
+            - src/tests/e2e/PasswordReset/api.test.ts
       integration:
         path: src/tests/integration
         authentication:

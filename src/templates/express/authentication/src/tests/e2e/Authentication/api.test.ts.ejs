@@ -114,7 +114,7 @@ describe('e2e: /api/v1/authentication', () => {
       expect(response).to.have.property('body').be.empty;
     });
 
-    it('it should get user if found in the database', async () => {
+    it('it should get record if found in the database', async () => {
       await AuthenticationModel.query().insert(FAKE_RECORDS);
 
       const response = await chai
