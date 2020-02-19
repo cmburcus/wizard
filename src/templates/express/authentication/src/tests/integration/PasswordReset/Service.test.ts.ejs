@@ -7,6 +7,29 @@ import AuthenticationModel from '../../../resources/Authentication/Model';
 import PasswordResetModel from '../../../resources/PasswordReset/Model';
 import PasswordResetService from '../../../resources/PasswordReset/Service';
 
+// Fake data to be used for the tests
+const FAKE_AUTHENTICATION_RECORDS = [
+  {
+    email: 'test1@testing.com',
+    password: 'password',
+  },
+  {
+    email: 'test2@testing.com',
+    password: 'password',
+  },
+];
+
+const FAKE_RECORDS = [
+  {
+    email: 'test1@testing.com',
+    token: 'fakeToken1',
+  },
+  {
+    email: 'test2@testing.com',
+    token: 'fakeToken2',
+  },
+];
+
 const expect = chai.expect;
 
 describe('INTEGRATION: Password Reset Service', () => {
@@ -35,20 +58,8 @@ describe('INTEGRATION: Password Reset Service', () => {
     });
 
     it('it should get all records in the database', async () => {
-      await AuthenticationModel.query().insert([
-        {
-          email: 'test1@testing.com',
-          password: 'password',
-        },
-        {
-          email: 'test2@testing.com',
-          password: 'password',
-        },
-      ]);
-      await PasswordResetModel.query().insert([
-        { email: 'test1@testing.com' },
-        { email: 'test2@testing.com' },
-      ]);
+      await AuthenticationModel.query().insert(FAKE_AUTHENTICATION_RECORDS);
+      await PasswordResetModel.query().insert(FAKE_RECORDS);
 
       let result = null;
 
@@ -66,13 +77,8 @@ describe('INTEGRATION: Password Reset Service', () => {
 
   describe('show', () => {
     it('it should get record if found in the database', async () => {
-      await AuthenticationModel.query().insert({
-        email: 'test@testing.com',
-        password: 'password',
-      });
-      await PasswordResetModel.query().insert({
-        email: 'test@testing.com',
-      });
+      await AuthenticationModel.query().insert(FAKE_AUTHENTICATION_RECORDS);
+      await PasswordResetModel.query().insert(FAKE_RECORDS);
 
       let result = null;
 
@@ -137,17 +143,12 @@ describe('INTEGRATION: Password Reset Service', () => {
 
   describe('create', () => {
     it('it should create a record if the data is valid', async () => {
-      await AuthenticationModel.query().insert({
-        email: 'test@testing.com',
-        password: 'password',
-      });
+      await AuthenticationModel.query().insert(FAKE_AUTHENTICATION_RECORDS);
 
       let result = null;
 
       try {
-        result = await PasswordResetService.create({
-          email: 'test@testing.com',
-        });
+        result = await PasswordResetService.create(FAKE_RECORDS[0]);
       } catch (error) {
         result = error;
       }
@@ -156,7 +157,7 @@ describe('INTEGRATION: Password Reset Service', () => {
       expect(result);
       expect(result)
         .to.have.property('email')
-        .equal('test@testing.com');
+        .equal('test1@testing.com');
       expect(result)
         .to.have.property('token')
         .be.a('string');
@@ -218,18 +219,18 @@ describe('INTEGRATION: Password Reset Service', () => {
     });
 
     it('it should fail if an authority does not exist with the email provided', async () => {
-      // let result = null;
-      //
-      // try {
-      //   result = await PasswordResetService.create({
-      //     email: 'doesnotexist@testing.com'
-      //   });
-      // } catch (error) {
-      //   result = error;
-      // }
-      //
-      // console.log(result);
-      // expect(result).to.be.an('error');
+      let result = null;
+
+      try {
+        result = await PasswordResetService.create({
+          email: 'doesnotexist@testing.com',
+          token: 'token',
+        });
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('error');
     });
 
     it('it should recreate the record if another one exists with the same email', async () => {});
@@ -237,19 +238,8 @@ describe('INTEGRATION: Password Reset Service', () => {
 
   describe('update', () => {
     it('it should update the record if the data is valid', async () => {
-      await AuthenticationModel.query().insert([
-        {
-          email: 'test@testing.com',
-          password: 'password',
-        },
-        {
-          email: 'test1@testing.com',
-          password: 'password',
-        },
-      ]);
-      const record = await PasswordResetModel.query().insert({
-        email: 'test@testing.com',
-      });
+      await AuthenticationModel.query().insert(FAKE_AUTHENTICATION_RECORDS);
+      const record = await PasswordResetModel.query().insert(FAKE_RECORDS[0]);
 
       let result = null;
 
@@ -257,6 +247,7 @@ describe('INTEGRATION: Password Reset Service', () => {
         // @ts-ignore
         result = await PasswordResetService.update(1, {
           email: 'test1@testing.com',
+          token: 'newToken',
         });
       } catch (error) {
         result = error;
@@ -268,7 +259,8 @@ describe('INTEGRATION: Password Reset Service', () => {
         .equal('test1@testing.com');
       expect(result)
         .to.have.property('token')
-        .be.a('string');
+        .be.a('string')
+        .and.not.equal(record.token);
       expect(result)
         .to.have.property('id')
         .be.a('number');
@@ -282,13 +274,8 @@ describe('INTEGRATION: Password Reset Service', () => {
     });
 
     it('it should fail if required fields are not defined', async () => {
-      await AuthenticationModel.query().insert({
-        email: 'test@testing.com',
-        password: 'password',
-      });
-      await PasswordResetModel.query().insert({
-        email: 'test@testing.com',
-      });
+      await AuthenticationModel.query().insert(FAKE_AUTHENTICATION_RECORDS);
+      await PasswordResetModel.query().insert(FAKE_RECORDS);
 
       let result = null;
 
@@ -314,13 +301,8 @@ describe('INTEGRATION: Password Reset Service', () => {
     });
 
     it('it should fail if no data is provided', async () => {
-      await AuthenticationModel.query().insert({
-        email: 'test@testing.com',
-        password: 'password',
-      });
-      await PasswordResetModel.query().insert({
-        email: 'test@testing.com',
-      });
+      await AuthenticationModel.query().insert(FAKE_AUTHENTICATION_RECORDS);
+      await PasswordResetModel.query().insert(FAKE_RECORDS);
 
       let result = null;
 
@@ -344,13 +326,8 @@ describe('INTEGRATION: Password Reset Service', () => {
     });
 
     it('it should fail if required fields are not defined', async () => {
-      await AuthenticationModel.query().insert({
-        email: 'test@testing.com',
-        password: 'password',
-      });
-      await PasswordResetModel.query().insert({
-        email: 'test@testing.com',
-      });
+      await AuthenticationModel.query().insert(FAKE_AUTHENTICATION_RECORDS);
+      await PasswordResetModel.query().insert(FAKE_RECORDS);
 
       let result = null;
 
@@ -376,13 +353,8 @@ describe('INTEGRATION: Password Reset Service', () => {
     });
 
     it('it should fail if no data is provided', async () => {
-      await AuthenticationModel.query().insert({
-        email: 'test@testing.com',
-        password: 'password',
-      });
-      await PasswordResetModel.query().insert({
-        email: 'test@testing.com',
-      });
+      await AuthenticationModel.query().insert(FAKE_AUTHENTICATION_RECORDS);
+      await PasswordResetModel.query().insert(FAKE_RECORDS);
 
       let result = null;
 
@@ -412,25 +384,15 @@ describe('INTEGRATION: Password Reset Service', () => {
 
   describe('patch', () => {
     it('it should update the record if the data is valid', async () => {
-      await AuthenticationModel.query().insert([
-        {
-          email: 'test@testing.com',
-          password: 'password',
-        },
-        {
-          email: 'test1@testing.com',
-          password: 'password',
-        },
-      ]);
-      const record = await PasswordResetModel.query().insert({
-        email: 'test@testing.com',
-      });
+      await AuthenticationModel.query().insert(FAKE_AUTHENTICATION_RECORDS);
+      const record = await PasswordResetModel.query().insert(FAKE_RECORDS);
 
       let result = null;
 
       try {
         result = await PasswordResetService.patch(1, {
           email: 'test1@testing.com',
+          token: 'newToken',
         });
       } catch (error) {
         result = error;
@@ -442,7 +404,9 @@ describe('INTEGRATION: Password Reset Service', () => {
         .equal('test1@testing.com');
       expect(result)
         .to.have.property('token')
-        .be.a('string');
+        .be.a('string')
+        // @ts-ignore
+        .and.not.equal(record.token);
       expect(result)
         .to.have.property('id')
         .be.a('number');
@@ -452,17 +416,13 @@ describe('INTEGRATION: Password Reset Service', () => {
       expect(result)
         .to.have.property('updated_at')
         .be.a('date')
+        // @ts-ignore
         .and.not.equal(record.updated_at);
     });
 
     it('it should fail if no data is provided', async () => {
-      await AuthenticationModel.query().insert({
-        email: 'test@testing.com',
-        password: 'password',
-      });
-      await PasswordResetModel.query().insert({
-        email: 'test@testing.com',
-      });
+      await AuthenticationModel.query().insert(FAKE_AUTHENTICATION_RECORDS);
+      await PasswordResetModel.query().insert(FAKE_RECORDS);
 
       let result = null;
 
@@ -492,13 +452,8 @@ describe('INTEGRATION: Password Reset Service', () => {
 
   describe('delete', () => {
     it('it should delete record if it exists', async () => {
-      await AuthenticationModel.query().insert({
-        email: 'test@testing.com',
-        password: 'password',
-      });
-      await PasswordResetModel.query().insert({
-        email: 'test@testing.com',
-      });
+      await AuthenticationModel.query().insert(FAKE_AUTHENTICATION_RECORDS);
+      await PasswordResetModel.query().insert(FAKE_RECORDS);
 
       let result = null;
 
@@ -550,18 +505,13 @@ describe('INTEGRATION: Password Reset Service', () => {
 
   describe('countBy', () => {
     it('it should be able to perform a count operation', async () => {
-      await AuthenticationModel.query().insert({
-        email: 'test@testing.com',
-        password: 'password',
-      });
-      await PasswordResetModel.query().insert({
-        email: 'test@testing.com',
-      });
+      await AuthenticationModel.query().insert(FAKE_AUTHENTICATION_RECORDS);
+      await PasswordResetModel.query().insert(FAKE_RECORDS[0]);
 
       let result = null;
 
       try {
-        result = await PasswordResetService.countBy([{ key: 'email', value: 'test@testing.com' }]);
+        result = await PasswordResetService.countBy([{ key: 'email', value: 'test1@testing.com' }]);
       } catch (error) {
         result = error;
       }
@@ -573,13 +523,8 @@ describe('INTEGRATION: Password Reset Service', () => {
     });
 
     it('it should be able to perform a count operation excluding an id', async () => {
-      await AuthenticationModel.query().insert({
-        email: 'test@testing.com',
-        password: 'password',
-      });
-      await PasswordResetModel.query().insert({
-        email: 'test@testing.com',
-      });
+      await AuthenticationModel.query().insert(FAKE_AUTHENTICATION_RECORDS);
+      await PasswordResetModel.query().insert(FAKE_RECORDS[0]);
 
       let result = null;
 
@@ -587,7 +532,7 @@ describe('INTEGRATION: Password Reset Service', () => {
         result = await PasswordResetService.countBy([
           {
             key: 'email',
-            value: 'test@testing.com',
+            value: 'test1@testing.com',
           },
           {
             key: 'id',

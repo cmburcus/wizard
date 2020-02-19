@@ -10,6 +10,7 @@ describe('UNIT: Password Reset Model', () => {
   it('it should generate token before inserting', () => {
     const model = PasswordResetModel.fromJson({
       email: 'test@example.com',
+      token: 'token',
     });
 
     model.$beforeInsert();
@@ -17,14 +18,17 @@ describe('UNIT: Password Reset Model', () => {
     expect(model)
       .to.have.property('token')
       .be.a('string')
-      .and.have.length(30);
+      .and.have.length(60);
   });
 
   it('it should override an existing token before inserting', () => {
     const fakeToken = '123';
     const model = PasswordResetModel.fromJson({
       email: 'test@example.com',
+      token: 'token',
     });
+
+    const oldToken = model.token;
 
     model.token = fakeToken;
     model.$beforeInsert();
@@ -32,7 +36,7 @@ describe('UNIT: Password Reset Model', () => {
     expect(model)
       .to.have.property('token')
       .be.a('string')
-      .and.have.length(30)
-      .and.not.equal(fakeToken);
+      .and.have.length(60)
+      .and.not.equal(oldToken);
   });
 });

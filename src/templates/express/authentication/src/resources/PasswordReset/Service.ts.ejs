@@ -1,5 +1,7 @@
 'use strict';
 
+import bcrypt from 'bcrypt';
+
 import Service from '../Service';
 import PasswordResetModel from './Model';
 import AuthenticationService from '../Authentication/Service';
@@ -18,11 +20,15 @@ export default {
 
     const passwordResetRequest = await PasswordResetModel.query().findOne({
       email: record.email,
-      token: record.token,
     });
 
-    if (passwordResetRequest == null || passwordResetRequest.id == null) {
-      throw errorUtil.getInvalidTokenError('Password reset request not found');
+    if (
+      passwordResetRequest == null ||
+      passwordResetRequest.id == null ||
+      passwordResetRequest.token == null ||
+      !bcrypt.compareSync(record.token, passwordResetRequest.token)
+    ) {
+      throw errorUtil.getInvalidTokenError('Password reset token is invalid');
     }
 
     const filter = [

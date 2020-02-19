@@ -27,9 +27,11 @@ const FAKE_AUTHENTICATION_RECORDS = [
 const FAKE_RECORDS = [
   {
     email: 'test@testing.com',
+    token: 'testToken1',
   },
   {
     email: 'test2@testing.com',
+    token: 'testToken2',
   },
 ];
 
@@ -489,7 +491,7 @@ describe('e2e: /api/v1/password', () => {
         .equal(401);
       expect(response)
         .to.have.nested.property('body.error')
-        .equal('Password reset request not found');
+        .equal('Password reset token is invalid');
     });
 
     it('it should fail if the user no longer exists', async () => {
@@ -516,7 +518,7 @@ describe('e2e: /api/v1/password', () => {
         .equal(401);
       expect(response)
         .to.have.nested.property('body.error')
-        .equal('Password reset request not found');
+        .equal('Password reset token is invalid');
     });
 
     it('it should update the authority password if data is valid', async () => {
@@ -531,7 +533,7 @@ describe('e2e: /api/v1/password', () => {
         .set('content-type', 'application/json')
         .send({
           email: 'test@testing.com',
-          token: 'a123456789a123456789a123456789',
+          token: 'testToken1',
           password: 'updatedPassword',
         });
 
@@ -561,7 +563,7 @@ describe('e2e: /api/v1/password', () => {
         .set('content-type', 'application/json')
         .send({
           email: 'newtest@testing.com',
-          token: 'a123456789a123456789a123456789',
+          token: 'testToken1',
           password: 'updatedPassword',
         });
 
@@ -587,7 +589,7 @@ describe('e2e: /api/v1/password', () => {
         .set('content-type', 'application/json')
         .send({
           email: 'test@testing.com',
-          token: 'a123456789a123456789a123456789',
+          token: 'testToken1',
           password: 'updatedPassword',
         });
 

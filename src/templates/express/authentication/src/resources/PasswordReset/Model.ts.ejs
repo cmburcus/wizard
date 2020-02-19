@@ -1,6 +1,8 @@
 'use strict';
 
 import Joi from '@hapi/joi';
+import crypto from 'crypto';
+import bcrypt from 'bcrypt';
 
 import Model from '../Model';
 import AuthenticationModel from '../Authentication/Model';
@@ -34,7 +36,7 @@ export default class PasswordReset extends Model {
   public $beforeInsert() {
     super.$beforeInsert();
 
-    this.token = 'a123456789a123456789a123456789';
+    this.token = bcrypt.hashSync(this.token, 10);
   }
 
   // Gets the joi schema for requesting password reset
@@ -79,7 +81,8 @@ export default class PasswordReset extends Model {
         },
         token: {
           type: 'string',
-          maxLength: 30,
+          maxLength: 60,
+          default: crypto.randomBytes(30).toString('hex'),
         },
         created_at: {
           type: 'string',
