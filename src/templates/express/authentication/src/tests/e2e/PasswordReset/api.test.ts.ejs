@@ -283,6 +283,142 @@ describe('e2e: /api/v1/password', () => {
     });
   });
 
+  describe('PUT: /:id', () => {
+    it('it should handle server failure by returning an error', async () => {
+      let errorReturn = null;
+
+      await PasswordResetController.update(
+        emptyRequest as Request,
+        emptyResponse as Response,
+        function(error: Error) {
+          errorReturn = error;
+        }
+      );
+
+      expect(errorReturn).to.be.an('error');
+    });
+
+    it('it should update the record if the data is valid', async () => {
+      await AuthenticationModel.query().insert(FAKE_AUTHENTICATION_RECORDS);
+      await PasswordResetModel.query().insert(FAKE_RECORDS[0]);
+
+      const response = await chai
+        .request(server)
+        .put('/api/v1/password/1')
+        .set('content-type', 'application/json')
+        .send({
+          email: 'test2@testing.com',
+        });
+
+      expect(response).to.have.status(200);
+      expect(response)
+        .to.have.property('body')
+        .be.an('object');
+      expect(response)
+        .to.have.nested.property('body.email')
+        .be.a('string')
+        .and.equal('test2@testing.com');
+      expect(response)
+        .to.have.nested.property('body.id')
+        .be.a('number')
+        .and.equal(1);
+      expect(response)
+        .to.have.nested.property('body.created_at')
+        .be.a('string');
+      expect(response)
+        .to.have.nested.property('body.updated_at')
+        .be.a('string');
+    });
+
+    it('it should fail if no data is provided', async () => {
+      await AuthenticationModel.query().insert(FAKE_AUTHENTICATION_RECORDS);
+      await PasswordResetModel.query().insert(FAKE_RECORDS);
+
+      const response = await chai
+        .request(server)
+        .put('/api/v1/password/1')
+        .set('content-type', 'application/json');
+
+      expect(response).to.have.status(400);
+      expect(response)
+        .to.have.nested.property('body.type')
+        .equal('ValidationError');
+      expect(response)
+        .to.have.nested.property('body.status')
+        .equal(400);
+      expect(response)
+        .to.have.nested.property('body.message')
+        .equal('Validation failed');
+      expect(response)
+        .to.have.nested.property('body.error')
+        .be.an('object');
+      expect(response)
+        .to.have.nested.property('body.error.original')
+        .be.an('object')
+        .and.deep.equal({});
+      expect(response)
+        .to.have.nested.property('body.error.errors')
+        .be.an('object');
+      expect(response)
+        .to.have.nested.property('body.error.errors.email')
+        .be.an('array')
+        .and.be.lengthOf(1);
+      expect(response)
+        .to.have.nested.property('body.error.errors.email[0]')
+        .be.an('object')
+        .and.deep.equal({
+          type: 'any.required',
+          message: 'email is required',
+        });
+    });
+
+    it('it should fail if email provided is not valid', async () => {
+      await AuthenticationModel.query().insert(FAKE_AUTHENTICATION_RECORDS);
+
+      const response = await chai
+        .request(server)
+        .put('/api/v1/password/1')
+        .set('content-type', 'application/json')
+        .send({
+          email: 'notanemail',
+        });
+
+      expect(response).to.have.status(400);
+      expect(response)
+        .to.have.nested.property('body.type')
+        .equal('ValidationError');
+      expect(response)
+        .to.have.nested.property('body.status')
+        .equal(400);
+      expect(response)
+        .to.have.nested.property('body.message')
+        .equal('Validation failed');
+      expect(response)
+        .to.have.nested.property('body.error')
+        .be.an('object');
+      expect(response)
+        .to.have.nested.property('body.error.original')
+        .be.an('object')
+        .and.deep.equal({
+          email: 'notanemail',
+        });
+      expect(response)
+        .to.have.nested.property('body.error.errors')
+        .be.an('object');
+      expect(response)
+        .to.have.nested.property('body.error.errors.email')
+        .be.an('array')
+        .and.be.lengthOf(1);
+      expect(response)
+        .to.have.nested.property('body.error.errors.email[0]')
+        .be.an('object')
+        .and.deep.equal({
+          type: 'string.email',
+          message: 'email must be a valid email',
+        });
+    });
+  });
+
   describe('PATCH: /:id', () => {
     it('it should handle server failure by returning an error', async () => {
       let errorReturn = null;
