@@ -30,3 +30,5 @@ file: src/config/routes.json
 authentication:
   - name: authentication
     path: ./resources/Authentication/routes
+  - name: password
+    path: ./resources/PasswordReset/routes

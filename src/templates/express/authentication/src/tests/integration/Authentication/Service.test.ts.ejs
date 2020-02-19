@@ -1,5 +1,6 @@
 'use strict';
 
+import { knex } from '../../../app';
 import chai from 'chai';
 import jsonwebtoken from 'jsonwebtoken';
 
@@ -11,54 +12,31 @@ const POSTGRESS_UNIQUE_FIELD_VIOLATION_CODE = '23505';
 // Fake data to be used for the tests
 const FAKE_RECORDS = [
   {
-    // eslint-disable-next-line @typescript-eslint/camelcase
-    authority_id: 1,
-    email: 'test@example.com',
-    password: 'asdfasdf',
+    authority_id: 1, // eslint-disable-line @typescript-eslint/camelcase
+    email: 'test@testing.com',
+    password: 'password',
   },
   {
-    // eslint-disable-next-line @typescript-eslint/camelcase
-    authority_id: null,
-    email: 'test2@example.com',
-    password: 'asdfasdf',
+    authority_id: null, // eslint-disable-line @typescript-eslint/camelcase
+    email: 'test2@testing.com',
+    password: 'password',
   },
 ];
 
-const FAKE_CREDENTIALS = {
-  email: FAKE_RECORDS[0].email,
-  password: FAKE_RECORDS[0].password,
-};
-
-const FAKE_AUTHORITY_ID = 1;
-const FAKE_EMAIL = 'johnsmith@example.com';
-const FAKE_PASSWORD = 'testPassword';
-
-let recordId: number | null | undefined = null;
-let storedRecord: AuthenticationModel | null = null;
-let token: string | null = null;
-
 const expect = chai.expect;
 
-describe('TESTING: AuthenticationService', () => {
+describe('INTEGRATION: Authentication Service', () => {
   beforeEach(async () => {
-    await AuthenticationModel.query().delete();
-    recordId = null;
-    storedRecord = null;
-    token = null;
+    await knex.migrate.rollback({ directory: 'dist/database/migrations' });
+    await knex.migrate.latest({ directory: 'dist/database/migrations' });
   });
 
   after(async () => {
-    await AuthenticationModel.query().delete();
+    await knex.migrate.rollback({ directory: 'dist/database/migrations' });
   });
 
   describe('query', () => {
-    beforeEach(async () => {
-      await AuthenticationModel.query().insert(FAKE_RECORDS);
-    });
-
     it('it should get an empty array if there are no records', async () => {
-      await AuthenticationModel.query().delete();
-
       let result = null;
 
       try {
@@ -73,6 +51,8 @@ describe('TESTING: AuthenticationService', () => {
     });
 
     it('it should get all records in the database', async () => {
+      await AuthenticationModel.query().insert(FAKE_RECORDS);
+
       let result = null;
 
       try {
@@ -88,16 +68,13 @@ describe('TESTING: AuthenticationService', () => {
   });
 
   describe('show', () => {
-    beforeEach(async () => {
-      const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
-      recordId = records[0].id;
-    });
-
     it('it should get record if found in the database', async () => {
+      await AuthenticationModel.query().insert(FAKE_RECORDS);
+
       let result = null;
 
       try {
-        result = await AuthenticationService.show(recordId as number);
+        result = await AuthenticationService.show(1);
       } catch (error) {
         result = error;
       }
@@ -105,16 +82,20 @@ describe('TESTING: AuthenticationService', () => {
       expect(result).to.be.an('object');
       expect(result)
         .to.have.property('id')
-        .be.a('number');
+        .be.a('number')
+        .and.equal(1);
       expect(result)
         .to.have.property('authority_id')
-        .be.a('number');
+        .be.a('number')
+        .and.equal(1);
       expect(result)
         .to.have.property('email')
-        .be.a('string');
+        .be.a('string')
+        .and.equal('test@testing.com');
       expect(result)
         .to.have.property('password')
-        .be.a('string');
+        .be.a('string')
+        .and.not.equal('password');
       expect(result)
         .to.have.property('created_at')
         .be.a('date');
@@ -124,6 +105,8 @@ describe('TESTING: AuthenticationService', () => {
     });
 
     it('it should return undefined if a record does not exist', async () => {
+      await AuthenticationModel.query().insert(FAKE_RECORDS);
+
       let result = null;
 
       try {
@@ -160,17 +143,10 @@ describe('TESTING: AuthenticationService', () => {
 
   describe('create', () => {
     it('it should create a record if the data is valid', async () => {
-      const record = {
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        authority_id: FAKE_AUTHORITY_ID,
-        email: FAKE_EMAIL,
-        password: FAKE_PASSWORD,
-      };
-
       let result = null;
 
       try {
-        result = await AuthenticationService.create(record);
+        result = await AuthenticationService.create(FAKE_RECORDS[0]);
       } catch (error) {
         result = error;
       }
@@ -178,22 +154,26 @@ describe('TESTING: AuthenticationService', () => {
       expect(result).to.be.an('object');
       expect(result)
         .to.have.property('authority_id')
-        .equal(record.authority_id);
+        .be.a('number')
+        .and.equal(1);
       expect(result)
         .to.have.property('email')
-        .equal(record.email);
+        .be.a('string')
+        .and.equal('test@testing.com');
       expect(result)
         .to.have.property('password')
-        .not.equal(record.password);
+        .be.a('string')
+        .and.not.equal('password');
       expect(result)
         .to.have.property('id')
-        .be.a('number');
+        .be.a('number')
+        .and.equal(1);
       expect(result)
         .to.have.property('created_at')
-        .be.a('string');
+        .be.a('date');
       expect(result)
         .to.have.property('updated_at')
-        .be.a('string');
+        .be.a('date');
     });
 
     it('it should fail if required fields are not defined', async () => {
@@ -244,32 +224,17 @@ describe('TESTING: AuthenticationService', () => {
   });
 
   describe('update', () => {
-    beforeEach(async () => {
-      const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
-      storedRecord = records[0];
-    });
-
     it('it should update the record if the data is valid', async () => {
-      expect(storedRecord)
-        .to.be.an('object')
-        .and.have.property('id')
-        .be.a('number');
-
-      if (!storedRecord || !storedRecord.id) {
-        return;
-      }
-
-      const record = {
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        authority_id: 2,
-        email: 'newtest@example.com',
-        password: 'asdfasdf2',
-      };
+      await AuthenticationModel.query().insert(FAKE_RECORDS);
 
       let result = null;
 
       try {
-        result = await AuthenticationService.update(storedRecord.id, record);
+        result = await AuthenticationService.update(1, {
+          authority_id: 2, // eslint-disable-line @typescript-eslint/camelcase
+          email: 'updated@testing.com',
+          password: 'newPassword',
+        });
       } catch (error) {
         result = error;
       }
@@ -277,16 +242,61 @@ describe('TESTING: AuthenticationService', () => {
       expect(result).to.be.an('object');
       expect(result)
         .to.have.property('authority_id')
-        .equal(record.authority_id);
+        .be.a('number')
+        .and.equal(2);
       expect(result)
         .to.have.property('email')
-        .equal(record.email);
+        .be.a('string')
+        .and.equal('updated@testing.com');
       expect(result)
         .to.have.property('password')
-        .not.equal(record.password);
+        .be.a('string')
+        .and.not.equal('newPassword');
       expect(result)
         .to.have.property('id')
-        .be.a('number');
+        .be.a('number')
+        .and.equal(1);
+      expect(result)
+        .to.have.property('created_at')
+        .be.a('date');
+      expect(result)
+        .to.have.property('updated_at')
+        .be.a('date');
+    });
+
+    it('it should not update the id', async () => {
+      await AuthenticationModel.query().insert(FAKE_RECORDS);
+
+      let result = null;
+
+      try {
+        result = await AuthenticationService.update(1, {
+          authority_id: 2, // eslint-disable-line @typescript-eslint/camelcase
+          email: 'updated@testing.com',
+          password: 'newPassword',
+          id: 5,
+        });
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('object');
+      expect(result)
+        .to.have.property('authority_id')
+        .be.a('number')
+        .and.equal(2);
+      expect(result)
+        .to.have.property('email')
+        .be.a('string')
+        .and.equal('updated@testing.com');
+      expect(result)
+        .to.have.property('password')
+        .be.a('string')
+        .and.not.equal('newPassword');
+      expect(result)
+        .to.have.property('id')
+        .be.a('number')
+        .and.equal(1);
       expect(result)
         .to.have.property('created_at')
         .be.a('date');
@@ -296,19 +306,12 @@ describe('TESTING: AuthenticationService', () => {
     });
 
     it('it should fail if required fields are not defined', async () => {
-      expect(storedRecord)
-        .to.be.an('object')
-        .and.have.property('id')
-        .be.a('number');
-
-      if (!storedRecord || !storedRecord.id) {
-        return;
-      }
+      await AuthenticationModel.query().insert(FAKE_RECORDS);
 
       let result = null;
 
       try {
-        result = await AuthenticationService.update(storedRecord.id, {});
+        result = await AuthenticationService.update(1, {});
       } catch (error) {
         result = error;
       }
@@ -329,11 +332,13 @@ describe('TESTING: AuthenticationService', () => {
     });
 
     it('it should fail if no data is provided', async () => {
+      await AuthenticationModel.query().insert(FAKE_RECORDS);
+
       let result = null;
 
       try {
         // @ts-ignore
-        result = await AuthenticationService.update(storedRecord.id);
+        result = await AuthenticationService.update(1);
       } catch (error) {
         result = error;
       }
@@ -352,29 +357,15 @@ describe('TESTING: AuthenticationService', () => {
   });
 
   describe('patch', () => {
-    beforeEach(async () => {
-      const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
-      storedRecord = records[0];
-    });
-
     it('it should update the record if the data is valid', async () => {
-      expect(storedRecord)
-        .to.be.an('object')
-        .and.have.property('id')
-        .be.a('number');
-
-      if (!storedRecord || !storedRecord.id) {
-        return;
-      }
-
-      const record = {
-        email: 'newtest@example.com',
-      };
+      await AuthenticationModel.query().insert(FAKE_RECORDS);
 
       let result = null;
 
       try {
-        result = await AuthenticationService.patch(storedRecord.id, record);
+        result = await AuthenticationService.patch(1, {
+          email: 'updated@testing.com',
+        });
       } catch (error) {
         result = error;
       }
@@ -382,16 +373,20 @@ describe('TESTING: AuthenticationService', () => {
       expect(result).to.be.an('object');
       expect(result)
         .to.have.property('authority_id')
-        .equal(storedRecord.authority_id);
+        .be.a('number')
+        .and.equal(1);
       expect(result)
         .to.have.property('email')
-        .equal(record.email);
+        .be.a('string')
+        .and.equal('updated@testing.com');
       expect(result)
         .to.have.property('password')
-        .equal(storedRecord.password);
+        .be.a('string')
+        .and.not.equal('password');
       expect(result)
         .to.have.property('id')
-        .be.a('number');
+        .be.a('number')
+        .and.equal(1);
       expect(result)
         .to.have.property('created_at')
         .be.a('date');
@@ -405,7 +400,7 @@ describe('TESTING: AuthenticationService', () => {
 
       try {
         // @ts-ignore
-        result = await AuthenticationService.patch(storedRecord.id);
+        result = await AuthenticationService.patch(1);
       } catch (error) {
         result = error;
       }
@@ -421,19 +416,54 @@ describe('TESTING: AuthenticationService', () => {
         .to.have.property('error')
         .equal('patch');
     });
-  });
 
-  describe('delete', () => {
-    beforeEach(async () => {
-      const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
-      recordId = records[0].id;
-    });
+    it('it should not update the id', async () => {
+      await AuthenticationModel.query().insert(FAKE_RECORDS);
 
-    it('it should delete record if it exists', async () => {
       let result = null;
 
       try {
-        result = await AuthenticationService.delete(recordId as number);
+        result = await AuthenticationService.patch(1, {
+          id: 5,
+        });
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('object');
+      expect(result)
+        .to.have.property('authority_id')
+        .be.a('number')
+        .and.equal(1);
+      expect(result)
+        .to.have.property('email')
+        .be.a('string')
+        .and.equal('test@testing.com');
+      expect(result)
+        .to.have.property('password')
+        .be.a('string')
+        .and.not.equal('password');
+      expect(result)
+        .to.have.property('id')
+        .be.a('number')
+        .and.equal(1);
+      expect(result)
+        .to.have.property('created_at')
+        .be.a('date');
+      expect(result)
+        .to.have.property('updated_at')
+        .be.a('date');
+    });
+  });
+
+  describe('delete', () => {
+    it('it should delete record if it exists', async () => {
+      await AuthenticationModel.query().insert(FAKE_RECORDS);
+
+      let result = null;
+
+      try {
+        result = await AuthenticationService.delete(1);
       } catch (error) {
         result = error;
       }
@@ -443,6 +473,8 @@ describe('TESTING: AuthenticationService', () => {
     });
 
     it('it should return 0 if the record does not exist', async () => {
+      await AuthenticationModel.query().insert(FAKE_RECORDS);
+
       let result = null;
 
       try {
@@ -479,16 +511,13 @@ describe('TESTING: AuthenticationService', () => {
   });
 
   describe('countBy', () => {
-    beforeEach(async () => {
-      const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
-      recordId = records[0].id;
-    });
-
     it('it should be able to perform a count operation', async () => {
+      await AuthenticationModel.query().insert(FAKE_RECORDS);
+
       let result = null;
 
       try {
-        result = await AuthenticationService.countBy([{ key: 'email', value: 'test@example.com' }]);
+        result = await AuthenticationService.countBy([{ key: 'email', value: 'test@testing.com' }]);
       } catch (error) {
         result = error;
       }
@@ -500,17 +529,19 @@ describe('TESTING: AuthenticationService', () => {
     });
 
     it('it should be able to perform a count operation excluding an id', async () => {
+      await AuthenticationModel.query().insert(FAKE_RECORDS);
+
       let result = null;
 
       try {
         result = await AuthenticationService.countBy([
           {
             key: 'email',
-            value: 'test@example.com',
+            value: 'test@testing.com',
           },
           {
             key: 'id',
-            value: recordId,
+            value: 1,
             condition: '!=',
           },
         ]);
@@ -530,10 +561,9 @@ describe('TESTING: AuthenticationService', () => {
       let result = null;
 
       const record = {
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        authority_id: FAKE_AUTHORITY_ID,
-        email: FAKE_EMAIL,
-        password: FAKE_PASSWORD,
+        authority_id: 1, // eslint-disable-line @typescript-eslint/camelcase
+        email: 'test@testing.com',
+        password: 'password',
       };
 
       try {
@@ -545,19 +575,22 @@ describe('TESTING: AuthenticationService', () => {
       expect(result).to.be.an('object');
       expect(result)
         .to.have.property('authority_id')
-        .equal(record.authority_id);
+        .be.a('number')
+        .and.equal(1);
       expect(result)
         .to.have.property('email')
-        .equal(record.email);
+        .be.a('string')
+        .and.equal('test@testing.com');
       expect(result)
         .to.have.property('password')
-        .not.equal(record.password);
+        .be.a('string')
+        .and.not.equal('password');
       expect(result)
         .to.have.property('created_at')
-        .be.a('string');
+        .be.a('date');
       expect(result)
         .to.have.property('updated_at')
-        .be.a('string');
+        .be.a('date');
     });
 
     it('it should fail if no data is provided', async () => {
@@ -588,10 +621,9 @@ describe('TESTING: AuthenticationService', () => {
       let result = null;
 
       const record = {
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        authority_id: null,
-        email: FAKE_EMAIL,
-        password: FAKE_PASSWORD,
+        authority_id: null, // eslint-disable-line @typescript-eslint/camelcase
+        email: 'test@testing.com',
+        password: 'password',
       };
 
       try {
@@ -601,36 +633,35 @@ describe('TESTING: AuthenticationService', () => {
       }
 
       expect(result).to.be.an('object');
-      expect(result)
-        .to.have.property('authority_id')
-        .equal(record.authority_id);
+      expect(result).to.have.property('authority_id').be.null;
       expect(result)
         .to.have.property('email')
-        .equal(record.email);
+        .be.a('string')
+        .and.equal('test@testing.com');
       expect(result)
         .to.have.property('password')
-        .not.equal(record.password);
+        .be.a('string')
+        .and.not.equal('password');
       expect(result)
         .to.have.property('created_at')
-        .be.a('string');
+        .be.a('date');
       expect(result)
         .to.have.property('updated_at')
-        .be.a('string');
+        .be.a('date');
     });
 
     it('it should fail if authority_id is not a number', async () => {
       let result = null;
 
       const record = {
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        authority_id: '1',
-        email: FAKE_EMAIL,
-        password: FAKE_PASSWORD,
+        authority_id: '1', // eslint-disable-line @typescript-eslint/camelcase
+        email: 'test@testing.com',
+        password: 'password',
       };
 
       try {
         // @ts-ignore
-        result = await AuthenticationService.register(record);
+        result = await AuthenticationService.register(record as AuthenticationModel);
       } catch (error) {
         result = error;
       }
@@ -657,10 +688,9 @@ describe('TESTING: AuthenticationService', () => {
       let result = null;
 
       const record = {
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        authority_id: -1,
-        email: FAKE_EMAIL,
-        password: FAKE_PASSWORD,
+        authority_id: -1, // eslint-disable-line @typescript-eslint/camelcase
+        email: 'test@testing.com',
+        password: 'password',
       };
 
       try {
@@ -683,23 +713,20 @@ describe('TESTING: AuthenticationService', () => {
     it('it should fail if authority_id is not unique', async () => {
       let result = null;
 
-      const recordOne = {
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        authority_id: FAKE_AUTHORITY_ID,
-        email: FAKE_EMAIL,
-        password: FAKE_PASSWORD,
-      };
-      const recordTwo = {
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        authority_id: FAKE_AUTHORITY_ID,
-        email: `2${FAKE_EMAIL}`,
-        password: FAKE_PASSWORD,
+      const record = {
+        authority_id: 1, // eslint-disable-line @typescript-eslint/camelcase
+        email: 'test2@testing.com',
+        password: 'password',
       };
 
       try {
-        await AuthenticationModel.query().insert(recordOne);
+        await AuthenticationModel.query().insert({
+          authority_id: 1, // eslint-disable-line @typescript-eslint/camelcase
+          email: 'test@testing.com',
+          password: 'password',
+        });
 
-        result = await AuthenticationService.register(recordTwo as AuthenticationModel);
+        result = await AuthenticationService.register(record as AuthenticationModel);
       } catch (error) {
         result = error;
       }
@@ -722,15 +749,14 @@ describe('TESTING: AuthenticationService', () => {
       let result = null;
 
       const record = {
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        authority_id: FAKE_AUTHORITY_ID,
+        authority_id: 1, // eslint-disable-line @typescript-eslint/camelcase
         email: null,
-        password: FAKE_PASSWORD,
+        password: 'password',
       };
 
       try {
         // @ts-ignore
-        result = await AuthenticationService.register(record);
+        result = await AuthenticationService.register(record as AuthenticationModel);
       } catch (error) {
         result = error;
       }
@@ -751,15 +777,14 @@ describe('TESTING: AuthenticationService', () => {
       let result = null;
 
       const record = {
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        authority_id: FAKE_AUTHORITY_ID,
+        authority_id: 1, // eslint-disable-line @typescript-eslint/camelcase
         email: 12345,
-        password: FAKE_PASSWORD,
+        password: 'password',
       };
 
       try {
         // @ts-ignore
-        result = await AuthenticationService.register(record);
+        result = await AuthenticationService.register(record as AuthenticationModel);
       } catch (error) {
         result = error;
       }
@@ -786,11 +811,10 @@ describe('TESTING: AuthenticationService', () => {
       let result = null;
 
       const record = {
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        authority_id: FAKE_AUTHORITY_ID,
+        authority_id: 1, // eslint-disable-line @typescript-eslint/camelcase
         email:
           'abcdefghijklmnopqrstuvwzabcdefghijklmnopqrstuvwzababcdefghijklmnopqrstuvwzabcdefghijklmnopqrstuvwzababcdefghijklmnopqrstuvwzabcdefghijklmnopqrstuvwzababcdefghijklmnopqrstuvwzabcdefghijklmnopqrstuvwzababcdefghijklmnopqrstuvwzabcdefghijklmnopqrstu@w.com',
-        password: FAKE_PASSWORD,
+        password: 'password',
       };
 
       try {
@@ -820,23 +844,20 @@ describe('TESTING: AuthenticationService', () => {
     it('it should fail if email is not unique', async () => {
       let result = null;
 
-      const recordOne = {
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        authority_id: FAKE_AUTHORITY_ID,
-        email: FAKE_EMAIL,
-        password: FAKE_PASSWORD,
-      };
-      const recordTwo = {
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        authority_id: FAKE_AUTHORITY_ID + 1,
-        email: FAKE_EMAIL,
-        password: FAKE_PASSWORD,
+      const record = {
+        authority_id: 2, // eslint-disable-line @typescript-eslint/camelcase
+        email: 'test@testing.com',
+        password: 'password',
       };
 
       try {
-        await AuthenticationModel.query().insert(recordOne);
+        await AuthenticationModel.query().insert({
+          authority_id: 1, // eslint-disable-line @typescript-eslint/camelcase
+          email: 'test@testing.com',
+          password: 'password',
+        });
 
-        result = await AuthenticationService.register(recordTwo as AuthenticationModel);
+        result = await AuthenticationService.register(record as AuthenticationModel);
       } catch (error) {
         result = error;
       }
@@ -859,15 +880,14 @@ describe('TESTING: AuthenticationService', () => {
       let result = null;
 
       const record = {
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        authority_id: FAKE_AUTHORITY_ID,
-        email: FAKE_EMAIL,
+        authority_id: 1, // eslint-disable-line @typescript-eslint/camelcase
+        email: 'test@testing.com',
         password: null,
       };
 
       try {
         // @ts-ignore
-        result = await AuthenticationService.register(record);
+        result = await AuthenticationService.register(record as AuthenticationModel);
       } catch (error) {
         result = error;
       }
@@ -888,15 +908,14 @@ describe('TESTING: AuthenticationService', () => {
       let result = null;
 
       const record = {
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        authority_id: FAKE_AUTHORITY_ID,
-        email: FAKE_EMAIL,
+        authority_id: 1, // eslint-disable-line @typescript-eslint/camelcase
+        email: 'test@testing.com',
         password: 123,
       };
 
       try {
         // @ts-ignore
-        result = await AuthenticationService.register(record);
+        result = await AuthenticationService.register(record as AuthenticationModel);
       } catch (error) {
         result = error;
       }
@@ -918,16 +937,16 @@ describe('TESTING: AuthenticationService', () => {
   });
 
   describe('authenticate', () => {
-    beforeEach(async () => {
-      const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
-      storedRecord = records[0];
-    });
-
     it('it should authenticate if the credentials are valid', async () => {
+      await AuthenticationModel.query().insert(FAKE_RECORDS[0]);
+
       let result = null;
 
       try {
-        result = await AuthenticationService.authenticate(FAKE_CREDENTIALS);
+        result = await AuthenticationService.authenticate({
+          email: 'test@testing.com',
+          password: 'password',
+        });
       } catch (error) {
         result = error;
       }
@@ -936,15 +955,15 @@ describe('TESTING: AuthenticationService', () => {
     });
 
     it('it should authenticate if even if the email is wrong case', async () => {
+      await AuthenticationModel.query().insert(FAKE_RECORDS[0]);
+
       let result = null;
 
-      const credentials = {
-        email: FAKE_CREDENTIALS.email.toUpperCase(),
-        password: FAKE_CREDENTIALS.password,
-      };
-
       try {
-        result = await AuthenticationService.authenticate(credentials);
+        result = await AuthenticationService.authenticate({
+          email: 'TEST@TESTING.COM',
+          password: 'password',
+        });
       } catch (error) {
         result = error;
       }
@@ -953,10 +972,15 @@ describe('TESTING: AuthenticationService', () => {
     });
 
     it('it should return a valid JWT token', async () => {
+      await AuthenticationModel.query().insert(FAKE_RECORDS[0]);
+
       let result = null;
 
       try {
-        result = await AuthenticationService.authenticate(FAKE_CREDENTIALS);
+        result = await AuthenticationService.authenticate({
+          email: 'test@testing.com',
+          password: 'password',
+        });
       } catch (error) {
         result = error;
       }
@@ -978,12 +1002,6 @@ describe('TESTING: AuthenticationService', () => {
         verifiedToken = error;
       }
 
-      expect(storedRecord).to.be.an('object');
-
-      if (!storedRecord) {
-        return;
-      }
-
       expect(verifiedToken).to.be.an('object');
       expect(verifiedToken)
         .to.have.property('data')
@@ -991,7 +1009,7 @@ describe('TESTING: AuthenticationService', () => {
       expect(verifiedToken)
         .to.have.nested.property('data.authorityId')
         .be.a('number')
-        .and.equal(storedRecord.authority_id);
+        .and.equal(1);
       expect(verifiedToken)
         .to.have.property('iat')
         .be.a('number');
@@ -1001,6 +1019,8 @@ describe('TESTING: AuthenticationService', () => {
     });
 
     it('it should set a token expiration even if one is not set in the environment variables', async () => {
+      await AuthenticationModel.query().insert(FAKE_RECORDS[0]);
+
       const currentJwtExpiration = process.env.JWT_EXPIRES_IN;
 
       process.env.JWT_EXPIRES_IN = '';
@@ -1008,7 +1028,10 @@ describe('TESTING: AuthenticationService', () => {
       let result = null;
 
       try {
-        result = await AuthenticationService.authenticate(FAKE_CREDENTIALS);
+        result = await AuthenticationService.authenticate({
+          email: 'test@testing.com',
+          password: 'password',
+        });
       } catch (error) {
         result = error;
       }
@@ -1017,12 +1040,11 @@ describe('TESTING: AuthenticationService', () => {
       process.env.JWT_EXPIRES_IN = currentJwtExpiration;
 
       expect(result).to.be.a('string');
-      expect(storedRecord).to.be.an('object');
       expect(process)
         .to.have.nested.property('env.JWT_SECRET')
         .be.a('string');
 
-      if (!storedRecord || !process.env.JWT_SECRET) {
+      if (!process.env.JWT_SECRET) {
         return;
       }
 
@@ -1041,7 +1063,7 @@ describe('TESTING: AuthenticationService', () => {
       expect(verifiedToken)
         .to.have.nested.property('data.authorityId')
         .be.a('number')
-        .and.equal(storedRecord.authority_id);
+        .and.equal(1);
       expect(verifiedToken)
         .to.have.property('iat')
         .be.a('number');
@@ -1073,15 +1095,15 @@ describe('TESTING: AuthenticationService', () => {
     });
 
     it('it should fail if email is not found', async () => {
+      await AuthenticationModel.query().insert(FAKE_RECORDS[0]);
+
       let result = null;
 
-      const credentials = {
-        email: 'wrongemail@example.com',
-        password: FAKE_CREDENTIALS.password,
-      };
-
       try {
-        result = await AuthenticationService.authenticate(credentials);
+        result = await AuthenticationService.authenticate({
+          email: 'wrongemail@example.com',
+          password: 'password',
+        });
       } catch (error) {
         result = error;
       }
@@ -1099,15 +1121,15 @@ describe('TESTING: AuthenticationService', () => {
     });
 
     it('it should fail if password is not correct', async () => {
+      await AuthenticationModel.query().insert(FAKE_RECORDS[0]);
+
       let result = null;
 
-      const credentials = {
-        email: FAKE_CREDENTIALS.email,
-        password: 'wrongPassword',
-      };
-
       try {
-        result = await AuthenticationService.authenticate(credentials);
+        result = await AuthenticationService.authenticate({
+          email: 'test@testing.com',
+          password: 'wrongPassword',
+        });
       } catch (error) {
         result = error;
       }
@@ -1126,25 +1148,19 @@ describe('TESTING: AuthenticationService', () => {
   });
 
   describe('verify', () => {
-    beforeEach(async () => {
-      const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
-      storedRecord = records[0];
-      token = await AuthenticationService.authenticate(FAKE_CREDENTIALS);
-    });
-
     it('it should return an authority object if JWT is valid', async () => {
+      await AuthenticationModel.query().insert(FAKE_RECORDS[0]);
+      const token = await AuthenticationService.authenticate({
+        email: 'test@testing.com',
+        password: 'password',
+      });
+
       let result = null;
 
       try {
-        result = await AuthenticationService.verify(token as string);
+        result = await AuthenticationService.verify(token);
       } catch (error) {
         result = error;
-      }
-
-      expect(storedRecord).to.be.an('object');
-
-      if (!storedRecord) {
-        return;
       }
 
       expect(result).to.be.an('object');
@@ -1154,7 +1170,7 @@ describe('TESTING: AuthenticationService', () => {
       expect(result)
         .to.have.nested.property('data.authorityId')
         .be.a('number')
-        .and.equal(storedRecord.authority_id);
+        .and.equal(1);
       expect(result)
         .to.have.property('iat')
         .be.a('number');
@@ -1208,16 +1224,13 @@ describe('TESTING: AuthenticationService', () => {
   });
 
   describe('deleteByAuthorityId', () => {
-    beforeEach(async () => {
-      const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
-      recordId = records[0].authority_id;
-    });
-
     it('it should delete record if it exists', async () => {
+      await AuthenticationModel.query().insert(FAKE_RECORDS);
+
       let result = null;
 
       try {
-        result = await AuthenticationService.deleteByAuthorityId(recordId as number);
+        result = await AuthenticationService.deleteByAuthorityId(1);
       } catch (error) {
         result = error;
       }
@@ -1227,6 +1240,8 @@ describe('TESTING: AuthenticationService', () => {
     });
 
     it('it should return 0 if the record does not exist', async () => {
+      await AuthenticationModel.query().insert(FAKE_RECORDS);
+
       let result = null;
 
       try {
@@ -1245,6 +1260,28 @@ describe('TESTING: AuthenticationService', () => {
       try {
         // @ts-ignore
         result = await AuthenticationService.deleteByAuthorityId();
+      } catch (error) {
+        result = error;
+      }
+
+      expect(result).to.be.an('error');
+      expect(result)
+        .to.have.property('type')
+        .equal('InvalidArgumentError');
+      expect(result)
+        .to.have.property('status')
+        .equal(400);
+      expect(result)
+        .to.have.property('error')
+        .equal('delete');
+    });
+
+    it('it should fail if id is null', async () => {
+      let result = null;
+
+      try {
+        // @ts-ignore
+        result = await AuthenticationService.deleteByAuthorityId(null);
       } catch (error) {
         result = error;
       }

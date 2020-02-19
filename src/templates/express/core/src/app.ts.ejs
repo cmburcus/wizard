@@ -20,7 +20,7 @@ const app = express();
 // Initialize knex.
 /* istanbul ignore next */
 // @ts-ignore
-const knex: any = Knex(databaseConfig[app.get('env') || 'development']);
+export const knex: any = Knex(databaseConfig[app.get('env') || 'development']);
 
 // Bind all Models to a knex instance. If you only have one database in
 // your server this is all you have to do. For multi database systems, see

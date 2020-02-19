@@ -43,7 +43,7 @@ const next = (returnedError: Error) => {
 
 const expect = chai.expect;
 
-describe('TESTING: Controller', () => {
+describe('UNIT: Abstract Controller', () => {
   beforeEach(() => {
     status = null;
     result = null;
@@ -88,7 +88,7 @@ describe('TESTING: Controller', () => {
       const request = { params: { id: 1 } };
 
       try {
-        await controller.show(request as unknown as Request, response as Response, next);
+        await controller.show((request as unknown) as Request, response as Response, next);
       } catch (codeError) {
         error = codeError;
       }
@@ -161,7 +161,7 @@ describe('TESTING: Controller', () => {
       };
 
       try {
-        await controller.update(request as unknown as Request, response as Response, next);
+        await controller.update((request as unknown) as Request, response as Response, next);
       } catch (codeError) {
         error = codeError;
       }
@@ -194,7 +194,7 @@ describe('TESTING: Controller', () => {
       };
 
       try {
-        await controller.patch(request as unknown as Request, response as Response, next);
+        await controller.patch((request as unknown) as Request, response as Response, next);
       } catch (codeError) {
         error = codeError;
       }
@@ -224,7 +224,7 @@ describe('TESTING: Controller', () => {
       const request = { params: { id: 1 } };
 
       try {
-        await controller.delete(request as unknown as Request, response as Response, next);
+        await controller.delete((request as unknown) as Request, response as Response, next);
       } catch (codeError) {
         error = codeError;
       }

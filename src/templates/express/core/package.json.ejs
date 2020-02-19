@@ -10,7 +10,8 @@
     "ts:build": "tsc",
     "node:dev": "NODE_ENV=development && DEBUG=app:* && nodemon",
     "node:prod": "NODE_ENV=production && DEBUG=app:* && node ./bin/www",
-    "node:test": "NODE_ENV=testing && DEBUG=app:* && nyc mocha dist/tests/**/*.js --file dist/app.js -t 10000 --recursive --exit",
+    "node:test": "tsc && NODE_ENV=testing && DEBUG=app:* && mocha --file dist/app.js --slow 400 --recursive --exit",
+    "node:test:coverage": "tsc && NODE_ENV=testing && DEBUG=app:* && nyc mocha --file dist/app.js --slow 400 --recursive --exit",
     "format": "eslint --quiet --report-unused-disable-directives --fix '**/*.ts' || true"
   },
   "dependencies": {},

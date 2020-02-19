@@ -1,5 +1,6 @@
 'use strict';
 
+import { knex } from '../../../app';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import bcrypt from 'bcrypt';
@@ -15,49 +16,34 @@ import AuthenticationService from '../../../resources/Authentication/Service';
 // Fake data to be used for the tests
 const FAKE_RECORDS = [
   {
-    // eslint-disable-next-line @typescript-eslint/camelcase
-    authority_id: 1,
-    email: 'test@example.com',
-    password: 'asdfasdf',
+    authority_id: 1, // eslint-disable-line @typescript-eslint/camelcase
+    email: 'test@testing.com',
+    password: 'password',
   },
   {
-    // eslint-disable-next-line @typescript-eslint/camelcase
-    authority_id: null,
-    email: 'test2@example.com',
-    password: 'asdfasdf',
+    authority_id: null, // eslint-disable-line @typescript-eslint/camelcase
+    email: 'test2@testing.com',
+    password: 'password',
   },
 ];
 
-const FAKE_CREDENTIALS = {
-  email: FAKE_RECORDS[0].email,
-  password: FAKE_RECORDS[0].password,
-};
-
-let emptyRequest = {};
-let emptyResponse = {};
-
-let storedRecord: Partial<AuthenticationModel> | null = null;
-let jwtToken: string | null = null;
+const emptyRequest = {};
+const emptyResponse = {};
 
 const expect = chai.expect;
 chai.use(chaiHttp);
 
-describe('TESTING HTTP: /api/v1/authentication', () => {
+describe('e2e: /api/v1/authentication', () => {
   beforeEach(async () => {
-    await AuthenticationModel.query().delete();
-    storedRecord = null;
-    jwtToken = null;
+    await knex.migrate.rollback({ directory: 'dist/database/migrations' });
+    await knex.migrate.latest({ directory: 'dist/database/migrations' });
   });
 
   after(async () => {
-    await AuthenticationModel.query().delete();
+    await knex.migrate.rollback({ directory: 'dist/database/migrations' });
   });
 
   describe('GET: /', () => {
-    beforeEach(async () => {
-      await AuthenticationModel.query().insert(FAKE_RECORDS);
-    });
-
     it('it should handle server failure by returning an error', async () => {
       let errorReturn = null;
 
@@ -73,8 +59,6 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     });
 
     it('it should get an empty array if there are no records', async () => {
-      await AuthenticationModel.query().delete();
-
       const response = await chai
         .request(server)
         .get('/api/v1/authentication')
@@ -88,6 +72,8 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     });
 
     it('it should get all records in the database', async () => {
+      await AuthenticationModel.query().insert(FAKE_RECORDS);
+
       const response = await chai
         .request(server)
         .get('/api/v1/authentication')
@@ -102,11 +88,6 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
   });
 
   describe('GET: /:id', () => {
-    beforeEach(async () => {
-      const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
-      storedRecord = records[0];
-    });
-
     it('it should handle server failure by returning an error', async () => {
       let errorReturn = null;
 
@@ -122,6 +103,8 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     });
 
     it('it should return NOT FOUND if a record is does not exist', async () => {
+      await AuthenticationModel.query().insert(FAKE_RECORDS);
+
       const response = await chai
         .request(server)
         .get('/api/v1/authentication/0')
@@ -131,40 +114,34 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
       expect(response).to.have.property('body').be.empty;
     });
 
-    it('it should get user if found in the database', async () => {
+    it('it should get record if found in the database', async () => {
+      await AuthenticationModel.query().insert(FAKE_RECORDS);
+
       const response = await chai
         .request(server)
-        .get(`/api/v1/authentication/${storedRecord ? storedRecord.id : null}`)
+        .get('/api/v1/authentication/1')
         .set('content-type', 'application/json');
-
-      expect(storedRecord).to.be.an('object');
-
-      if (!storedRecord) {
-        return;
-      }
 
       expect(response).to.have.status(200);
       expect(response)
         .to.have.nested.property('body.id')
         .be.a('number')
-        .and.equal(storedRecord.id);
+        .and.equal(1);
       expect(response)
         .to.have.nested.property('body.authority_id')
         .be.a('number')
-        .and.equal(storedRecord.authority_id);
+        .and.equal(1);
       expect(response)
         .to.have.nested.property('body.email')
         .be.a('string')
-        .and.equal(storedRecord.email);
+        .and.equal('test@testing.com');
       expect(response).to.not.have.nested.property('password');
       expect(response)
         .to.have.nested.property('body.created_at')
-        .be.a('string')
-        .and.equal(storedRecord.created_at);
+        .be.a('string');
       expect(response)
         .to.have.nested.property('body.updated_at')
-        .be.a('string')
-        .and.equal(storedRecord.updated_at);
+        .be.a('string');
     });
   });
 
@@ -184,18 +161,11 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     });
 
     it('it should create a record if the data is valid', async () => {
-      const record = {
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        authority_id: 1,
-        email: 'johnsmith@example.com',
-        password: 'asdfasdf',
-      };
-
       const response = await chai
         .request(server)
         .post('/api/v1/authentication')
         .set('content-type', 'application/json')
-        .send(record);
+        .send(FAKE_RECORDS[0]);
 
       expect(response).to.have.status(201);
       expect(response)
@@ -203,14 +173,17 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
         .be.an('object');
       expect(response)
         .to.have.nested.property('body.authority_id')
-        .equal(record.authority_id);
+        .be.a('number')
+        .and.equal(1);
       expect(response)
         .to.have.nested.property('body.email')
-        .equal(record.email);
+        .be.a('string')
+        .and.equal('test@testing.com');
       expect(response).to.not.have.nested.property('body.password');
       expect(response)
         .to.have.nested.property('body.id')
-        .be.a('number');
+        .be.a('number')
+        .and.equal(1);
       expect(response)
         .to.have.nested.property('body.created_at')
         .be.a('string');
@@ -271,11 +244,6 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
   });
 
   describe('PUT: /:id', () => {
-    beforeEach(async () => {
-      const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
-      storedRecord = records[0];
-    });
-
     it('it should handle server failure by returning an error', async () => {
       let errorReturn = null;
 
@@ -291,18 +259,17 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     });
 
     it('it should update the record if the data is valid', async () => {
-      const record = {
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        authority_id: 5000,
-        email: 'newjohnsmith@example.com',
-        password: 'newPassword',
-      };
+      await AuthenticationModel.query().insert(FAKE_RECORDS);
 
       const response = await chai
         .request(server)
-        .put(`/api/v1/authentication/${storedRecord ? storedRecord.id : null}`)
+        .put('/api/v1/authentication/1')
         .set('content-type', 'application/json')
-        .send(record);
+        .send({
+          authority_id: 5000, // eslint-disable-line @typescript-eslint/camelcase
+          email: 'updated@testing.com',
+          password: 'newPassword',
+        });
 
       expect(response).to.have.status(200);
       expect(response)
@@ -310,14 +277,17 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
         .be.an('object');
       expect(response)
         .to.have.nested.property('body.authority_id')
-        .equal(record.authority_id);
+        .be.a('number')
+        .and.equal(5000);
       expect(response)
         .to.have.nested.property('body.email')
-        .equal(record.email);
+        .be.a('string')
+        .and.equal('updated@testing.com');
       expect(response).to.not.have.nested.property('password');
       expect(response)
         .to.have.nested.property('body.id')
-        .be.a('number');
+        .be.a('number')
+        .and.equal(1);
       expect(response)
         .to.have.nested.property('body.created_at')
         .be.a('string');
@@ -327,9 +297,11 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     });
 
     it('it should fail if no data is provided', async () => {
+      await AuthenticationModel.query().insert(FAKE_RECORDS);
+
       const response = await chai
         .request(server)
-        .put(`/api/v1/authentication/${storedRecord ? storedRecord.id : null}`)
+        .put('/api/v1/authentication/1')
         .set('content-type', 'application/json');
 
       expect(response).to.have.status(400);
@@ -378,11 +350,6 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
   });
 
   describe('PATCH: /:id', () => {
-    beforeEach(async () => {
-      const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
-      storedRecord = records[0];
-    });
-
     it('it should handle server failure by returning an error', async () => {
       let errorReturn = null;
 
@@ -398,22 +365,15 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     });
 
     it('it should update the record if the data is valid', async () => {
-      const record = {
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        authority_id: 5000,
-      };
+      await AuthenticationModel.query().insert(FAKE_RECORDS);
 
       const response = await chai
         .request(server)
-        .patch(`/api/v1/authentication/${storedRecord ? storedRecord.id : null}`)
+        .patch('/api/v1/authentication/1')
         .set('content-type', 'application/json')
-        .send(record);
-
-      expect(storedRecord).to.be.an('object');
-
-      if (!storedRecord) {
-        return;
-      }
+        .send({
+          authority_id: 5000, // eslint-disable-line @typescript-eslint/camelcase
+        });
 
       expect(response).to.have.status(200);
       expect(response)
@@ -421,14 +381,17 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
         .be.an('object');
       expect(response)
         .to.have.nested.property('body.authority_id')
-        .equal(record.authority_id);
+        .be.a('number')
+        .and.equal(5000);
       expect(response)
         .to.have.nested.property('body.email')
-        .equal(storedRecord.email);
+        .be.a('string')
+        .and.equal('test@testing.com');
       expect(response).to.not.have.nested.property('password');
       expect(response)
         .to.have.nested.property('body.id')
-        .be.a('number');
+        .be.a('number')
+        .and.equal(1);
       expect(response)
         .to.have.nested.property('body.created_at')
         .be.a('string');
@@ -438,16 +401,12 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     });
 
     it('it should succeed even if no data is provided', async () => {
+      await AuthenticationModel.query().insert(FAKE_RECORDS);
+
       const response = await chai
         .request(server)
-        .patch(`/api/v1/authentication/${storedRecord ? storedRecord.id : null}`)
+        .patch('/api/v1/authentication/1')
         .set('content-type', 'application/json');
-
-      expect(storedRecord).to.be.an('object');
-
-      if (!storedRecord) {
-        return;
-      }
 
       expect(response).to.have.status(200);
       expect(response)
@@ -455,14 +414,17 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
         .be.an('object');
       expect(response)
         .to.have.nested.property('body.authority_id')
-        .equal(storedRecord.authority_id);
+        .be.a('number')
+        .and.equal(1);
       expect(response)
         .to.have.nested.property('body.email')
-        .equal(storedRecord.email);
+        .be.a('string')
+        .and.equal('test@testing.com');
       expect(response).to.not.have.nested.property('password');
       expect(response)
         .to.have.nested.property('body.id')
-        .be.a('number');
+        .be.a('number')
+        .and.equal(1);
       expect(response)
         .to.have.nested.property('body.created_at')
         .be.a('string');
@@ -473,11 +435,6 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
   });
 
   describe('DELETE: /:id', () => {
-    beforeEach(async () => {
-      const records = await AuthenticationModel.query().insert(FAKE_RECORDS);
-      storedRecord = records[0];
-    });
-
     it('it should handle server failure by returning an error', async () => {
       let errorReturn = null;
 
@@ -493,9 +450,11 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     });
 
     it('it should delete record if it exists', async () => {
+      await AuthenticationModel.query().insert(FAKE_RECORDS);
+
       const response = await chai
         .request(server)
-        .delete(`/api/v1/authentication/${storedRecord ? storedRecord.id : null}`)
+        .delete('/api/v1/authentication/1')
         .set('content-type', 'application/json');
 
       expect(response).to.have.status(200);
@@ -506,6 +465,8 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     });
 
     it('it should return NOT FOUND if the record does not exists', async () => {
+      await AuthenticationModel.query().insert(FAKE_RECORDS);
+
       const response = await chai
         .request(server)
         .delete('/api/v1/authentication/0')
@@ -551,8 +512,8 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
         .post('/api/v1/authentication/register')
         .set('content-type', 'application/json')
         .send({
-          email: FAKE_RECORDS[0].email,
-          password: FAKE_RECORDS[0].password,
+          email: 'test@testing.com',
+          password: 'password',
         });
 
       expect(response).to.have.status(201);
@@ -565,10 +526,9 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
         .post('/api/v1/authentication/register')
         .set('content-type', 'application/json')
         .send({
-          // eslint-disable-next-line @typescript-eslint/camelcase
-          authority_id: null,
-          email: FAKE_RECORDS[0].email,
-          password: FAKE_RECORDS[0].password,
+          authority_id: null, // eslint-disable-line @typescript-eslint/camelcase
+          email: 'test@testing.com',
+          password: 'password',
         });
 
       expect(response).to.have.status(201);
@@ -634,10 +594,6 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
   });
 
   describe('POST: /authenticate', () => {
-    beforeEach(async () => {
-      await AuthenticationModel.query().insert(FAKE_RECORDS);
-    });
-
     it('it should handle server failure by returning an error', async () => {
       let errorReturn = null;
 
@@ -653,11 +609,16 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     });
 
     it('it should authenticate if the credentials are valid', async () => {
+      await AuthenticationModel.query().insert(FAKE_RECORDS);
+
       const response = await chai
         .request(server)
         .post('/api/v1/authentication/authenticate')
         .set('content-type', 'application/json')
-        .send(FAKE_CREDENTIALS);
+        .send({
+          email: 'test@testing.com',
+          password: 'password',
+        });
 
       expect(response).to.have.status(200);
       expect(response)
@@ -666,11 +627,16 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     });
 
     it('it should return a valid JWT token', async () => {
+      await AuthenticationModel.query().insert(FAKE_RECORDS);
+
       const response = await chai
         .request(server)
         .post('/api/v1/authentication/authenticate')
         .set('content-type', 'application/json')
-        .send(FAKE_CREDENTIALS);
+        .send({
+          email: 'test@testing.com',
+          password: 'password',
+        });
 
       expect(response)
         .to.have.property('body')
@@ -698,7 +664,7 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
       expect(verifiedToken)
         .to.have.nested.property('data.authorityId')
         .be.a('number')
-        .and.equal(FAKE_RECORDS[0].authority_id);
+        .and.equal(1);
       expect(verifiedToken)
         .to.have.property('iat')
         .be.a('number');
@@ -708,13 +674,15 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     });
 
     it('it should fail if email is not found', async () => {
+      await AuthenticationModel.query().insert(FAKE_RECORDS);
+
       const response = await chai
         .request(server)
         .post('/api/v1/authentication/authenticate')
         .set('content-type', 'application/json')
         .send({
-          email: 'fakejohnsmith@example.com',
-          password: FAKE_CREDENTIALS.password,
+          email: 'fakeemail@testing.com',
+          password: 'password',
         });
 
       expect(response).to.have.status(401);
@@ -737,12 +705,14 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     });
 
     it('it should fail if password is incorrect', async () => {
+      await AuthenticationModel.query().insert(FAKE_RECORDS);
+
       const response = await chai
         .request(server)
         .post('/api/v1/authentication/authenticate')
         .set('content-type', 'application/json')
         .send({
-          email: FAKE_CREDENTIALS.email,
+          email: 'test@testing.com',
           password: 'wrongPassword',
         });
 
@@ -799,11 +769,6 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
   });
 
   describe('GET: /verify', () => {
-    beforeEach(async () => {
-      await AuthenticationModel.query().insert(FAKE_RECORDS);
-      jwtToken = await AuthenticationService.authenticate(FAKE_CREDENTIALS);
-    });
-
     it('it should handle server failure by returning an error', async () => {
       let errorReturn = null;
 
@@ -819,6 +784,12 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
     });
 
     it('it should return an authority object if JWT is valid', async () => {
+      await AuthenticationModel.query().insert(FAKE_RECORDS);
+      const jwtToken = await AuthenticationService.authenticate({
+        email: 'test@testing.com',
+        password: 'password',
+      });
+
       const response = await chai
         .request(server)
         .get('/api/v1/authentication/verify')
@@ -835,7 +806,7 @@ describe('TESTING HTTP: /api/v1/authentication', () => {
       expect(response)
         .to.have.nested.property('body.data.authorityId')
         .be.a('number')
-        .and.equal(FAKE_RECORDS[0].authority_id);
+        .and.equal(1);
       expect(response)
         .to.have.nested.property('body.iat')
         .be.a('number');

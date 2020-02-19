@@ -1,0 +1,50 @@
+'use strict';
+
+import bcrypt from 'bcrypt';
+
+import Service from '../Service';
+import PasswordResetModel from './Model';
+import AuthenticationService from '../Authentication/Service';
+import errorUtil from '../../utils/errors';
+
+export default {
+  ...Service(PasswordResetModel),
+
+  /**
+   * Sets a new password for an authority
+   */
+  reset: async (record: PasswordResetModel) => {
+    if (!record || !record.token || !record.email || !record.password) {
+      throw errorUtil.getInvalidArgumentError('password-reset');
+    }
+
+    const passwordResetRequest = await PasswordResetModel.query().findOne({
+      email: record.email,
+    });
+
+    if (
+      passwordResetRequest == null ||
+      passwordResetRequest.id == null ||
+      passwordResetRequest.token == null ||
+      !bcrypt.compareSync(record.token, passwordResetRequest.token)
+    ) {
+      throw errorUtil.getInvalidTokenError('Password reset token is invalid');
+    }
+
+    const filter = [
+      {
+        column: 'email',
+        value: passwordResetRequest.email,
+      },
+    ];
+
+    const authentications = await AuthenticationService.query({ filter: JSON.stringify(filter) });
+
+    // Password reset requests delete and update on cascade so it will always exist
+    await AuthenticationService.patch(authentications[0].id, {
+      password: record.password,
+    });
+
+    await PasswordResetModel.query().deleteById(passwordResetRequest.id);
+  },
+};

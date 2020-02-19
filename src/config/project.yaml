@@ -65,8 +65,8 @@ environment:
         comment: Running latest migrations
         params:
           - node_modules/.bin/knex
-          - --knexfile
-          - dist/database/knexfile.js
+          - --cwd
+          - dist/database
           - migrate:latest
       migrateRollback:
         comment: Rollback of last migration
@@ -87,6 +87,11 @@ environment:
         params:
           - yarn
           - node:test
+      runTestsWithCoverage:
+        comment: Running tests inside docker container
+        params:
+          - yarn
+          - node:test:coverage
       runApp:
         comment: Running app in docker container
         params:

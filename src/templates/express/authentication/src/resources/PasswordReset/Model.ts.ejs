@@ -1,0 +1,97 @@
+'use strict';
+
+import Joi from '@hapi/joi';
+import crypto from 'crypto';
+import bcrypt from 'bcrypt';
+
+import Model from '../Model';
+import AuthenticationModel from '../Authentication/Model';
+
+/**
+ * This represents a password reset model
+ */
+export default class PasswordReset extends Model {
+  public id?: number;
+  public email?: string;
+  public token?: string;
+  public password?: string;
+
+  // Name of database table for this model
+  public static get tableName() {
+    return 'password_resets';
+  }
+
+  public static get joiEmailValidation() {
+    return Joi.string()
+      .min(5)
+      .max(250)
+      .email();
+  }
+
+  public static get joiTokenValidation() {
+    return Joi.string().max(30);
+  }
+
+  // Create token for password reset
+  public $beforeInsert() {
+    super.$beforeInsert();
+
+    this.token = bcrypt.hashSync(this.token, 10);
+  }
+
+  // Gets the joi schema for requesting password reset
+  public static get joiSchema() {
+    return Joi.object().keys({
+      email: this.joiEmailValidation.required(),
+    });
+  }
+
+  // Gets the joi schema for update route validation
+  public static get joiPatchSchema() {
+    return Joi.object().keys({
+      email: this.joiEmailValidation.optional(),
+    });
+  }
+
+  // Gets the joi schema for resetting password
+  public static get joiResetSchema() {
+    return Joi.object().keys({
+      email: this.joiEmailValidation.required(),
+      token: this.joiTokenValidation.required(),
+      password: AuthenticationModel.joiPasswordValidation.required(),
+    });
+  }
+
+  // Optional schema against which the JSON is validated
+  public static get jsonSchema() {
+    return {
+      // Type for this model
+      type: 'object',
+
+      // Required fields
+      required: ['email'],
+
+      // Property validation when creating the object
+      properties: {
+        /* eslint-disable @typescript-eslint/camelcase */
+        email: {
+          type: 'string',
+          minLength: 5,
+          maxLength: 250,
+        },
+        token: {
+          type: 'string',
+          maxLength: 60,
+          default: crypto.randomBytes(30).toString('hex'),
+        },
+        created_at: {
+          type: 'string',
+        },
+        updated_at: {
+          type: 'string',
+        },
+        /* eslint-enable @typescript-eslint/camelcase */
+      },
+    };
+  }
+}

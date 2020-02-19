@@ -5,41 +5,47 @@ import bcrypt from 'bcrypt';
 
 import AuthenticationModel from '../../../../resources/Authentication/Model';
 
-const FAKE_RECORD = {
-  authority_id: 1, // eslint-disable-line @typescript-eslint/camelcase
-  email: 'test@example.com',
-  password: 'testPassword',
-};
-
 const expect = chai.expect;
 
-describe('TESTING: Authentication Model', () => {
+describe('UNIT: Authentication Model', () => {
   it('it should encrypt the password before inserting', async () => {
-    const model = await AuthenticationModel.fromJson(FAKE_RECORD);
+    const model = await AuthenticationModel.fromJson({
+      authority_id: 1, // eslint-disable-line @typescript-eslint/camelcase
+      email: 'test@testing.com',
+      password: 'password',
+    });
 
     model.$beforeInsert();
 
     expect(model)
       .to.have.property('password')
       .be.a('string')
-      .and.not.equal(FAKE_RECORD.password);
-    expect(bcrypt.compareSync(FAKE_RECORD.password, model.password as string)).to.equal(true);
+      .and.not.equal('password');
+    expect(bcrypt.compareSync('password', model.password as string)).to.equal(true);
   });
 
   it('it should encrypt the password before updating if it exists', async () => {
-    const model = await AuthenticationModel.fromJson(FAKE_RECORD);
+    const model = await AuthenticationModel.fromJson({
+      authority_id: 1, // eslint-disable-line @typescript-eslint/camelcase
+      email: 'test@testing.com',
+      password: 'password',
+    });
 
     model.$beforeUpdate();
 
     expect(model)
       .to.have.property('password')
       .be.a('string')
-      .and.not.equal(FAKE_RECORD.password);
-    expect(bcrypt.compareSync(FAKE_RECORD.password, model.password as string)).to.equal(true);
+      .and.not.equal('password');
+    expect(bcrypt.compareSync('password', model.password as string)).to.equal(true);
   });
 
   it('it should ignore the password encryption before updating if it does not exist', async () => {
-    const model = await AuthenticationModel.fromJson(FAKE_RECORD);
+    const model = await AuthenticationModel.fromJson({
+      authority_id: 1, // eslint-disable-line @typescript-eslint/camelcase
+      email: 'test@testing.com',
+      password: 'password',
+    });
 
     delete model.password;
 
@@ -49,7 +55,11 @@ describe('TESTING: Authentication Model', () => {
   });
 
   it('it should not return the password when formatting as json', async () => {
-    const model = await AuthenticationModel.fromJson(FAKE_RECORD);
+    const model = await AuthenticationModel.fromJson({
+      authority_id: 1, // eslint-disable-line @typescript-eslint/camelcase
+      email: 'test@testing.com',
+      password: 'password',
+    });
 
     expect(model.toJSON()).to.not.have.property('password');
   });

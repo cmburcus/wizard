@@ -1,0 +1,194 @@
+'use strict';
+
+import AuthenticationModel from '../../../resources/Authentication/Model';
+
+export default {
+  register: [
+    {
+      message: 'it should fail if authority_id is empty',
+      record: {
+        authority_id: '', // eslint-disable-line @typescript-eslint/camelcase
+        email: 'test@testing.com',
+        password: 'password',
+      },
+    },
+    {
+      message: 'it should fail if authority_id is not a number',
+      record: {
+        authority_id: '1a', // eslint-disable-line @typescript-eslint/camelcase
+        email: 'test@testing.com',
+        password: 'password',
+      },
+    },
+    {
+      message: 'it should fail if authority_id is not a negative number',
+      record: {
+        authority_id: -1, // eslint-disable-line @typescript-eslint/camelcase
+        email: 'test@testing.com',
+        password: 'password',
+      },
+    },
+    {
+      message: 'it should fail if authority_id is not unique',
+      record: {
+        authority_id: 1, // eslint-disable-line @typescript-eslint/camelcase
+        email: 'test2@testing.com',
+        password: 'password',
+      },
+      prerequesite: async () => {
+        await AuthenticationModel.query().insert({
+          authority_id: 1, // eslint-disable-line @typescript-eslint/camelcase
+          email: 'test@testing.com',
+          password: 'password',
+        });
+      },
+    },
+    {
+      message: 'it should fail if no data is provided',
+    },
+    {
+      message: 'it should fail if email is not provided',
+      record: {
+        authority_id: 1, // eslint-disable-line @typescript-eslint/camelcase
+        password: 'password',
+      },
+    },
+    {
+      message: 'it should fail if email is null',
+      record: {
+        authority_id: 1, // eslint-disable-line @typescript-eslint/camelcase
+        email: null,
+        password: 'password',
+      },
+    },
+    {
+      message: 'it should fail if email is empty',
+      record: {
+        authority_id: 1, // eslint-disable-line @typescript-eslint/camelcase
+        email: '',
+        password: 'password',
+      },
+    },
+    {
+      message: 'it should fail if email is not a string',
+      record: {
+        authority_id: 1, // eslint-disable-line @typescript-eslint/camelcase
+        email: 12345,
+        password: 'password',
+      },
+    },
+    {
+      message: 'it should fail if email is less than 5 characters',
+      record: {
+        authority_id: 1, // eslint-disable-line @typescript-eslint/camelcase
+        email: 'a@b.',
+        password: 'password',
+      },
+    },
+    {
+      message: 'it should fail if email is longer than 250 characters',
+      record: {
+        authority_id: 1, // eslint-disable-line @typescript-eslint/camelcase
+        email:
+          'abcdefghijklmnopqrstuvwzabcdefghijklmnopqrstuvwzababcdefghijklmnopqrstuvwzabcdefghijklmnopqrstuvwzababcdefghijklmnopqrstuvwzabcdefghijklmnopqrstuvwzababcdefghijklmnopqrstuvwzabcdefghijklmnopqrstuvwzababcdefghijklmnopqrstuvwzabcdefghijklmnopqrstu@w.com',
+        password: 'password',
+      },
+    },
+    {
+      message: 'it should fail if email does not have the @ sign',
+      record: {
+        authority_id: 1, // eslint-disable-line @typescript-eslint/camelcase
+        email: 'test.com',
+        password: 'password',
+      },
+    },
+    {
+      message: 'it should fail if email does not have the .domain',
+      record: {
+        authority_id: 1, // eslint-disable-line @typescript-eslint/camelcase
+        email: 'test@testing.',
+        password: 'password',
+      },
+    },
+    {
+      message: 'it should fail if email is not an email format',
+      record: {
+        authority_id: 1, // eslint-disable-line @typescript-eslint/camelcase
+        email: 'test',
+        password: 'password',
+      },
+    },
+    {
+      message: 'it should fail if email is not unique',
+      record: {
+        authority_id: 1, // eslint-disable-line @typescript-eslint/camelcase
+        email: 'test@testing.com',
+        password: 'password',
+      },
+      prerequesite: async () => {
+        await AuthenticationModel.query().insert({
+          authority_id: 5000, // eslint-disable-line @typescript-eslint/camelcase
+          email: 'test@testing.com',
+          password: 'password',
+        });
+      },
+    },
+    {
+      message: 'it should fail if password is not provided',
+      record: {
+        authority_id: 1, // eslint-disable-line @typescript-eslint/camelcase
+        email: 'test@testing.com',
+      },
+    },
+    {
+      message: 'it should fail if password is null',
+      record: {
+        authority_id: 1, // eslint-disable-line @typescript-eslint/camelcase
+        email: 'test@testing.com',
+        password: null,
+      },
+    },
+    {
+      message: 'it should fail if password is empty',
+      record: {
+        authority_id: 1, // eslint-disable-line @typescript-eslint/camelcase
+        email: 'test@testing.com',
+        password: '',
+      },
+    },
+    {
+      message: 'it should fail if password is not a string',
+      record: {
+        authority_id: 1, // eslint-disable-line @typescript-eslint/camelcase
+        email: 'test@testing.com',
+        password: 1234567890,
+      },
+    },
+    {
+      message: 'it should fail if password is less than 8 characters',
+      record: {
+        authority_id: 1, // eslint-disable-line @typescript-eslint/camelcase
+        email: 'test@testing.com',
+        password: '1234567',
+      },
+    },
+  ],
+
+  authenticate: [
+    {
+      message: 'it should fail if no data is provided',
+    },
+    {
+      message: 'it should fail if email is not provided',
+      record: {
+        password: 'password',
+      },
+    },
+    {
+      message: 'it should fail if password is not provided',
+      record: {
+        email: 'test@testing.com',
+      },
+    },
+  ],
+};
